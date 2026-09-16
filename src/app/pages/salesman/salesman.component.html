@@ -1,0 +1,457 @@
+<div class="container-fluid px-0">
+  <div class="d-flex mb-4">
+    <button class="btn tab-btn me-2 px-3 py-2" *ngIf="positionId === 'Territory Manager'||'State Head'|| misstatus?.toLowerCase() === 'yes'||positionId === 'Dealer'||positionId === 'National Sales Head'"
+            [ngClass]="{ 'custom-btn': activeTab === 'list', 'btn-outline': activeTab !== 'list' }"
+            (click)="showList()" style="font-size:14px">
+      <i class="fa-solid fa-list me-2"></i>Salesman List
+    </button>
+    <button class="btn tab-btn me-2 px-3 py-2"
+            *ngIf="positionId === 'Territory Manager'|| misstatus?.toLowerCase() === 'yes'||positionId === 'Dealer'"
+            [ngClass]="{ 'custom-btn': activeTab === 'create'||activeTab === 'update',
+            'btn-outline': activeTab !== 'create' && activeTab !== 'update' }"
+            (click)="showCreate()" style="font-size:14px">
+      {{ activeTab === 'update' ? 'Update Salesman' : 'Add Salesman' }}
+    </button>
+    <button class="btn tab-btn px-3 py-2"
+            [ngClass]="{ 'custom-btn': activeTab === 'kyc', 'btn-outline': activeTab !== 'kyc' }"
+            *ngIf="positionId === 'Territory Manager'||misstatus?.toLowerCase() === 'yes'||positionId === 'Dealer'||positionId === 'National Sales Head'"
+            (click)="showKyc()" style="font-size:14px">
+      <i class="fa-solid fa-id-card me-2"></i>KYC Approval
+    </button>
+
+    <button class="text-white border-0 rounded me-2"
+            [ngClass]="{ 'custom-btn': activeTab === 'kyc', 'btn-outline': activeTab !== 'kyc' }"
+            style="background-color:#4796BD;padding:6px 16px;font-size:14px;margin-left:10px;"
+            (click)="exportToExcel()">
+      <i class="fas fa-download"></i>
+    </button>
+  </div>
+
+  <!-- Create / Update Form Section -->
+  <div *ngIf="(activeTab === 'create' || activeTab === 'update') && (positionId === 'Territory Manager'|| misstatus?.toLowerCase() === 'yes'||positionId === 'Dealer')" class="card shadow-sm rounded-3">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-lg-3 col-sm-6" *ngIf="showSH">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+              <option value="">Select State Head</option>
+              <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+            </select>
+            <label>State Head</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6" *ngIf="showAM">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+              <option value="">Select Area Manager</option>
+              <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+            </select>
+            <label>Area Manager</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6" *ngIf="showTM">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+              <option value="">Select Territory Manager</option>
+              <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+            </select>
+            <label>Territory Manager</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6" *ngIf="showDealer">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedDealer" name="dealer"
+                    [ngClass]="{'is-invalid': submitClicked && !selectedDealer}"
+                    [disabled]="activeTab==='update'">
+              <option value="">Select Dealer</option>
+              <option *ngFor="let dealer of dealersList" [value]="dealer.Name">{{ dealer.Name }}</option>
+            </select>
+            <label>Dealer</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="name" name="name" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !name}"
+                   [disabled]="activeTab==='update' && (ApprovalStatus === 'Approved'||ApprovalStatus === 'Approval Pending')">
+            <label>Salesman Name</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="mobile" name="mobile" maxlength="10"
+                   class="form-control" pattern="[0-9]{0,10}"
+                   (keypress)="allowNumbersOnly($event)"
+                   [ngClass]="{'is-invalid': submitClicked && (!mobile || !isMobileValid(mobile))}"
+                   [disabled]="activeTab==='update' && (ApprovalStatus === 'Approved'||ApprovalStatus === 'Approval Pending')">
+            <label>Mobile No</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="date" [(ngModel)]="dateofjoin" name="dateofjoin" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !dateofjoin}"
+                   [disabled]="activeTab==='update' && (ApprovalStatus === 'Approved'||ApprovalStatus === 'Approval Pending')">
+            <label>Date Of join</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="status" name="status" class="form-control"
+                    [ngClass]="{'is-invalid': submitClicked && !status}">
+              <option value="" disabled selected hidden></option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <label>Status</label>
+          </div>
+        </div>
+
+        <!--date of seperation-->
+        <div class="col-lg-3 col-sm-6" *ngIf="activeTab === 'update'">
+          <div class="form-floating-custom">
+            <input type="date" [(ngModel)]="dateofseperation" name="dateofseperation" class="form-control">
+            <label>Date Of Separation</label>
+          </div>
+        </div>
+        <!--
+          KYC field visibility rules:
+          - CREATE (activeTab==='create'): hamesha dikhao
+          - UPDATE (activeTab==='update'): sirf jab ApprovalStatus === 'Document Pending' ya 'Reject'
+        -->
+        <div class="col-lg-3 col-sm-6"
+             *ngIf="activeTab === 'create' || (activeTab === 'update' && (ApprovalStatus === 'Document Pending' || ApprovalStatus === 'Reject'))">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="kycstatus" name="kycstatus" class="form-control"
+                    [ngClass]="{'is-invalid': submitClicked && !kycstatus}"
+                    (change)="onKycStatusChange()">
+              <option value="" disabled selected hidden></option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            <label>Kyc</label>
+          </div>
+        </div>
+        <!-- File upload: sirf tab jab kycstatus === 'Yes' ho -->
+        <div class="col-lg-3 col-sm-6" *ngIf="kycdetail">
+          <div class="form-floating-custom">
+            <input type="file" name="file1" accept="application/pdf"
+                   class="form-control" (change)="onFileChange($event, 'file1')"
+                   [ngClass]="{'is-invalid': submitClicked && kycstatus === 'Yes' && !file1}" />
+            <label>Aadhar Card</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6" *ngIf="kycdetail">
+          <div class="form-floating-custom">
+            <input type="file" name="file2" accept="application/pdf"
+                   class="form-control" (change)="onFileChange($event, 'file2')"
+                   [ngClass]="{'is-invalid': submitClicked && kycstatus === 'Yes' && !file2}" />
+            <label>Cancelled Cheque</label>
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6" *ngIf="kycdetail">
+          <div class="form-floating-custom">
+            <input type="file" name="file3" accept="application/pdf"
+                   class="form-control" (change)="onFileChange($event, 'file3')"
+                   [ngClass]="{'is-invalid': submitClicked && kycstatus === 'Yes' && !file3}" />
+            <label>Pan Card</label>
+          </div>
+        </div>
+        <div class="col-auto pb-4">
+          <button class="btn custom-btn px-4 py-2" (click)="onSubmitSalesman()">
+            {{ activeTab === 'create' ? 'Submit' : 'Update' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salesman List Section -->
+  <div *ngIf="(activeTab === 'list')&& (positionId === 'Territory Manager'||'State Head'|| misstatus?.toLowerCase() === 'yes' ||positionId === 'Dealer'||positionId === 'National Sales Head')">
+    <div class="card shadow-sm rounded-3 p-4" *ngIf="!isDealer">
+      <div class="row g-3 align-items-end">
+        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" *ngIf="showSH">
+          <div class="form-floating-custom">
+            <select class="form-select" id="shSelect" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+              <option value="">Select State Head</option>
+              <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+            </select>
+            <label for="shSelect">State Head</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" *ngIf="showAM">
+          <div class="form-floating-custom">
+            <select class="form-select" id="amSelect" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+              <option value="">Select Area Manager</option>
+              <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+            </select>
+            <label for="amSelect">Area Manager</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" *ngIf="showTM">
+          <div class="form-floating-custom">
+            <select class="form-select" id="tmSelect" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+              <option value="">Select Territory Manager</option>
+              <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+            </select>
+            <label for="tmSelect">Territory Manager</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6" *ngIf="showDealer">
+          <div class="form-floating-custom">
+            <select class="form-select" id="dealerSelect" [(ngModel)]="selectedDealer">
+              <option value="">Select Dealer</option>
+              <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+            </select>
+            <label for="dealerSelect">Dealer</label>
+          </div>
+        </div>
+        <div class="col-auto align-self-start">
+          <button class="btn custom-btn" (click)="onShowReport()">
+            <i class="bi bi-clipboard-data me-1"></i> Show Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-3">
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1400px;">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px; width:10px">S.No.</th>
+            <th class="text-nowrap fw-normal" style="width:10px;" *ngIf="positionId !== 'National Sales Head'">Action</th>
+            <th class="text-nowrap fw-normal">Salesman Name</th>
+            <th class="text-nowrap fw-normal">Mobile Number</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">Kyc Status</th>
+            <th class="text-nowrap fw-normal">Aadhar Card</th>
+            <th class="text-nowrap fw-normal">Cancelled Cheque</th>
+            <th class="text-nowrap fw-normal">Pan Card</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Date Of Join</th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr *ngFor="let item of salesmanList; let i = index;">
+            <td>{{ i + 1 }}</td>
+            <td *ngIf="positionId !== 'National Sales Head'" class="text-center">
+              <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+                 style="font-size:14px" title="Update Salesman" (click)="onRowClick(item)"></i>
+            </td>
+            <td class="text-nowrap">{{ item.SalesmanName }}</td>
+            <td class="text-nowrap">{{ item.MobileNo }}</td>
+            <td class="text-nowrap">{{ item.DealerCode }}</td>
+            <td class="text-nowrap">{{ item.DealerName }}</td>
+            <td class="text-nowrap">
+              <span class="kyc-badge"
+                    [ngClass]="{
+                  'badge-approved': item.ApprovalSataus === 'Approved',
+                  'badge-pending': item.ApprovalSataus === 'Document Pending' || item.ApprovalSataus === 'Pending',
+                  'badge-rejected': item.ApprovalSataus === 'Approval Pending' || item.ApprovalSataus === 'Approval Pending'
+                }">
+                {{ item.ApprovalSataus }}
+              </span>
+            </td>
+            <!-- Document 1 -->
+            <td class="text-nowrap">
+              <a *ngIf="item.file1" [href]="item.file1" target="_blank" class="pdf-doc-btn" title="View Document 1">
+                <i class="fa-regular fa-file-pdf"></i>
+              </a>
+              <span *ngIf="!item.file1" class="text-muted">—</span>
+            </td>
+            <!-- Document 2 -->
+            <td class="text-nowrap">
+              <a *ngIf="item.file2" [href]="item.file2" target="_blank" class="pdf-doc-btn" title="View Document 2">
+                <i class="fa-regular fa-file-pdf"></i>
+              </a>
+              <span *ngIf="!item.file2" class="text-muted">—</span>
+            </td>
+            <!-- Document 3 -->
+            <td class="text-nowrap">
+              <a *ngIf="item.file3" [href]="item.file3" target="_blank" class="pdf-doc-btn" title="View Document 3">
+                <i class="fa-regular fa-file-pdf"></i>
+              </a>
+              <span *ngIf="!item.file3" class="text-muted">—</span>
+            </td>
+            <td class="text-nowrap">  {{ item.dateofjoin? (item.dateofjoin | date:'dd-MMM-yyyy') : '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KYC Approval Section -->
+  <div *ngIf="activeTab === 'kyc'">
+
+
+
+    <div class="col-xl-3 col-lg-4 col-md-6">
+      <label class="form-label fw-medium mb-0" style="margin-left:10px">
+        Status Name
+      </label>
+      <select class="form-select"
+              [(ngModel)]="selectedStatus"
+              name="status"
+              (change)="onStatusChange()">
+        <option value="">-- All Status --</option>
+        <option value="1">Approved</option>
+        <option value="0">Pending</option>
+        <option value="-1">Rejected</option>
+      
+      </select>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-3">
+      <table class="table table-bordered table-striped" style="min-width: 1300px;">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th class="text-nowrap fw-normal" style="width:10px; border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Salesman Name</th>
+            <th class="text-nowrap fw-normal">Mobile No</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Last Reviewed By</th>
+            <th class="text-nowrap fw-normal">Pending On</th>
+            <th class="text-nowrap fw-normal">Status</th>
+            <th class="text-nowrap fw-normal">Remark</th>
+            <th class="text-nowrap fw-normal">Aadhar Card</th>
+            <th class="text-nowrap fw-normal">Cancelled Cheque</th>
+            <th class="text-nowrap fw-normal">Pan Card</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Action</th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <ng-container *ngIf="kycList.length > 0; else noKycData">
+            <tr *ngFor="let item of kycList; let i = index;">
+              <td>{{ i + 1 }}</td>
+              <td class="text-nowrap">{{ item.salesmanname }}</td>
+              <td class="text-nowrap">{{ item.mobileno }}</td>
+              <td class="text-nowrap">{{ item.dealercode }}</td>
+              <td class="text-nowrap">{{ item.lastreviewedname ?? '—' }}</td>
+              <td class="text-nowrap">{{ item.pendingon ?? '—' }}</td>
+              <td class="text-nowrap">
+                <span class="kyc-badge"
+                      [ngClass]="{
+                    'badge-approved': item.iscommited === 1,
+                    'badge-pending': item.iscommited === 0,
+                    'badge-rejected': item.iscommited === -1
+                  }">
+                  {{
+                    item.iscommited === 0 ? 'Pending' :
+                    item.iscommited === 1 ? 'Approved' :
+                    item.iscommited === -1 ? 'Rejected' : '—'
+                  }}
+                </span>
+              </td>
+              <td class="text-nowrap">
+                <span class="kyc-badge"
+                      [ngClass]="{
+          'badge-rejected': item.iscommited === -1
+        }">
+                  {{ item.Remark ? item.Remark : '-' }}
+                </span>
+              </td>
+              <!-- Document 1 -->
+              <td class="text-nowrap">
+                <a *ngIf="item.file1" [href]="item.file1" target="_blank" class="pdf-doc-btn" title="View Document 1">
+                  <i class="fa-regular fa-file-pdf"></i>
+                </a>
+                <span *ngIf="!item.file1" class="text-muted">—</span>
+              </td>
+              <!-- Document 2 -->
+              <td class="text-nowrap">
+                <a *ngIf="item.file2" [href]="item.file2" target="_blank" class="pdf-doc-btn" title="View Document 2">
+                  <i class="fa-regular fa-file-pdf"></i>
+                </a>
+                <span *ngIf="!item.file2" class="text-muted">—</span>
+              </td>
+              <!-- Document 3 -->
+              <td class="text-nowrap">
+                <a *ngIf="item.file3" [href]="item.file3" target="_blank" class="pdf-doc-btn" title="View Document 3">
+                  <i class="fa-regular fa-file-pdf"></i>
+                </a>
+                <span *ngIf="!item.file3" class="text-muted">—</span>
+              </td>
+              <!-- Action -->
+              <td class="text-nowrap" *ngIf="item.pendingonposition === positionId">
+                <button class="kyc-approve-btn me-1"
+                        title="Approve"
+                        (click)="onKycAction(item, 'Approved')">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button class="kyc-reject-btn"
+                        title="Reject"
+                        (click)="openRejectModal(item)">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+              </td>
+              <td class="text-nowrap" *ngIf="item.pendingonposition !== positionId">—</td>
+            </tr>
+          </ng-container>
+          <ng-template #noKycData>
+            <tr>
+              <td colspan="12" class="text-center text-muted py-3" style="font-size:13px;">
+                No pending KYC records found.
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Reject Remark Modal -->
+<div class="modal-backdrop-custom" *ngIf="showRejectModal" (click)="closeRejectModal()"></div>
+
+<div class="reject-modal-wrap" *ngIf="showRejectModal">
+  <div class="reject-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="reject-modal-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="reject-icon-circle">
+          <i class="fa-solid fa-xmark"></i>
+        </span>
+        <span class="reject-modal-title">Reject KYC</span>
+      </div>
+      <button class="reject-close-btn" (click)="closeRejectModal()" title="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="reject-modal-body">
+      <p class="reject-salesman-name">
+        <i class="fa-solid fa-user me-1" style="color:#215378"></i>
+        {{ rejectTargetItem?.salesmanname }}
+        <span class="reject-dealer-code">· {{ rejectTargetItem?.dealercode }}</span>
+      </p>
+
+      <label class="reject-label">
+        Remark <span style="color:#dc3545">*</span>
+        <span class="remark-counter" [ngClass]="{'remark-counter-warn': remarkWordCount > 90}">
+          {{ remarkWordCount }} / 100 words
+        </span>
+      </label>
+      <textarea class="reject-textarea"
+                [(ngModel)]="rejectRemark"
+                (input)="onRemarkInput()"
+                placeholder="Enter reason for rejection..."
+                rows="4"
+                [ngClass]="{'reject-textarea-error': rejectSubmitClicked && !remarkHasContent}"></textarea>
+      <span class="reject-error-msg" *ngIf="rejectSubmitClicked && !remarkHasContent">
+        Remark is required.
+      </span>
+    </div>
+
+    <!-- Footer -->
+    <div class="reject-modal-footer">
+      <button class="reject-cancel-btn" (click)="closeRejectModal()">Cancel</button>
+      <button class="reject-confirm-btn" (click)="confirmReject()">
+        <i class="fa-solid fa-xmark me-1"></i> Confirm Reject
+      </button>
+    </div>
+
+  </div>
+</div>

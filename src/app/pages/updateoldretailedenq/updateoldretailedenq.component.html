@@ -1,0 +1,732 @@
+<div class="container-fluid px-0">
+
+  <!-- ═══ FILTER SECTION ═══ -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row g-3 align-items-end mb-3">
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
+        <label class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let sh of stateHead" [value]="sh.Mail">{{ sh.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showAM">
+        <label class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
+        <label class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDealer">
+        <label class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedDealer">
+          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 align-self-end">
+        <button class="btn custom-btn" (click)="onShowReport()">
+          <i class="bi bi-clipboard-data"></i>
+          <span>Filter</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SEARCH BAR ═══ -->
+  <div class="search-wrapper mt-4">
+    <div class="input-group custom-search-group">
+      <span class="input-group-text bg-white border-0">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      </span>
+      <input type="text" class="form-control border-0 shadow-none"
+             placeholder="Search by SAP, chassis no. or mobile"
+             [(ngModel)]="globalFilter">
+      <button class="btn search-btn text-white" type="button" (click)="searchFilter()">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ TABLE ═══ -->
+  <div class="table-responsive mt-4 enquiry-table-wrapper">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1300px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">Mobile</th>
+          <th class="text-nowrap fw-normal">SAP</th>
+          <th class="text-nowrap fw-normal">Customer Name</th>
+          <th class="text-nowrap fw-normal">Model Name</th>
+          <th class="text-nowrap fw-normal">Drive Type</th>
+          <th class="text-nowrap fw-normal">Delivery Date</th>
+          <th class="text-nowrap fw-normal">Chassis No</th>
+          <th class="text-nowrap fw-normal">Payment Mode</th>
+          <th class="text-nowrap fw-normal">Final SP</th>
+          <th class="text-nowrap fw-normal">DP Amount</th>
+          <th class="text-nowrap fw-normal">Ageing of Advance</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;">Financer</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of paginatedEnquiryList; let i = index;" style="cursor: pointer;">
+          <td class="text-nowrap">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-center">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+               style="font-size: 14px;"
+               title="Update Retailed Enquiry"
+               (click)="onRowClick(item)">
+            </i>
+          </td>
+          <td class="text-nowrap">{{ item.Mobile || 'VACANT' }}</td>
+          <td class="text-nowrap">{{ item.DealerCode }}</td>
+          <td class="text-nowrap">{{ item.CustomerName || 'VACANT' }}</td>
+          <td class="text-nowrap">{{ item.ModelName || '—' }}</td>
+          <td class="text-nowrap">{{ item.DriveType || '—' }}</td>
+          <td class="text-nowrap">{{ formatDisplayDate(item.DeliveryDate) }}</td>
+          <td class="text-nowrap">{{ item.ChassisNumber || '—' }}</td>
+          <td class="text-nowrap">{{ item.PaymentMode || '—' }}</td>
+          <td class="text-nowrap">
+            <i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size: 11px;"></i>
+            {{ item.FinalSellingPrice ? (item.FinalSellingPrice | number) : '—' }}
+          </td>
+          <td class="text-nowrap">
+            <i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size: 11px;"></i>
+            {{ item.DpAmount ? (item.DpAmount | number) : '—' }}
+          </td>
+          <td class="text-nowrap">{{ item.AgeingofAdvance ? item.AgeingofAdvance + ' Days' : '—' }}</td>
+          <td class="text-nowrap">{{ item.FinancerName || '—' }}</td>
+        </tr>
+
+        <!-- No Data Row -->
+        <tr *ngIf="!paginatedEnquiryList || paginatedEnquiryList.length === 0">
+          <td colspan="14" class="text-center py-4">
+            <div class="mb-2 d-flex justify-content-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width: 48px; height: 48px;
+                          background: linear-gradient(135deg, #4e73df, #1cc88a);
+                          color: white;">
+                <i class="fas fa-database fs-5"></i>
+              </div>
+            </div>
+            <h6 class="fw-normal mb-1" style="font-size: 15px; color: #2c3e50;">No Retailed Enquiries Found</h6>
+            <p class="mb-0 text-muted" style="font-size: 13px;">
+              There is currently no retailed enquiry data available. Try adjusting your filters.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ PAGINATION ═══ -->
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     MODAL — Update Retailed Enquiry
+══════════════════════════════════════════ -->
+<div class="modal fade" id="updateOldRetailedEnqModal" tabindex="-1"
+     aria-labelledby="updateOldRetailedEnqLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-0 shadow-lg">
+
+      <!-- Modal Header -->
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0" id="updateOldRetailedEnqLabel">
+            <i class="bi bi-pencil-square me-2"></i>Update Retailed Enquiry
+          </h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3"
+                style="font-size: 13px;" (click)="closeModal()"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+
+        <!-- ═══ TABS ═══ -->
+        <ul class="nav nav-tabs mb-3 d-flex gap-2" style="border-bottom: 1px solid #d6e8f3;">
+          <li class="nav-item">
+            <button class="nav-link"
+                    [style.background]="activeTab === 'retail' ? 'linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%)' : ''"
+                    [style.color]="activeTab === 'retail' ? '#fff' : 'black'"
+                    [style.border-radius]="'8px 8px 0 0'"
+                    (click)="setActiveTab('retail')"
+                    style="font-size: 13px;">
+              <i class="bi bi-receipt me-1"></i>Retail
+            </button>
+          </li>
+
+        </ul>
+
+        <!-- ══════════════════
+             RETAIL TAB
+        ══════════════════ -->
+        <div *ngIf="activeTab === 'retail'">
+          <div *ngIf="selectedItem">
+
+            <!-- ENQUIRY / CUSTOMER DETAILS (from updateoldenquiry) -->
+            <div class="customer-details-card mb-3">
+              <div class="card-header-custom mb-2">Customer / Prospect Details</div>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <div class="detail-label">Mobile</div>
+                  <div class="detail-value">{{ selectedItem.Mobile }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">SAP</div>
+                  <div class="detail-value">{{ selectedItem.DealerCode }}</div>
+                </div>
+    
+                <div class="detail-item">
+                  <div class="detail-label">Prospect Name</div>
+                  <div class="detail-value">{{ $any(selectedItem).CustomerName || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Prospect District</div>
+                  <div class="detail-value">{{ selectedItem.ProspectDistrict || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Prospect Tehsil</div>
+                  <div class="detail-value">{{ $any(selectedItem).ProspectTehsil || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Prospect Village</div>
+                  <div class="detail-value">{{ selectedItem.ProspectVillage || '—' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Pin Code</div>
+                  <div class="detail-value">{{ $any(selectedItem).ProspectPinCode || '—' }}</div>
+                </div>
+                
+                <div class="detail-item">
+                  <div class="detail-label">Drive Type</div>
+                  <div class="detail-value">{{ selectedItem.DriveType }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">Model Name</div>
+                  <div class="detail-value">{{ selectedItem.ModelName }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">BOM Code</div>
+                  <div class="detail-value">{{ selectedItem.Modelcode }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fa-solid fa-calendar-days me-1 text-primary"></i>Delivery Date
+                  </div>
+                  <div class="detail-value">{{ formatDisplayDate(selectedItem.DeliveryDate) }}</div>
+                </div>
+
+                <div class="detail-item">
+                  <div class="detail-label">
+                    <i class="fa-solid fa-hashtag me-1 text-secondary"></i>Chassis Number
+                  </div>
+                  <div class="detail-value">{{ selectedItem.ChasisNo }}</div>
+                </div>
+
+               
+
+                <div class="detail-item" *ngIf="selectedItem?.IsRetailedSales === 'Yes'">
+                  <div class="detail-label">
+                    <i class="fa-solid fa-calendar-check me-1 text-success"></i>Retailed Date
+                  </div>
+                  <div class="detail-value">{{ formatDisplayDate(selectedItem!.retailedDate) }}</div>
+                </div>
+
+                <!-- Retail Status -->
+                <div class="detail-item">
+                  <div class="detail-label">Retail Status</div>
+                  <div class="detail-value d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkInStock"
+                             [checked]="selectedItem!.IsRetailedSales === 'Yes'"
+                             disabled />
+                      <label class="form-check-label" for="chkInStock">Retailed</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkSold"
+                             [checked]="selectedItem!.IsRetailedSales !== 'Yes'"
+                             disabled />
+                      <label class="form-check-label" for="chkSold">Not Retailed</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Exchange Stock Status -->
+                <div class="detail-item" *ngIf="retailForm.ProspectType === 'Exchange' && selectedItem!.ProspectType === 'Exchange'">
+                  <div class="detail-label">Exchange Stock Status</div>
+                  <div class="detail-value d-flex gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkInStock"
+                             [checked]="apiExchStSold !== 'Sold'"
+                             disabled />
+                      <label class="form-check-label" for="chkInStock">In Stock</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="chkSold"
+                             [checked]="apiExchStSold === 'Sold'"
+                             disabled />
+                      <label class="form-check-label" for="chkSold">Sold</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ═══════════════════════════════════
+                 EXCHANGE VEHICLE INFO
+                 (show only if ProspectType = Exchange)
+            ═══════════════════════════════════ -->
+            <div class="customer-details-card mb-3" *ngIf="retailForm.ProspectType === 'Exchange'">
+              <div class="card-header-custom mb-2">Exchange Details</div>
+              <div class="row g-3">
+
+                <!-- Make -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Make <span class="text-danger">*</span></label>
+                  <select class="form-select form-control-custom" [(ngModel)]="retailForm.ExchangeMake">
+                    <option value="">-- Select Make --</option>
+                    <option *ngFor="let m of exchangeMakeOptions" [value]="m">{{ m }}</option>
+                  </select>
+                  <input *ngIf="retailForm.ExchangeMake === 'OTHER'"
+                         type="text" class="form-control form-control-custom mt-2"
+                         placeholder="Enter make name"
+                         [(ngModel)]="customExchangeMake" />
+                  <div *ngIf="formErrors['ExchangeMake']" class="text-danger small mt-1">
+                    {{ formErrors['ExchangeMake'] }}
+                  </div>
+                </div>
+
+                <!-- Model -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Model <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-custom"
+                         placeholder="Enter model" [(ngModel)]="retailForm.ExchangeModel" />
+                  <div *ngIf="formErrors['ExchangeModel']" class="text-danger small mt-1">{{ formErrors['ExchangeModel'] }}</div>
+                </div>
+
+                <!-- HP Category -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Exc HP Category <span class="text-danger">*</span></label>
+                  <select class="form-select form-control-custom" [(ngModel)]="retailForm.ExchangeHpCategory">
+                    <option value="">-- Select --</option>
+                    <option *ngFor="let hp of exchangeHpCategories" [value]="hp">{{ hp }}</option>
+                  </select>
+                  <div *ngIf="formErrors['ExchangeHpCategory']" class="text-danger small mt-1">{{ formErrors['ExchangeHpCategory'] }}</div>
+                </div>
+
+                <!-- Mfg Year -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Mfg Year <span class="text-danger">*</span></label>
+                  <select class="form-select form-control-custom" [(ngModel)]="retailForm.ExchangeMfgYear">
+                    <option value="">-- Select Year --</option>
+                    <option *ngFor="let y of mfgYearOptions" [value]="y">{{ y }}</option>
+                  </select>
+                  <div *ngIf="formErrors['ExchangeMfgYear']" class="text-danger small mt-1">{{ formErrors['ExchangeMfgYear'] }}</div>
+                </div>
+
+                <!-- Mkt Value Exc Tr. -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Mkt Value Exc Tr. <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control form-control-custom"
+                         placeholder="Enter market value"
+                         [(ngModel)]="retailForm.MktExchTracAmt" min="0" />
+                  <div *ngIf="formErrors['MktExchTracAmt']" class="text-danger small mt-1">{{ formErrors['MktExchTracAmt'] }}</div>
+                </div>
+
+                <!-- Deal Price Exc Tr. -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Deal Price of Exc Tr. <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control form-control-custom"
+                         placeholder="Enter deal price"
+                         [(ngModel)]="retailForm.DealExchTracAmt" min="0"
+                         (ngModelChange)="calculateCustomerDues()" />
+                  <div *ngIf="formErrors['DealExchTracAmt']" class="text-danger small mt-1">{{ formErrors['DealExchTracAmt'] }}</div>
+                </div>
+
+                <!-- Exchange Gap Error -->
+                <div class="col-12"
+                     *ngIf="retailForm.ProspectType === 'Exchange'
+                            && retailForm.MktExchTracAmt
+                            && retailForm.DealExchTracAmt
+                            && formErrors['exchangeGap']">
+                  <div style="display: inline-flex; align-items: center; gap: 8px;
+                              background: #fff2f2; border: 1px solid #f5c6cb;
+                              border-radius: 8px; padding: 6px 14px;
+                              font-size: 11px; color: #842029;
+                              max-width: 100%; flex-wrap: wrap; word-break: break-word;">
+                    ⚠️ Difference between <strong>Mkt Value Exc Tr.</strong> &amp;
+                    <strong>Deal Price of Exc Tr.</strong> can't exceed <strong>₹ 1,00,000</strong>
+                  </div>
+                </div>
+
+                <!-- Customer Ask-Exc Tr. -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Customer Ask-Exc Tr.</label>
+                  <input type="number" class="form-control form-control-custom"
+                         [(ngModel)]="retailForm.CustomerAskExchTracAmt"
+                         style="background: #f8f9fa;" />
+                </div>
+
+                <!-- Exchange Stock Entry Type -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Exchange Stock Entry <span class="text-danger">*</span></label>
+                  <select class="form-select form-control-custom"
+                          [(ngModel)]="retailForm.exchangeStockEntry"
+                          (change)="onExchangeStockEntryTypeChange()">
+                    <option value="">-- Select --</option>
+                    <option value="Serial No">Serial No</option>
+                    <option value="Registration No">Registration No</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <div *ngIf="formErrors['exchangeStockEntry']" class="text-danger small mt-1">{{ formErrors['exchangeStockEntry'] }}</div>
+                </div>
+
+                <!-- Exchange Stock Entry Value -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="retailForm.exchangeStockEntry">
+                  <label class="form-label fw-medium mb-1">
+                    {{
+ retailForm.exchangeStockEntry === 'Serial No' ? 'Serial No'
+                       : retailForm.exchangeStockEntry === 'Registration No' ? 'Registration No'
+                       : 'Other Details'
+                    }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control form-control-custom"
+                         [placeholder]="retailForm.exchangeStockEntry === 'Serial No' ? 'Enter Serial No'
+                                        : retailForm.exchangeStockEntry === 'Registration No' ? 'Enter Registration No'
+                                        : 'Enter Other Details'"
+                         [(ngModel)]="retailForm.exchangeStockEntryValue" />
+                  <div *ngIf="formErrors['exchangeStockEntryValue']" class="text-danger small mt-1">{{ formErrors['exchangeStockEntryValue'] }}</div>
+                </div>
+
+              </div>
+            </div>
+            <!-- /Exchange Vehicle Info -->
+            <!-- ═══════════════════════════════════
+                 PAYMENT & FINANCE DETAILS
+            ═══════════════════════════════════ -->
+            <div class="customer-details-card">
+              <div class="card-header-custom mb-2">Payment &amp; Finance Details</div>
+              <div class="row g-3">
+
+                <!-- Selling Price-->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Final Sale Price <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control form-control-custom"
+                         placeholder="Enter amount"
+                         [(ngModel)]="retailForm.FinalSellingPrice"
+                         min="0"
+                         (ngModelChange)="calculateCustomerDues()" />
+                  <div *ngIf="formErrors['FinalSellingPrice']" class="text-danger small mt-1">{{ formErrors['FinalSellingPrice'] }}</div>
+                </div>
+
+                <!--DP Amount -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">DP Amount <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control form-control-custom"
+                         placeholder="Enter amount"
+                         [(ngModel)]="retailForm.DpAmount"
+                         min="0"
+                         (ngModelChange)="calculateCustomerDues()" />
+                  <div *ngIf="formErrors['DpAmount']" class="text-danger small mt-1">{{ formErrors['DpAmount'] }}</div>
+                </div>
+
+                <!-- Prospect Type -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Prospect Type <span class="text-danger">*</span></label>
+                  <select class="form-select form-control-custom"
+                          [(ngModel)]="retailForm.ProspectType"
+                          (change)="onProspectTypeChange()">
+                    <option value="">-- Select --</option>
+                    <option *ngFor="let pt of prospectTypeOptions" [value]="pt">{{ pt }}</option>
+                  </select>
+                  <div *ngIf="formErrors['ProspectType']" class="text-danger small mt-1">{{ formErrors['ProspectType'] }}</div>
+                </div>
+
+                <!-- Payment Type -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <label class="form-label fw-medium mb-1">Payment Type <span class="text-danger">*</span></label>
+                  <select class="form-select form-control-custom"
+                          [(ngModel)]="retailForm.PaymentMode"
+                          (change)="onPaymentModeChange()">
+                    <option value="">-- Select --</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Loan">Loan</option>
+                  </select>
+                  <div *ngIf="formErrors['PaymentMode']" class="text-danger small mt-1">{{ formErrors['PaymentMode'] }}</div>
+                </div>
+
+                <!-- Additional Payment -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  <!--*ngIf="retailForm.PaymentMode && (customerDues > 0 || retailForm.AdditionalPayment)"-->
+
+                  <label class="form-label fw-medium mb-1">Additional Payment</label>
+                  <input type="number" class="form-control form-control-custom"
+                         placeholder="Enter amount"
+                         [(ngModel)]="retailForm.AdditionalPayment"
+                         min="0"
+                         (ngModelChange)="calculateCustomerDues()" />
+                </div>
+
+                <!-- ── LOAN ONLY fields ── -->
+                <ng-container *ngIf="retailForm.PaymentMode === 'Loan'">
+
+                  <!-- Loan Amount -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <label class="form-label fw-medium mb-1">Loan Required <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control form-control-custom"
+                           placeholder="Min 6 digits"
+                           [(ngModel)]="retailForm.LoanAmount" min="100000"
+                           (ngModelChange)="calculateCustomerDues()" />
+                    <div *ngIf="formErrors['LoanAmount']" class="text-danger small mt-1">{{ formErrors['LoanAmount'] }}</div>
+                  </div>
+
+                  <!-- Financer Name -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <label class="form-label fw-medium mb-1">Financer Name <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom"
+                            [(ngModel)]="retailForm.FinancerName"
+                            (change)="onFinancerChange()">
+                      <option value="">-- Select --</option>
+                      <option value="MFSL">MFSL</option>
+                      <option value="LTF">LTF</option>
+                      <option value="HDFC">HDFC</option>
+                      <option value="ICICI">ICICI</option>
+                      <option value="KOTAK">KOTAK</option>
+                      <option value="AU">AU</option>
+                      <option value="YES">YES</option>
+                      <option value="OTHER">OTHER</option>
+                    </select>
+                    <input *ngIf="retailForm.FinancerName === 'OTHER'"
+                           type="text" class="form-control form-control-custom mt-2"
+                           placeholder="Enter financer name"
+                           [(ngModel)]="customFinancerName" />
+                    <div *ngIf="formErrors['FinancerName']" class="text-danger small mt-1">{{ formErrors['FinancerName'] }}</div>
+                  </div>
+
+                  <!-- Loan Type -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <label class="form-label fw-medium mb-1">Loan Type <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom" [(ngModel)]="retailForm.LoanType">
+                      <option value="">-- Select --</option>
+                      <option value="Normal">Normal</option>
+                      <option value="KYC">KYC</option>
+                    </select>
+                    <div *ngIf="formErrors['LoanType']" class="text-danger small mt-1">{{ formErrors['LoanType'] }}</div>
+                  </div>
+
+                  <!-- Finance Status -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <label class="form-label fw-medium mb-1">Finance Status <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom"
+                            [(ngModel)]="retailForm.FinanceStatus"
+                            (change)="onFinanceStatusChange()">
+                      <option value="">-- Select --</option>
+                      <option value="In-Process">In-Process</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Not Approved">Not Approved</option>
+                      <option value="Disbursed">Disbursed</option>
+                    </select>
+                    <div *ngIf="formErrors['FinanceStatus']" class="text-danger small mt-1">{{ formErrors['FinanceStatus'] }}</div>
+                  </div>
+
+                  <!-- Finance Sub Status — only In-Process -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showFinanceSubStatus">
+                    <label class="form-label fw-medium mb-1">Finance Sub Status <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom" [(ngModel)]="retailForm.FinanceSubStatus">
+                      <option value="">-- Select --</option>
+                      <option *ngFor="let sub of financeSubStatusOptions" [value]="sub">{{ sub }}</option>
+                    </select>
+                    <div *ngIf="formErrors['FinanceSubStatus']" class="text-danger small mt-1">{{ formErrors['FinanceSubStatus'] }}</div>
+                  </div>
+
+                  <!-- Disburse Amount — only Disbursed -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="retailForm.FinanceStatus === 'Disbursed'">
+                    <label class="form-label fw-medium mb-1">Disburse Amount <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control form-control-custom"
+                           placeholder="Min 6 digits"
+                           [(ngModel)]="retailForm.DisburseAmount"
+                           (ngModelChange)="calculateCustomerDues()"
+                           min="100000" />
+                    <div *ngIf="formErrors['DisburseAmount']" class="text-danger small mt-1">{{ formErrors['DisburseAmount'] }}</div>
+                  </div>
+
+                </ng-container>
+                <!-- /Loan only -->
+                <!-- Customer Dues — auto-calculated, readonly -->
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="retailForm.PaymentMode">
+                  <label class="form-label fw-medium mb-1">Customer Dues (Auto)</label>
+                  <input type="text" class="form-control form-control-custom"
+                         [value]="customerDues | number" readonly
+                         style="background: #f0f8ff; color: #4796BD;" />
+                </div>
+
+              </div>
+
+              <!-- ── LOAN gap indicator ── -->
+              <div class="mt-3" *ngIf="retailForm.PaymentMode === 'Loan'"
+                   [ngClass]="(retailForm.FinalSellingPrice - retailForm.DpAmount
+                               - (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                               - (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                               - (retailForm.FinanceStatus === 'Disbursed' ? (retailForm.DisburseAmount || 0) : 0)
+                               - (retailForm.bookingAmount || 0)) === 0
+                              ? 'alert alert-success py-2 px-3 small mb-0'
+                              : 'alert alert-info py-2 px-3 small mb-0'"
+                   style="font-size: 11px;">
+                <i class="bi bi-calculator me-1"></i>
+                DP (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.DpAmount | number }})
+                <ng-container *ngIf="retailForm.ProspectType === 'Exchange' && retailForm.DealExchTracAmt">
+                  + Deal Price (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.DealExchTracAmt | number }})
+                </ng-container>
+                <ng-container *ngIf="baseAdditionalCash + (retailForm.AdditionalPayment || 0) > 0">
+                  + Additional (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ baseAdditionalCash + (retailForm.AdditionalPayment || 0) | number }})
+                </ng-container>
+                <ng-container *ngIf="retailForm.FinanceStatus === 'Disbursed' && retailForm.DisburseAmount">
+                  + Disbursed (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.DisburseAmount | number }})
+                </ng-container>
+                <ng-container *ngIf="retailForm.bookingAmount && retailForm.bookingAmount > 0">
+                  + Booking (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.bookingAmount | number }})
+                </ng-container>
+                = <i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>
+                {{
+ (retailForm.DpAmount
+                    + (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                    + (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                    + (retailForm.FinanceStatus === 'Disbursed' ? (retailForm.DisburseAmount || 0) : 0)
+                    + (retailForm.bookingAmount || 0)) | number
+                }}
+                &nbsp;|&nbsp; Final Price :
+                <i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.FinalSellingPrice | number }}
+                &nbsp;|&nbsp; Gap :
+                <i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>
+                {{
+ (retailForm.FinalSellingPrice - retailForm.DpAmount
+                    - (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                    - (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                    - (retailForm.FinanceStatus === 'Disbursed' ? (retailForm.DisburseAmount || 0) : 0)
+                    - (retailForm.bookingAmount || 0)) | number
+                }}
+                <span *ngIf="(retailForm.FinalSellingPrice - retailForm.DpAmount
+                              - (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                              - (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                              - (retailForm.FinanceStatus === 'Disbursed' ? (retailForm.DisburseAmount || 0) : 0)
+                              - (retailForm.bookingAmount || 0)) === 0">
+                  <i class="fa-solid fa-circle-check ms-1 text-success"></i>
+                </span>
+              </div>
+
+              <!-- ── CASH dues indicator ── -->
+              <div class="mt-3" *ngIf="retailForm.PaymentMode === 'Cash'"
+                   [ngClass]="(retailForm.FinalSellingPrice - retailForm.DpAmount
+                               - (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                               - (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                               - (retailForm.bookingAmount || 0)) === 0
+                              ? 'alert alert-success py-2 px-3 small mb-0'
+                              : 'alert alert-info py-2 px-3 small mb-0'"
+                   style="font-size: 11px;">
+                <i class="bi bi-calculator me-1"></i>
+                DP (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.DpAmount | number }})
+                <ng-container *ngIf="retailForm.ProspectType === 'Exchange' && retailForm.DealExchTracAmt">
+                  + Deal Price (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.DealExchTracAmt | number }})
+                </ng-container>
+                <ng-container *ngIf="baseAdditionalCash + (retailForm.AdditionalPayment || 0) > 0">
+                  + Additional (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ baseAdditionalCash + (retailForm.AdditionalPayment || 0) | number }})
+                </ng-container>
+                <ng-container *ngIf="retailForm.bookingAmount && retailForm.bookingAmount > 0">
+                  + Booking (<i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.bookingAmount | number }})
+                </ng-container>
+                &nbsp;|&nbsp; Final Price :
+                <i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>{{ retailForm.FinalSellingPrice | number }}
+                &nbsp;|&nbsp; Gap :
+                <i class="fa-solid fa-indian-rupee-sign pe-1" style="font-size:10px"></i>
+                {{
+ (retailForm.FinalSellingPrice - retailForm.DpAmount
+                    - (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                    - (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                    - (retailForm.bookingAmount || 0)) | number
+                }}
+                <span *ngIf="(retailForm.FinalSellingPrice - retailForm.DpAmount
+                              - (retailForm.ProspectType === 'Exchange' ? (retailForm.DealExchTracAmt || 0) : 0)
+                              - (baseAdditionalCash + (retailForm.AdditionalPayment || 0))
+                              - (retailForm.bookingAmount || 0)) === 0">
+                  <i class="fa-solid fa-circle-check ms-1 text-success"></i>
+                </span>
+              </div>
+
+            </div>
+            <!-- /Payment & Finance Details -->
+
+          </div>
+        </div>
+        <!-- /RETAIL TAB -->
+        <!-- ══════════════════════════════
+             ADDITIONAL PAYMENT HISTORY TAB
+        ══════════════════════════════ -->
+        <div *ngIf="activeTab === 'history'">
+          <div class="table-responsive enquiry-table-wrapper mb-0">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr class="border-top-0"
+                    style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+                  <th class="text-nowrap fw-normal text-center" style="border-top-left-radius: 8px;">S.No.</th>
+                  <th class="text-nowrap fw-normal text-center">Amount</th>
+                  <th class="text-nowrap fw-normal text-center" style="border-top-right-radius: 8px;">Payment Date</th>
+                </tr>
+              </thead>
+              <tbody style="font-size: 14px;">
+                <tr *ngFor="let h of additionalHistoryList; let i = index;">
+                  <td class="text-nowrap text-center">{{ i + 1 }}</td>
+                  <td class="text-nowrap text-center">
+                    <i class="fa-solid fa-indian-rupee-sign me-1 text-success"></i>{{ h.RecAmount | number }}
+                  </td>
+                  <td class="text-nowrap text-center">{{ h.Date | date:'dd-MMM-yyyy' }}</td>
+                </tr>
+                <tr *ngIf="!additionalHistoryList || additionalHistoryList.length === 0">
+                  <td colspan="3" class="text-center py-4">
+                    <div class="d-flex flex-column align-items-center justify-content-center text-muted">
+                      <i class="fa-solid fa-database fa-2x mb-3 text-secondary fs-1"></i>
+                      <h6 class="mb-1 fw-normal" style="font-size: 14px;">No Payment History Available</h6>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- /HISTORY TAB -->
+
+      </div>
+      <!-- /Modal Body -->
+      <!-- Modal Footer — shown only on Retail tab -->
+      <div class="modal-footer pt-0 p-3 d-flex justify-content-center" *ngIf="activeTab === 'retail'">
+        <button type="button" class="btn btn-submit mt-3"
+                (click)="onSubmit()" [disabled]="isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1" role="status"></span>
+          <i *ngIf="!isSubmitting" class="bi bi-check-circle me-1"></i>
+          {{ isSubmitting ? 'Submitting...' : 'Update Enquiry' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,287 @@
+<div class="container-fluid px-0">
+  <!-- Tabs Navigation -->
+  <div class="d-flex gap-2 mt-3 mb-3">
+    <button (click)="switchTab('free-services')"
+            *ngIf="permission.dealerAccess()"
+            [style.background]="activeTab === 'free-services' ? '#4796BD' : '#fff'"
+            [style.color]="activeTab === 'free-services' ? 'white' : '#666'"
+            style="border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+      <i class="bi bi-tools me-1"></i>Free Services
+    </button>
+
+    <button (click)="switchTab('installations')"
+            *ngIf="permission.dealerAccess()"
+            [style.background]="activeTab === 'installations' ? '#4796BD' : '#fff'"
+            [style.color]="activeTab === 'installations' ? 'white' : '#666'"
+            style="border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+      <i class="bi bi-hammer me-1"></i>Installations
+    </button>
+
+    <button (click)="switchTab('generated')"
+            [style.background]="activeTab === 'generated' ? '#4796BD' : '#fff'"
+            [style.color]="activeTab === 'generated' ? 'white' : '#666'"
+            style="border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s;">
+      <i class="bi bi-file-earmark-pdf me-1"></i>Generated Invoices
+
+    </button>
+  </div>
+
+  <!-- FREE SERVICES TAB -->
+  <div *ngIf="activeTab === 'free-services'" class="mt-3">
+    <div class="enquiry-table-wrapper">
+      <div *ngIf="isLoadingFS" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <table *ngIf="!isLoadingFS" id="freeServiceTable" class="table table-bordered table-striped" style="min-width: 1300px;">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px; width: 40px;">
+              <input type="checkbox"
+                     (change)="onSelectAll($event, 'free-services')"
+                     [checked]="isAllSelected('free-services')" />
+            </th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">Chassis Number</th>
+            <th class="text-nowrap fw-normal">Service Date</th>
+            <th class="text-nowrap fw-normal">Job Card Type</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of freeServiceList" [class.table-active]="isSelected(item.Id, 'free-services')">
+            <td style="width: 40px;">
+              <input type="checkbox"
+                     [checked]="isSelected(item.Id, 'free-services')"
+                     (change)="onSelectRow($event, item.Id, 'free-services')" />
+            </td>
+            <td class="text-nowrap">
+              <span style="font-family: monospace; font-size: 12px; color: #4796BD;">{{ item.DealerCode }}</span>
+            </td>
+            <td class="text-nowrap">{{ item.DealerName }}</td>
+            <td class="text-nowrap">{{ item.ChassiNumber }}</td>
+            <td class="text-nowrap">{{ item.JobCardDate }}</td>
+            <td class="text-nowrap">{{ item.JobCardType }}</td>
+            <td class="text-nowrap">
+              <span class="badge" style="background: #4796BD; color: white; font-size: 11px;">Pending</span>
+            </td>
+          </tr>
+          <tr *ngIf="freeServiceList.length === 0 && !isLoadingFS">
+            <td colspan="7" class="text-center py-4">
+              <p style="color: #999; font-size: 14px;">No free services available</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-3" style="display: flex; gap: 1rem; align-items: center;">
+      <span style="font-size: 14px; color: #666;">
+        Selected: <strong>{{ getSelectedCount('free-services') }}</strong> rows
+      </span>
+      <button class="btn custom-btn px-4"
+              (click)="generateInvoice('free-services')"
+              [disabled]="getSelectedCount('free-services') === 0 || isGenerating"
+              style="font-size: 13px;">
+        <i class="bi bi-file-earmark-pdf me-1"></i>
+        <span *ngIf="isGenerating">Generating...</span>
+        <span *ngIf="!isGenerating">Generate Invoice</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- INSTALLATIONS TAB -->
+  <div *ngIf="activeTab === 'installations'" class="mt-3">
+    <div class="enquiry-table-wrapper">
+      <div *ngIf="isLoadingINST" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <table *ngIf="!isLoadingINST" id="installationTable" class="table table-bordered table-striped" style="min-width: 1300px;">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px; width: 40px;">
+              <input type="checkbox"
+                     (change)="onSelectAll($event, 'installations')"
+                     [checked]="isAllSelected('installations')" />
+            </th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">Chassis Number</th>
+            <th class="text-nowrap fw-normal">Installation Date</th>
+            <!--<th class="text-nowrap fw-normal">Model</th>-->
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of installationList" [class.table-active]="isSelected(item.Id, 'installations')">
+            <td style="width: 40px;">
+              <input type="checkbox"
+                     [checked]="isSelected(item.Id, 'installations')"
+                     (change)="onSelectRow($event, item.Id, 'installations')" />
+            </td>
+            <td class="text-nowrap">
+              <span style="font-family: monospace; font-size: 12px; color: #4796BD;">{{ item.DealerCode }}</span>
+            </td>
+            <td class="text-nowrap">{{ item.DealerName }}</td>
+            <td class="text-nowrap">{{ item.ChassisNo }}</td>
+            <td class="text-nowrap">{{ item.InstallationCompleteDate }}</td>
+            <!--<td class="text-nowrap">{{ item.Model }}</td>-->
+            <td class="text-nowrap">
+              <span class="badge" style="background: #4796BD; color: white; font-size: 11px;">Pending</span>
+            </td>
+          </tr>
+          <tr *ngIf="installationList.length === 0 && !isLoadingINST">
+            <td colspan="7" class="text-center py-4">
+              <p style="color: #999; font-size: 14px;">No installations available</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-3" style="display: flex; gap: 1rem; align-items: center;">
+      <span style="font-size: 14px; color: #666;">
+        Selected: <strong>{{ getSelectedCount('installations') }}</strong> rows
+      </span>
+      <button class="btn custom-btn px-4"
+              (click)="generateInvoice('installations')"
+              [disabled]="getSelectedCount('installations') === 0 || isGenerating"
+              style="font-size: 13px;">
+        <i class="bi bi-file-earmark-pdf me-1"></i>
+        <span *ngIf="isGenerating">Generating...</span>
+        <span *ngIf="!isGenerating">Generate Invoice</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- GENERATED INVOICES TAB -->
+  <div *ngIf="activeTab === 'generated'" class="mt-3">
+    <!-- FILTER SECTION -->
+    <div class="filter-section" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+
+        <!-- Duration Dropdown -->
+        <div>
+          <label style="font-size: 13px; color: #333; font-weight: 500; display: block; margin-bottom: 0.5rem;">
+            Duration
+          </label>
+          <select [(ngModel)]="selectedDuration"
+                  (change)="onDurationChange()"
+                  style="padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; min-width: 180px; background: white; cursor: pointer;">
+            <option value="This Month">This Month</option>
+            <option value="This Quarter">This Quarter</option>
+            <option value="Last Quarter">Last Quarter</option>
+            <option value="This FY">This Financial Year</option>
+            <option value="Custom">Custom Date Range</option>
+          </select>
+        </div>
+
+        <!-- Custom Dates (Sirf jab Custom select ho) -->
+        <ng-container *ngIf="selectedDuration === 'Custom'">
+          <div>
+            <label style="font-size: 13px; color: #333; font-weight: 500; display: block; margin-bottom: 0.5rem;">
+              Start Date
+            </label>
+            <input type="date"
+                   [(ngModel)]="customStartDate"
+                   style="padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+          </div>
+
+          <div>
+            <label style="font-size: 13px; color: #333; font-weight: 500; display: block; margin-bottom: 0.5rem;">
+              End Date
+            </label>
+            <input type="date"
+                   [(ngModel)]="customEndDate"
+                   style="padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+          </div>
+        </ng-container>
+
+        <!-- Apply Button -->
+        <button (click)="applyFilter()"
+                style="padding: 0.5rem 1.5rem; background: #4796BD; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;"
+                onmouseover="this.style.background='#2d5f8d'"
+                onmouseout="this.style.background='#4796BD'">
+          <i class="bi bi-funnel me-1"></i>Apply
+        </button>
+
+        <!-- Clear Button -->
+        <button (click)="clearFilter()"
+                style="padding: 0.5rem 1.5rem; background: #f0f0f0; color: #333; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;"
+                onmouseover="this.style.background='#e0e0e0'"
+                onmouseout="this.style.background='#f0f0f0'">
+          <i class="bi bi-x me-1"></i>Clear
+        </button>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper">
+      <table id="generatedInvoicesTable" class="table table-bordered table-striped" style="min-width: 1300px;">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">Sr No</th>
+            <th class="text-nowrap fw-normal">Invoice Number</th>
+            <th class="text-nowrap fw-normal">Type</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">Generated Date</th>
+            <th class="text-nowrap fw-normal">Amount</th>
+            <th class="text-nowrap fw-normal">Status</th>
+
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invoice of generatedInvoices; let i = index">
+            <td class="text-nowrap">
+              <span style="font-family: monospace; font-size: 12px; color: #4796BD;">{{ i+1 }}</span>
+            </td>
+            <td class="text-nowrap">{{ invoice.InvoiceNo }}</td>
+
+            <td class="text-nowrap">{{ invoice.ItemName }}</td>
+            <td class="text-nowrap">{{ invoice.DealerCode }}</td>
+            <td class="text-nowrap">{{ invoice.DealerName }}</td>
+            <td class="text-nowrap">{{ invoice.InvoiceDate }}</td>
+            <td class="text-nowrap">{{ invoice.TotalAmount }}</td>
+            <td class="text-nowrap">
+              <span class="badge" style="background: #4D963A; color: white; font-size: 11px;">{{ invoice.status }}</span>
+            </td>
+            <td class="text-nowrap">
+              <!-- Update Reimbursement Status -->
+              <button type="button"
+                      [disabled]="invoice.status === 'Paid'"
+                      class="btn btn-sm download-btn me-1"
+                      style="background-color: #607d8b;"
+                      title="Update Reimbursement Payment Status"
+                      (click)="updateReimbursementStatus(invoice.MasterId)">
+                <i class="bi bi-pencil"></i>
+              </button>
+
+              <!-- Download Invoice -->
+              <button type="button"
+                      class="btn btn-sm download-btn"
+                      title="Download Invoice"
+                      (click)="downloadInvoice(invoice.downloadUrl)">
+                <i class="bi bi-download"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="generatedInvoices.length === 0">
+            <td colspan="9" class="text-center py-5">
+              <p style="color: #999; font-size: 14px;">No invoices generated yet</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

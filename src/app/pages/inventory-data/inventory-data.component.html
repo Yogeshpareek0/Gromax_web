@@ -1,0 +1,323 @@
+<div class="container-fluid px-0" (click)="onDocumentClick($event)">
+
+  <!-- Top Filter Panel -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row">
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Duration</label>
+        <select class="form-select" [(ngModel)]="selectedFilter" (ngModelChange)="datefilterchange($event)">
+          <option value="Month">This Month</option>
+          <option value="Quarter">This Quarter</option>
+          <option value="Financial Year">This Financial Year</option>
+          <option value="Custom">Custom</option>
+          <option value="All">All Time</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+        <label class="form-label fw-medium mb-0">Start Date</label>
+        <input type="date" class="form-control" [(ngModel)]="startdate_val">
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+        <label class="form-label fw-medium mb-0">End Date</label>
+        <input type="date" class="form-control" [(ngModel)]="enddate_val">
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Stock Type</label>
+        <select class="form-select" [(ngModel)]="selectedType">
+          <option value="In Stock">In Stock</option>
+          <option value="Sold">Advance</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showSH">
+        <label class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showAM">
+        <label class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showTM">
+        <label class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showDealer">
+        <label class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select" [(ngModel)]="selectedDealer">
+          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+        </select>
+      </div>-->
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showStatename">
+        <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
+        <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
+          <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showLocation">
+        <label for="location" class="form-label fw-medium mb-0">Location</label>
+        <select class="form-select" [(ngModel)]="selectedLocation">
+          <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end">
+        <div class="d-flex gap-2">
+          <button class="btn custom-btn flex-fill py-2" (click)="onShowReport()">
+            <i class="bi bi-clipboard-data me-1"></i> Show Report
+          </button>
+          <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px" (click)="exportToExcel()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aging Cards -->
+    <div class="row g-3 mt-0">
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-xl-2_4 mb-3" (click)="onAgingClick('','')">
+        <div class="d-flex align-items-center justify-content-between"
+             [ngClass]="{'active-box': activeAging === '-'}"
+             style="border-radius:8px;padding:6px 16px;border:2px solid #4796BD;box-shadow:0 3px 0 #4796BD;color:#4796BD">
+          <div class="align-self-center">
+            <h6 class="fw-normal mb-1">Total Stock</h6>
+            <h6 class="fw-normal mb-0">{{ totalStockCount }}</h6>
+          </div>
+          <div style="background:#4796BD;border-radius:50%;padding:6px;">
+            <img src="assets/images/Total Sales.png" alt="sales" width="32" height="32" />
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-xl-2_4 mb-3" (click)="onAgingClick('0','120')">
+        <div class="text-center" style="border:2px solid #4796BD;padding:6px 16px;border-radius:8px;box-shadow:0 3px 0 #4796BD;" [ngClass]="{'active-box': activeAging === '0-120'}">
+          <h6 class="fw-normal mb-1" style="color:#4796BD">Aging</h6>
+          <h6 class="mb-0" style="color:#4796BD;font-size:13px">0-120 days</h6>
+          <small style="color:#4796BD;font-size:13px" class="fw-medium">Count : {{ aging30_90_Count }}</small>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-xl-2_4 mb-3" (click)="onAgingClick('121','180')">
+        <div class="text-center" style="border:2px solid #4796BD;padding:6px 16px;border-radius:8px;box-shadow:0 3px 0 #4796BD;" [ngClass]="{'active-box': activeAging === '121-180'}">
+          <h6 class="fw-normal mb-1" style="color:#4796BD">Aging</h6>
+          <h6 class="mb-0" style="color:#4796BD;font-size:13px">121-180 days</h6>
+          <small style="color:#4796BD;font-size:13px" class="fw-medium">Count : {{ aging90_180_Count }}</small>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-xl-2_4 mb-3" (click)="onAgingClick('181','364')">
+        <div class="text-center" style="border:2px solid #4796BD;padding:6px 16px;border-radius:8px;box-shadow:0 3px 0 #4796BD;" [ngClass]="{'active-box': activeAging === '181-364'}">
+          <h6 class="fw-normal mb-1" style="color:#4796BD">Aging</h6>
+          <h6 class="mb-0" style="color:#4796BD;font-size:13px">181-364 days</h6>
+          <small style="color:#4796BD;font-size:13px" class="fw-medium">Count : {{ aging180_364_Count }}</small>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-xl-2_4 mb-3" (click)="onAgingClick('365','')">
+        <div class="text-center" style="border:2px solid #4796BD;padding:6px 16px;border-radius:10px;box-shadow:0 3px 0 #4796BD;" [ngClass]="{'active-box': activeAging === '365-'}">
+          <h6 class="fw-normal mb-1" style="color:#4796BD">Aging</h6>
+          <h6 class="mb-0" style="color:#4796BD;font-size:13px">365 Days and More</h6>
+          <small style="color:#4796BD;font-size:13px" class="fw-medium">Count : {{ aging365Plus_Count }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+    <div class="search-wrapper">
+      <div class="input-group custom-search-group">
+        <span class="input-group-text bg-white border-0">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input #mobileInput type="text" class="form-control border-0 shadow-none" placeholder="Search chassis no...">
+        <button class="btn search-btn text-white" type="button" (click)="searchValue(mobileInput)">Search</button>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+
+      <!-- Freeze Columns -->
+      <div class="position-relative">
+        <button class="btn-freeze" (click)="toggleFreezePanel($event)">
+          <i class="fas fa-thumbtack me-1"></i> Freeze Columns
+          <span *ngIf="frozenColumnKeys.size > 0" class="freeze-badge">{{ frozenColumnKeys.size }}</span>
+        </button>
+        <div class="tool-panel" [class.open]="freezePanelOpen" (click)="$event.stopPropagation()">
+          <div class="tool-panel-title">Select columns to freeze</div>
+          <div class="tool-panel-options">
+            <label *ngFor="let col of freezableColumns" class="tool-panel-option">
+              <input type="checkbox"
+                     [checked]="frozenColumnKeys.has(col.key)"
+                     (change)="toggleFreezeColumn(col.key, $event)">
+              <span>{{ col.label }}</span>
+            </label>
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="clearAllFreeze()">Clear All</button>
+            <button class="btn btn-sm btn-primary-custom flex-fill" (click)="freezePanelOpen = false">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customize Columns -->
+      <div class="position-relative">
+        <button class="btn-customize" (click)="toggleCustomizePanel($event)">
+          <i class="fas fa-cog me-1"></i> Customize Columns
+        </button>
+        <div class="tool-panel" [class.open]="customizePanelOpen" (click)="$event.stopPropagation()">
+          <div class="tool-panel-title">Show / Hide Columns</div>
+          <div class="tool-panel-options">
+            <label *ngFor="let col of allTableColumns" class="tool-panel-option">
+              <input type="checkbox"
+                     [checked]="!hiddenColumns.has(col.key)"
+                     (change)="toggleColumnVisibility(col.key, $event)">
+              <span>{{ col.label }}</span>
+            </label>
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="showAllColumns()">Show All</button>
+            <button class="btn btn-sm btn-primary-custom flex-fill" (click)="customizePanelOpen = false">Done</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Active Filters Bar -->
+  <div class="active-filters-bar" *ngIf="activeFilters.size > 0">
+    <span class="filter-bar-label"><i class="fas fa-filter me-1"></i>Active Filters:</span>
+    <span class="filter-chip" *ngFor="let col of getActiveFilterCols()">
+      <span class="filter-chip-col">{{ getColumnLabel(col) }}</span>
+      <span class="filter-chip-vals">{{ getFilterSummary(col) }}</span>
+      <button class="filter-chip-remove" (click)="removeFilter(col)"><i class="fas fa-times"></i></button>
+    </span>
+    <button class="btn-clear-all-filters" (click)="clearAllFilters()">Clear All</button>
+  </div>
+
+  <!-- Table -->
+  <div class="enquiry-table-wrapper mt-2" #tableWrapper>
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width:1200px;">
+      <thead>
+        <tr style="--bs-table-bg:#215378;--bs-table-color:white;font-size:14px;">
+
+          <th class="th-cell" [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')" style="border-top-left-radius:8px;">
+            <div class="th-content"><span>S.No.</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('sno')" (click)="openColumnFilter($event,'sno')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="showSH && !hiddenColumns.has('StateHead')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('StateHead')" [style.left.px]="getFrozenLeft('StateHead')">
+            <div class="th-content"><span>SH Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('StateHead')" (click)="openColumnFilter($event,'StateHead')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="showAM && !hiddenColumns.has('Am')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Am')" [style.left.px]="getFrozenLeft('Am')">
+            <div class="th-content"><span>AM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Am')" (click)="openColumnFilter($event,'Am')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="showTM && !hiddenColumns.has('Tm')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Tm')" [style.left.px]="getFrozenLeft('Tm')">
+            <div class="th-content"><span>TM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Tm')" (click)="openColumnFilter($event,'Tm')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DealerCode')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">
+            <div class="th-content"><span>Dealer Code</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerCode')" (click)="openColumnFilter($event,'DealerCode')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DealerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">
+            <div class="th-content"><span>Dealership Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerName')" (click)="openColumnFilter($event,'DealerName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Location')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Location')" [style.left.px]="getFrozenLeft('Location')">
+            <div class="th-content"><span>Dealer Location</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Location')" (click)="openColumnFilter($event,'Location')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DlrCat')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">
+            <div class="th-content"><span>Dealer Category</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrCat')" (click)="openColumnFilter($event,'DlrCat')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('BillingDate')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('BillingDate')" [style.left.px]="getFrozenLeft('BillingDate')">
+            <div class="th-content">
+              <span>{{ ChnageAfterFilterselectedType.toLowerCase() === 'sold' ? 'Delivery Date' : 'Billing Date' }}</span>
+              <button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('BillingDate')" (click)="openColumnFilter($event,'BillingDate')"><i class="fas fa-filter"></i></button>
+            </div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('TractorSrNumber')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('TractorSrNumber')" [style.left.px]="getFrozenLeft('TractorSrNumber')">
+            <div class="th-content"><span>Tractor Sr.Number</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('TractorSrNumber')" (click)="openColumnFilter($event,'TractorSrNumber')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Model')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Model')" [style.left.px]="getFrozenLeft('Model')">
+            <div class="th-content"><span>Model</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Model')" (click)="openColumnFilter($event,'Model')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DriveType')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DriveType')" [style.left.px]="getFrozenLeft('DriveType')">
+            <div class="th-content"><span>Drive Type</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DriveType')" (click)="openColumnFilter($event,'DriveType')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Colour')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Colour')" [style.left.px]="getFrozenLeft('Colour')">
+            <div class="th-content"><span>Colour</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Colour')" (click)="openColumnFilter($event,'Colour')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Aging')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Aging')" [style.left.px]="getFrozenLeft('Aging')">
+            <div class="th-content">
+              <span>{{ ChnageAfterFilterselectedType.toLowerCase() === 'sold' ? 'Advance Aging' : 'Stock Aging' }}</span>
+              <button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Aging')" (click)="openColumnFilter($event,'Aging')"><i class="fas fa-filter"></i></button>
+            </div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('chasisno')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('chasisno')" [style.left.px]="getFrozenLeft('chasisno')">
+            <div class="th-content"><span>Chassis Number</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('chasisno')" (click)="openColumnFilter($event,'chasisno')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Status')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Status')" [style.left.px]="getFrozenLeft('Status')" style="border-top-right-radius:8px;">
+            <div class="th-content"><span>Status</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Status')" (click)="openColumnFilter($event,'Status')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+        </tr>
+      </thead>
+      <tbody style="font-size:14px;">
+        <tr *ngFor="let item of displayData; let i = index">
+          <td [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td *ngIf="showSH && !hiddenColumns.has('StateHead')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('StateHead')" [style.left.px]="getFrozenLeft('StateHead')">{{ item.StateHead }}</td>
+          <td *ngIf="showAM && !hiddenColumns.has('Am')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Am')" [style.left.px]="getFrozenLeft('Am')">{{ item.Am }}</td>
+          <td *ngIf="showTM && !hiddenColumns.has('Tm')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Tm')" [style.left.px]="getFrozenLeft('Tm')">{{ item.Tm }}</td>
+          <td *ngIf="!hiddenColumns.has('DealerCode')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">{{ item.DealerCode }}</td>
+          <td *ngIf="!hiddenColumns.has('DealerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">{{ item.DealerName }}</td>
+          <td *ngIf="!hiddenColumns.has('Location')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Location')" [style.left.px]="getFrozenLeft('Location')">{{ item.Location }}</td>
+          <td *ngIf="!hiddenColumns.has('DlrCat')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">{{ item.DlrCat }}</td>
+          <td *ngIf="!hiddenColumns.has('BillingDate')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('BillingDate')" [style.left.px]="getFrozenLeft('BillingDate')">{{ item.BillingDate | date:'dd-MM-yyyy' }}</td>
+          <td *ngIf="!hiddenColumns.has('TractorSrNumber')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('TractorSrNumber')" [style.left.px]="getFrozenLeft('TractorSrNumber')">{{ item.TractorSrNumber }}</td>
+          <td *ngIf="!hiddenColumns.has('Model')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Model')" [style.left.px]="getFrozenLeft('Model')">{{ item.Model }}</td>
+          <td *ngIf="!hiddenColumns.has('DriveType')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DriveType')" [style.left.px]="getFrozenLeft('DriveType')">{{ item.DriveType }}</td>
+          <td *ngIf="!hiddenColumns.has('Colour')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Colour')" [style.left.px]="getFrozenLeft('Colour')">{{ item.Colour }}</td>
+          <td *ngIf="!hiddenColumns.has('Aging')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Aging')" [style.left.px]="getFrozenLeft('Aging')">{{ getAgeing(item.BillingDate) }} days</td>
+          <td *ngIf="!hiddenColumns.has('chasisno')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('chasisno')" [style.left.px]="getFrozenLeft('chasisno')">{{ item.chasisno }}</td>
+          <td *ngIf="!hiddenColumns.has('Status')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Status')" [style.left.px]="getFrozenLeft('Status')">{{ item.Status.toLowerCase() === 'sold' ? 'Advance' : item.Status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+
+  <!-- Column Filter Dropdown — fully DOM-controlled, no Angular class binding -->
+  <div #filterDropdownEl class="col-filter-dropdown" (click)="$event.stopPropagation()">
+    <input type="text" class="filter-search-input" placeholder="Search values..."
+           [(ngModel)]="filterSearchText" (input)="onFilterSearch()">
+    <div class="filter-select-actions">
+      <button (click)="selectAllFilterValues()">Select All</button>
+      <button (click)="clearAllFilterValues()">Clear All</button>
+    </div>
+    <div class="filter-values-list">
+      <label *ngFor="let val of filteredDropdownValues" class="filter-value-item">
+        <input type="checkbox" [checked]="tempSelectedValues.has(val)" (change)="toggleFilterValue(val, $event)">
+        <span>{{ val || '(Blank)' }}</span>
+      </label>
+      <div *ngIf="filteredDropdownValues.length === 0" class="no-values-msg">No values found</div>
+    </div>
+    <div class="filter-dropdown-actions">
+      <button class="btn-cancel" (click)="cancelFilter()">Cancel</button>
+      <button class="btn-apply" (click)="applyColumnFilter()">Apply</button>
+    </div>
+  </div>
+
+</div>

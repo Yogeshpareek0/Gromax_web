@@ -1,0 +1,44 @@
+.pagination .page-item.active .page-link {
+  background-color: #4796BD;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.page-link {
+  background-color: #E9EFF3;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 6px 10px;
+  min-width: 36px;
+  text-align: center;
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pagination.gap-2 .page-item {
+  margin: 0 3px;
+}
+
+@media (max-width: 576px) {
+  .pagination .page-link {
+    font-size: 12px;
+    padding: 4px 8px;
+    min-width: 28px;
+  }
+
+  nav .d-flex {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  nav .pagination {
+    justify-content: center !important;
+  }
+}

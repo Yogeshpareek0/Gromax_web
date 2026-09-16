@@ -1,0 +1,112 @@
+h6 {
+  color: #4796BD
+}
+
+@media (min-width: 1200px) {
+  .col-xl-5th {
+    flex: 0 0 20%;
+    max-width: 25%;
+  }
+}
+.shadow-sm {
+  border-radius: 10px;
+  font-size: 14px;
+  border: 1px solid #4796BD;
+  cursor: pointer;
+  color: #4796BD;
+  background-color: #fff; 
+  transition: all 0.3s ease; 
+}
+
+  .shadow-sm.active{
+    background-color: #4796BD;
+    color: #fff; 
+  }
+
+    .shadow-sm:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .shadow-sm.active h6 {
+      color: #fff;
+    }
+
+.form-control, .form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+}
+
+.form-floating-custom {
+  position: relative;
+  margin-bottom: 1.8rem;
+}
+
+  .form-floating-custom input {
+    height: 40px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .form-floating-custom label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0 4px;
+    font-size: 14px;
+    color: #212529bf;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+
+  .form-floating-custom input:focus + label,
+  .form-floating-custom input:not(:placeholder-shown) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.form-control:focus, .form-select:focus {
+  box-shadow: none !important;
+}
+
+.form-floating-custom select {
+  height: 40px;
+  padding: 10px 14px;
+  font-size: 14px;
+  appearance: none;
+}
+
+  .form-floating-custom select:focus + label,
+  .form-floating-custom select:not([value=""]) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+.error-message {
+  padding-bottom: 18px;
+  margin-top: -28px;
+}
+/* Chrome autofill – remove only background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.form-control:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.form-select:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}

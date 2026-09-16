@@ -1,0 +1,1026 @@
+<div class="container-fluid px-0" (click)="closeAllDropdowns()">
+
+  <!-- ==================== TABLE VIEW ==================== -->
+  <ng-container *ngIf="!showForm">
+
+    <div class="nda-toolbar d-flex align-items-center mb-3 mt-2">
+
+      <!-- Left Side -->
+      <div *ngIf="userName === 'wairagal.devidas@gromaxagri.com' ||
+              userName === 'ykp900155@gmail.com'">
+
+        <button type="button"
+                class="nda-add-btn"
+                (click)="openNdaOpenList()">
+
+          <span class="nda-add-text">
+            Nda Open List
+          </span>
+
+        </button>
+
+        <button type="button"
+                class="nda-add-btn"
+                (click)="PendingConversionByList(1)">
+
+          <span class="nda-add-text">
+            Conversion By Pending List
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- Right Side -->
+      <div class="d-flex align-items-center ms-auto">
+
+        <button *ngIf="listType === 'NdaList'"
+                type="button"
+                class="nda-export-btn"
+                (click)="exportToExcel()">
+
+          <i class="fas fa-download"></i>
+
+        </button>
+
+
+        <button type="button"
+                class="nda-add-btn"
+                (click)="showAddForm()">
+
+          <span class="nda-add-icon">
+            <i class="fa-solid fa-plus"></i>
+          </span>
+
+          <span class="nda-add-text">
+            Add NDA Enquiry
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+    <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+      <div class="row">
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+          <label class="form-label fw-medium mb-0">Duration</label>
+          <select class="form-select" [(ngModel)]="selectedFilter" (ngModelChange)="datefilterchange($event)">
+            <option value="This Month">This Month</option>
+            <option value="This Quarter">This Quarter</option>
+            <option value="This FY">This Financial Year</option>
+            <option value="Custom">Custom</option>
+          </select>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+          <label class="form-label fw-medium mb-0">Start Date</label>
+          <input type="date" class="form-control" [(ngModel)]="stDate">
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+          <label class="form-label fw-medium mb-0">End Date</label>
+          <input type="date" class="form-control" [(ngModel)]="enDate">
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+          <label for="location" class="form-label fw-medium mb-0">State Name</label>
+          <select class="form-select" [(ngModel)]="selectedState">
+            <option value="">All</option>
+            <option *ngFor="let state of statelist" [value]="state.stateCode">{{ state.stateName }}</option>
+          </select>
+        </div>
+
+        <!--Enquiry Source-->
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+          <label for="selectedEnquirySource" class="form-label fw-medium mb-0">Enquiry Source</label>
+          <select class="form-select" [(ngModel)]="selectedEnquirySource" (change)="onFilterSourceChange()">
+            <option value="">All</option>
+            <option *ngFor="let src of enquirySourceOptionsFilter" [value]="src">{{ src }}</option>
+          </select>
+        </div>
+
+        <!--Enquiry Sub-Source-->
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="selectedEnquirySource.length > 0">
+          <label for="selectedEnquirySubSource" class="form-label fw-medium mb-0">Enquiry Sub-Source</label>
+          <select class="form-select" [(ngModel)]="selectedEnquirySubSource">
+            <option value="">All</option>
+            <option *ngFor="let sub of subSourceOptions" [value]="sub">{{ sub }}</option>
+          </select>
+        </div>
+
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="listType === 'NdaList'">
+          <label for="selectedOverdueFilter" class="form-label fw-medium mb-0">Overdue Status</label>
+          <select class="form-select" [(ngModel)]="selectedOverdueFilter">
+            <option value="">All</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+          <label for="mobileFilter" class="form-label fw-medium mb-0">Mobile Number</label>
+          <input type="text" id="mobileFilter" class="form-control" [(ngModel)]="selectedMobileNumber"
+                 placeholder="Search by mobile" maxlength="10"
+                 pattern="[0-9]*" inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)">
+        </div>
+        <!--<div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+          <label for="location" class="form-label fw-medium mb-0">Location</label>
+          <select class="form-select" [(ngModel)]="selectedLocation">
+            <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+          </select>
+        </div>-->
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end">
+          <div class="d-flex gap-2">
+            <button class="btn custom-btn flex-fill py-2" (click)="onShowReport()">
+              <i class="bi bi-clipboard-data me-1"></i> Show Report
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-4">
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1600px;">
+        <thead>
+          <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal" *ngIf="listType === 'NdaList'">Action</th>
+
+            <th class="text-nowrap fw-normal">State</th>
+            <th class="text-nowrap fw-normal">District</th>
+
+            <th class="text-nowrap fw-normal" style="width:15px;">Party Name</th>
+
+
+            <th class="text-nowrap fw-normal">Party Mobile</th>
+            <th class="text-nowrap fw-normal">Enquiry Source</th>
+            <th class="text-nowrap fw-normal">Sub Source</th>
+
+            <th class="text-nowrap fw-normal">Enquiry Date</th>
+            <th class="text-nowrap fw-normal">Next Followup Date</th>
+
+            <th class="text-nowrap fw-normal">Followup Remarks</th>
+            <th class="text-nowrap fw-normal">Overdue Status</th>
+
+
+            <th class="text-nowrap fw-normal">ECD</th>
+
+
+
+            <th class="text-nowrap fw-normal">LOI Status</th>
+
+            <th *ngIf="isSuperAdmin && listType === 'PendingConversion'"
+                class="text-nowrap fw-normal"
+                style="border-top-right-radius: 6px;">
+              Conv. By
+            </th>
+
+            <!--<th *ngIf="userName !== 'wairagal.devidas@gromaxagri.com'"
+                class="text-nowrap fw-normal"
+                style="border-top-right-radius: 6px;">
+              Status
+            </th>-->
+
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="ndaList.length === 0">
+            <td colspan="13">
+              <div class="d-flex flex-column align-items-center justify-content-center py-3">
+                <div style="width: 48px; height: 48px; background-color: #EBF5FB;
+              border-radius: 50%; display: flex; align-items: center;
+              justify-content: center; margin-bottom:6px;">
+                  <i class="fa-solid fa-file-circle-xmark" style="font-size: 20px; color: #4796BD;"></i>
+                </div>
+                <p class="mb-0" style="font-size: 14px; color: #333;">No NDA Enquiries Found</p>
+                <p class="mb-0" style="font-size: 12px; color: #919191;">Click "Add NDA Enquiry" to add a new enquiry</p>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let item of ndaList; let i = index" style="cursor:pointer">
+            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td *ngIf="listType === 'NdaList'">
+              <button class="btn btn-sm"
+                      style="background-color: #EBF5FB; color: #215378; border: 1px solid #4796BD; border-radius: 20px;font-size:10px;padding:4px 6px"
+                      (click)="openFollowupModal(item)">
+                <i class="fa-solid fa-phone" style="font-size:9px"></i> Followup
+              </button>
+            </td>
+            <td>{{ item.stateName }}</td>
+            <td>{{ item.DistrictName }}</td>
+            <td>{{ item.NDAProspectName }}</td>
+
+            <td>{{ item.MobileNo }}</td>
+            <td>{{ item.EnquirySource }}</td>
+            <td>{{ item.EnquirySubSource || '-' }}</td>
+            <td>{{ item.EnquiryDate | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ item.NextFollowDate | date: 'dd-MM-yyyy' }}</td>
+
+            <td>{{ item.Remarks || '-' }}</td>
+            <td>{{ item.overDueStatus || '-' }}</td>
+
+
+            <td>{{ item.expectedConversionDate??'-' }}</td>
+
+            <td>{{ item.CodeOpenedStatus??'-' }}</td>
+            <td *ngIf="isSuperAdmin && listType === 'PendingConversion'">
+              <button type="button"
+                      class="btn btn-sm btn-primary"
+                      (click)="openModal(item)">
+                <i class="fa-solid fa-pen-to-square me-1"></i>
+                Update
+              </button>
+            </td>
+            <!--<td>
+              {{ item.Status}}
+            </td>-->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+  </ng-container>
+
+  <!-- ==================== GENERATE FORM ==================== -->
+
+  <ng-container *ngIf="showForm && !isFollowupMode">
+    <div class="nda-form-header mb-2">
+      <button type="button" class="nda-back-btn" (click)="showTableView()">
+        <span class="nda-back-arrow"><i class="fa-solid fa-arrow-left"></i></span>
+        <span>Back</span>
+      </button>
+    </div>
+
+    <div class="card shadow-sm px-4 border-0 py-2 mt-2" style="border-radius: 12px;">
+      <div class="row pt-4">
+
+        <!-- State Head -->
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
+          <div class="form-floating-custom" [class.has-value]="selectedSH">
+            <select class="form-select" [(ngModel)]="selectedSH" (change)="onStateHeadChange(selectedSH)">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let sh of stateHeadList" [value]="sh.Mail">{{ sh.Name }}</option>
+            </select>
+            <label>State Head</label>
+          </div>
+        </div>
+
+        <!-- Area Manager -->
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showAM">
+          <div class="form-floating-custom" [class.has-value]="selectedAM">
+            <select class="form-select" [(ngModel)]="selectedAM" (change)="onAreaManagerChange(selectedAM)">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+            </select>
+            <label>Area Manager</label>
+          </div>
+        </div>
+
+        <!-- Territory Manager -->
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
+          <div class="form-floating-custom" [class.has-value]="selectedTM">
+            <select class="form-select" [(ngModel)]="selectedTM">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+            </select>
+            <label>Territory Manager</label>
+          </div>
+        </div>
+
+        <!-- Enquiry Source -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="enquirySource">
+            <select class="form-select" [(ngModel)]="enquirySource" (change)="onSourceChange()">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let src of enquirySourceOptions" [value]="src">{{ src }}</option>
+            </select>
+            <label>Enquiry Source</label>
+          </div>
+        </div>
+
+        <!-- Enquiry Sub-Source -->
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="subSourceOptions.length > 0">
+          <div class="form-floating-custom" [class.has-value]="enquirySubSource">
+            <select class="form-select" [(ngModel)]="enquirySubSource">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let sub of subSourceOptions" [value]="sub">{{ sub }}</option>
+            </select>
+            <label>Enquiry Sub-Source</label>
+          </div>
+        </div>
+
+        <!-- NDA Prospect Name -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="prospectName">
+            <input type="text" class="form-control" placeholder="" [(ngModel)]="prospectName" />
+            <label>NDA Prospect Name</label>
+          </div>
+        </div>
+
+        <!-- Party Mobile -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="partyMobile">
+            <input type="text" class="form-control" placeholder="" maxlength="10"
+                   [(ngModel)]="partyMobile" pattern="[0-9]*" inputmode="numeric"
+                   (keypress)="allowNumbersOnly($event)" />
+            <label>Party Mobile</label>
+          </div>
+        </div>
+
+        <!-- Enquiry Current Status (always Open in generate mode) -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="getFinalStatus()" readonly />
+            <label>Enquiry Current Status</label>
+          </div>
+        </div>
+
+        <!-- ===== INTERESTED FIELDS (always shown in generate mode) ===== -->
+        <!-- Party District -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="partyDistrict">
+            <select class="form-select" [(ngModel)]="partyDistrict" (change)="onDistrictChange()">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let d of districtList" [value]="d.DistrictCode">{{ d.DistrictName }}</option>
+            </select>
+            <label>Party District</label>
+          </div>
+        </div>
+
+        <!-- Current Business -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="currentBusiness">
+            <select class="form-select" [(ngModel)]="currentBusiness">
+              <option value="" disabled selected hidden></option>
+              <option value="Farmer">Farmer</option>
+              <option value="Trader">Trader</option>
+              <option value="Contractor">Contractor</option>
+              <option value="Service Provider">Service Provider</option>
+              <option value="Retailer">Retailer</option>
+              <option value="Other">Other</option>
+            </select>
+            <label>Current Business</label>
+          </div>
+        </div>
+
+        <!-- Interested Taluka -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="multi-dropdown-wrapper" (click)="$event.stopPropagation()">
+            <label class="multi-dropdown-label">Interested Taluka</label>
+            <div class="multi-dropdown-toggle" (click)="toggleTalukaDropdown($event)">
+              <span class="multi-dropdown-placeholder" *ngIf="interestedTaluka.length === 0">Select Taluka</span>
+              <span class="multi-dropdown-tags" *ngIf="interestedTaluka.length > 0">
+                <span class="multi-tag" *ngFor="let code of interestedTaluka">
+                  {{ getTalukaName(code) }}
+                  <i class="fa-solid fa-xmark" (click)="$event.stopPropagation(); removeTaluka(code)"></i>
+                </span>
+              </span>
+              <i class="fa-solid fa-chevron-down multi-dropdown-arrow" [class.rotated]="talukaDropdownOpen"></i>
+            </div>
+            <div class="multi-dropdown-menu" *ngIf="talukaDropdownOpen">
+              <div *ngFor="let t of talukaList" class="multi-dropdown-item"
+                   [class.selected]="interestedTaluka.includes(+t.Tehsil)"
+                   (click)="onTalukaCheckChange($event, t.Tehsil,t.TehsilName)">
+                <i class="fa-solid fa-check check-icon"></i>{{ t.TehsilName }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interested Location -->
+        <!--<div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="multi-dropdown-wrapper" (click)="$event.stopPropagation()">
+            <label class="multi-dropdown-label">Interested Location</label>
+            <div class="multi-dropdown-toggle" (click)="toggleLocationDropdown($event)">
+              <span class="multi-dropdown-placeholder" *ngIf="interestedLocation.length === 0">Select Location</span>
+              <span class="multi-dropdown-tags" *ngIf="interestedLocation.length > 0">
+                <span class="multi-tag" *ngFor="let loc of interestedLocation">
+                  {{ loc }}
+                  <i class="fa-solid fa-xmark" (click)="$event.stopPropagation(); removeLocation(loc)"></i>
+                </span>
+              </span>
+              <i class="fa-solid fa-chevron-down multi-dropdown-arrow" [class.rotated]="locationDropdownOpen"></i>
+            </div>
+            <div class="multi-dropdown-menu" *ngIf="locationDropdownOpen">
+              <div *ngFor="let loc of locationOptions" class="multi-dropdown-item"
+                   [class.selected]="interestedLocation.includes(loc)"
+                   (click)="onLocationCheckChange($event, loc)">
+                <i class="fa-solid fa-check check-icon"></i>{{ loc }}
+              </div>
+            </div>
+          </div>
+        </div>-->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="interestedLocationName">
+            <select class="form-select"
+                    [(ngModel)]="interestedLocationName"
+                    name="interestedLocationName">
+              <option value="" disabled selected hidden></option>
+              <option *ngFor="let loc of locationOptions" [value]="loc">
+                {{ loc }}
+              </option>
+            </select>
+            <label>Interested Location</label>
+          </div>
+        </div>
+
+
+        <!-- Industry Size -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="industrySize">
+            <input type="text" class="form-control" [(ngModel)]="industrySize" readonly />
+            <label>Industry Size</label>
+          </div>
+        </div>
+
+        <!-- Investment Plan -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="investmentPlan">
+            <select class="form-select" [(ngModel)]="investmentPlan">
+              <option value="" disabled selected hidden></option>
+              <option value="10-20 Lakh">10-20 Lakh</option>
+              <option value="20-30 Lakh">20-30 Lakh</option>
+              <option value="30-40 Lakh">30-40 Lakh</option>
+              <option value="40-50 Lakh">40-50 Lakh</option>
+              <option value="> 50 Lakh">&gt; 50 Lakh</option>
+            </select>
+            <label>Investment Plan</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="expectedConversionDate">
+            <input type="date" class="form-control" [(ngModel)]="expectedConversionDate"
+                   [min]="todayDate" max="max60Days" (change)="validateConversionDate()" />
+            <label>Expected Conversion Date</label>
+            <small class="text-danger" *ngIf="conversionDateError" style="font-size: 12px;">
+              {{ conversionDateError }}
+            </small>
+          </div>
+
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="nextFollowupDate">
+            <input type="date" class="form-control" style="font-size:14px"
+                   [min]="todayDate" [max]="max30Days" [(ngModel)]="nextFollowupDate" (change)="validateNextFollowDate()" />
+            <label>Next Follow-up Date</label>
+            <small class="text-danger" *ngIf="nextFollowUpDateError" style="font-size: 12px;">
+              {{ nextFollowUpDateError }}
+            </small>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="remarks">
+            <input type="text"
+                   class="form-control"
+                   style="font-size:14px"
+                   maxlength="100"
+                   [(ngModel)]="remarks"
+                   placeholder=" " />
+            <label>Remarks</label>
+            <small class="text-danger" *ngIf="remarksError" style="font-size: 12px;">
+              {{ remarksError }}
+            </small>
+          </div>
+        </div>
+
+
+        <div class="text-center pb-3 col-12 mt-2">
+          <button type="button" class="btn text-white px-4"
+                  [disabled]="!isFormValid()"
+                  (click)="onSubmit()"
+                  style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+            Generate NDA Enquiry
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ==================== FOLLOWUP FORM ==================== -->
+  <ng-container *ngIf="showForm && isFollowupMode">
+    <div class="nda-form-header mb-2">
+      <button type="button" class="nda-back-btn" (click)="showTableView()">
+        <span class="nda-back-arrow"><i class="fa-solid fa-arrow-left"></i></span>
+        <span>Back</span>
+      </button>
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <div class="d-flex mb-0" style="gap:0; border-bottom: none;">
+      <button class="nda-tab-btn" [class.nda-tab-active]="activeFollowupTab === 'followup'"
+              (click)="activeFollowupTab = 'followup'">
+        <i class="fa-solid fa-phone me-1" style="font-size:12px"></i> Followup
+      </button>
+      <button class="nda-tab-btn" [class.nda-tab-active]="activeFollowupTab === 'history'"
+              (click)="activeFollowupTab = 'history'; loadFollowupHistory()">
+        <i class="fa-solid fa-clock-rotate-left me-1" style="font-size:12px"></i> Followup History
+      </button>
+    </div>
+
+    <!-- ===== FOLLOWUP TAB ===== -->
+    <div class="card shadow-sm px-4 border-0 py-2"
+         style="border-radius: 0 12px 12px 12px;"
+         *ngIf="activeFollowupTab === 'followup'">
+      <div class="row pt-4">
+
+        <!-- Readonly Info -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="prospectName" readonly />
+            <label>NDA Prospect Name</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="partyMobile" readonly />
+            <label>Party Mobile</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="stateName" readonly />
+            <label>State Name</label>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="partyDistrict" readonly />
+            <label>District Name</label>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="enquirySource" readonly />
+            <label>Enquiry Source</label>
+          </div>
+        </div>
+
+        <!-- Enquiry Current Status -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom has-value">
+            <input type="text" class="form-control" [value]="getFinalStatus()" readonly />
+            <label>Enquiry Current Status</label>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="followupRemarks==='Interested'">
+          <div class="form-floating-custom" [class.has-value]="expectedConversionDate">
+            <input type="date" class="form-control" [(ngModel)]="expectedConversionDate"
+                   [min]="todayDate" [max]="max60Days" (change)="validateConversionDate()" />
+            <label>Expected Conversion Date</label>
+            <small class="text-danger" *ngIf="conversionDateError" style="font-size: 12px;">
+              {{ conversionDateError }}
+            </small>
+          </div>
+
+        </div>
+
+        <!-- Followup Remarks -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="followupRemarks">
+            <select class="form-select" [(ngModel)]="followupRemarks" (change)="onFollowupRemarksChange()">
+              <option value="" disabled selected hidden></option>
+              <option value="Interested">Interested</option>
+              <option value="Not Interested">Not Interested</option>
+              <option value="Fake Enquiry">Fake Enquiry</option>
+              <option value="Others">Others</option>
+            </select>
+            <label>Followup Remarks</label>
+          </div>
+        </div>
+
+        <!-- NOT INTERESTED -->
+        <ng-container *ngIf="followupRemarks === 'Not Interested'">
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="form-floating-custom" [class.has-value]="notInterestedReason">
+              <select class="form-select" [(ngModel)]="notInterestedReason">
+                <option value="" disabled selected hidden></option>
+                <option value="Investment Issue">Investment Issue</option>
+                <option value="Not Ready To Invest Now">Not Ready To Invest Now</option>
+                <option value="Expecting Other Location">Expecting Other Location</option>
+                <option value="Others">Others</option>
+              </select>
+              <label>Add Remarks</label>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- FAKE / OTHERS -->
+        <ng-container *ngIf="followupRemarks === 'Fake Enquiry' || followupRemarks === 'Others'">
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="form-floating-custom" [class.has-value]="closingRemarks">
+              <input type="text" class="form-control" placeholder="" [(ngModel)]="closingRemarks" />
+              <label>Add Remarks</label>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- INTERESTED -->
+        <ng-container *ngIf="followupRemarks === 'Interested'">
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="form-floating-custom" [class.has-value]="actionPlanned">
+              <select class="form-select" [(ngModel)]="actionPlanned">
+                <option value="" disabled selected hidden></option>
+                <option value="Meeting Planned">Meeting Planned</option>
+                <option value="Detailes Shared">Detailes Shared</option>
+                <option value="Interview with SH Planned">Interview with SH Planned</option>
+                <option value="Others">Others</option>
+              </select>
+              <label>Action Planned</label>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="form-floating-custom" [class.has-value]="nextFollowupDate">
+              <input type="date" class="form-control" style="font-size:14px"
+                     [min]="todayDate" [max]="max30Days" [(ngModel)]="nextFollowupDate" (change)="validateNextFollowDate()" />
+              <label>Next Follow-up Date</label>
+              <small class="text-danger" *ngIf="nextFollowUpDateError" style="font-size: 12px;">
+                {{ nextFollowUpDateError }}
+              </small>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="form-floating-custom" [class.has-value]="remarks">
+              <input type="text"
+                     class="form-control"
+                     style="font-size:14px"
+                     maxlength="100"
+                     [(ngModel)]="remarks"
+                     placeholder=" " />
+              <label>Remarks</label>
+              <small class="text-danger" *ngIf="remarksError" style="font-size: 12px;">
+                {{ remarksError }}
+              </small>
+            </div>
+          </div>
+
+          <!-- SH Interview Done -->
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="form-floating-custom" [class.has-value]="shInterviewDone">
+              <select class="form-select" [(ngModel)]="shInterviewDone" (change)="onSHInterviewChange()">
+                <option value="" disabled selected hidden></option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <label>SH Interview Done</label>
+            </div>
+          </div>
+
+          <!-- SH Interview Date -->
+          <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="shInterviewDone === 'Yes'">
+            <div class="form-floating-custom" [class.has-value]="shInterviewDate">
+              <input type="date" class="form-control" style="font-size:14px"
+                     [max]="todayDate" [(ngModel)]="shInterviewDate" />
+              <label>SH Interview Date</label>
+            </div>
+          </div>
+
+          <!-- SH Remarks -->
+          <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="shInterviewDone === 'Yes'">
+            <div class="form-floating-custom" [class.has-value]="shRemarks">
+              <select class="form-select" [(ngModel)]="shRemarks" (change)="onSHRemarksChange()">
+                <option value="" disabled selected hidden></option>
+                <option value="HO Interview">HO Interview</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              <label>SH Remarks</label>
+            </div>
+          </div>
+
+          <!-- SH Rejection Remarks -->
+          <div class="col-xl-3 col-lg-4 col-sm-6"
+               *ngIf="shInterviewDone === 'Yes' && shRemarks === 'Rejected'">
+            <div class="form-floating-custom" [class.has-value]="shRejectionRemarks">
+              <input type="text" class="form-control" placeholder="" [(ngModel)]="shRejectionRemarks" />
+              <label>SH Rejection Remarks</label>
+            </div>
+          </div>
+
+          <!-- HO Interview -->
+          <ng-container *ngIf="shInterviewDone === 'Yes' && shRemarks === 'HO Interview'">
+
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="hoInterviewDone">
+                <select class="form-select" [(ngModel)]="hoInterviewDone" (change)="onHOInterviewChange()">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+                <label>HO Interview Done</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="hoInterviewDone === 'Yes'">
+              <div class="form-floating-custom" [class.has-value]="hoInterviewDate">
+                <input type="date" class="form-control" style="font-size:14px"
+                       [max]="todayDate" [(ngModel)]="hoInterviewDate" />
+                <label>HO Interview Date</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="hoInterviewDone === 'Yes'">
+              <div class="form-floating-custom" [class.has-value]="hoRemarks">
+                <select class="form-select" [(ngModel)]="hoRemarks" (change)="onHORemarksChange()">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+                <label>HO Remarks</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6"
+                 *ngIf="hoInterviewDone === 'Yes' && hoRemarks === 'Rejected'">
+              <div class="form-floating-custom" [class.has-value]="hoRejectionRemarks">
+                <input type="text" class="form-control" placeholder="" [(ngModel)]="hoRejectionRemarks" />
+                <label>HO Rejection Remarks</label>
+              </div>
+            </div>
+
+            <!-- POST APPROVAL -->
+            <ng-container *ngIf="hoInterviewDone === 'Yes' && hoRemarks === 'Approved'">
+
+              <!-- SD Received -->
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="sdReceived">
+                  <select class="form-select" [(ngModel)]="sdReceived" (change)="onSDReceivedChange()">
+                    <option value="" disabled selected hidden></option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="TBR">TBR</option>
+                  </select>
+                  <label>SD Received</label>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="sdReceived === 'Yes'">
+                <div class="form-floating-custom" [class.has-value]="sdReceivingDate">
+                  <input type="date" class="form-control" style="font-size:14px"
+                         [max]="todayDate" [(ngModel)]="sdReceivingDate" />
+                  <label>SD Receiving Date</label>
+                </div>
+              </div>
+
+              <!-- GST -->
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="gstStatus">
+                  <select class="form-select" [(ngModel)]="gstStatus" (change)="onGSTChange()">
+                    <option value="" disabled selected hidden></option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="In Process">In Process</option>
+                  </select>
+                  <label>GST</label>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="gstStatus === 'Yes'">
+                <div class="form-floating-custom" [class.has-value]="gstRegistrationDate">
+                  <input type="date" class="form-control" style="font-size:14px"
+                         [max]="todayDate" [(ngModel)]="gstRegistrationDate" />
+                  <label>GST Registration Date</label>
+                </div>
+              </div>
+
+              <!-- Funds Received -->
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="fundsReceived">
+                  <select class="form-select" [(ngModel)]="fundsReceived" (change)="onFundsChange()">
+                    <option value="" disabled selected hidden></option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="In Process">In Process</option>
+                  </select>
+                  <label>Funds Received</label>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="fundsReceived === 'Yes'">
+                <div class="form-floating-custom" [class.has-value]="fundTransferDate">
+                  <input type="date" class="form-control" style="font-size:14px"
+                         [max]="todayDate" [(ngModel)]="fundTransferDate" />
+                  <label>Fund Transfer Date</label>
+                </div>
+              </div>
+
+              <!-- BG Received -->
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="bgReceived">
+                  <select class="form-select" [(ngModel)]="bgReceived" (change)="onBGChange()">
+                    <option value="" disabled selected hidden></option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="In Process">In Process</option>
+                  </select>
+                  <label>BG Received</label>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="bgReceived === 'Yes'">
+                <div class="form-floating-custom" [class.has-value]="bgSubmissionDate">
+                  <input type="date" class="form-control" style="font-size:14px"
+                         [max]="todayDate" [(ngModel)]="bgSubmissionDate" />
+                  <label>BG Submission Date</label>
+                </div>
+              </div>
+
+              <!-- Code Opened -->
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="codeOpened">
+                  <select class="form-select" [(ngModel)]="codeOpened" (change)="onCodeOpenedChange()">
+                    <option value="" disabled selected hidden></option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="In Process">In Process</option>
+                  </select>
+                  <label>Code Opened</label>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="codeOpened === 'Yes'">
+                <div class="form-floating-custom" [class.has-value]="loiDate">
+                  <input type="date" class="form-control" style="font-size:14px"
+                         [max]="todayDate" [(ngModel)]="loiDate" />
+                  <label>LOI Date</label>
+                </div>
+              </div>
+
+            </ng-container>
+          </ng-container>
+        </ng-container>
+
+        <div class="text-center pb-3 col-12 mt-2">
+          <button type="button" class="btn text-white px-4"
+                  [disabled]="!isFormValid()"
+                  (click)="onFollowupSubmit()"
+                  style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+            <i class="fa-solid fa-paper-plane me-1"></i> Submit Followup
+          </button>
+        </div>
+
+      </div>
+    </div>
+    <!-- end followup tab -->
+    <!-- ===== FOLLOWUP HISTORY TAB ===== -->
+    <div class="card shadow-sm border-0 py-3 px-3"
+         style="border-radius: 0 12px 12px 12px;"
+         *ngIf="activeFollowupTab === 'history'">
+
+      <!-- Loading -->
+      <div *ngIf="historyLoading" class="d-flex justify-content-center align-items-center py-4">
+        <div class="spinner-border spinner-border-sm me-2" style="color:#4796BD"></div>
+        <span style="font-size:13px; color:#4796BD">Loading history...</span>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!historyLoading && followupHistory.length === 0"
+           class="d-flex flex-column align-items-center justify-content-center py-4">
+        <div style="width:48px;height:48px;background:#EBF5FB;border-radius:50%;
+                    display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
+          <i class="fa-solid fa-clock-rotate-left" style="font-size:20px;color:#4796BD"></i>
+        </div>
+        <p class="mb-0" style="font-size:14px;color:#333;">No History Found</p>
+      </div>
+
+      <!-- History Table -->
+      <div *ngIf="!historyLoading && followupHistory.length > 0" class="table-responsive">
+        <table class="table table-bordered table-striped mb-0" style="font-size:12px; min-width:1400px;">
+          <thead>
+            <tr style="--bs-table-bg:#215378; --bs-table-color:white;">
+              <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
+              <th class="text-nowrap fw-normal">Next Followup Date</th>
+              <th class="text-nowrap fw-normal">Remarks</th>
+              <th class="text-nowrap fw-normal">Followup Date</th>
+              <th class="text-nowrap fw-normal">Followup Remarks</th>
+              <!--<th class="text-nowrap fw-normal">Close Remark</th>-->
+              <th class="text-nowrap fw-normal">Action Plan</th>
+              <th class="text-nowrap fw-normal">SH Interview</th>
+              <th class="text-nowrap fw-normal">SH Interview Date</th>
+              <th class="text-nowrap fw-normal">SH Remarks</th>
+              <th class="text-nowrap fw-normal">SH Rejection Remark</th>
+              <th class="text-nowrap fw-normal">HO Interview</th>
+              <th class="text-nowrap fw-normal">HO Interview Date</th>
+              <th class="text-nowrap fw-normal">HO Remarks</th>
+              <th class="text-nowrap fw-normal">HO Rejection Remark</th>
+              <th class="text-nowrap fw-normal">SD Received</th>
+              <th class="text-nowrap fw-normal">SD Receiving Date</th>
+              <th class="text-nowrap fw-normal">GST</th>
+              <th class="text-nowrap fw-normal">GST Reg. Date</th>
+              <th class="text-nowrap fw-normal">Funds Received</th>
+              <th class="text-nowrap fw-normal">Fund Transfer Date</th>
+              <th class="text-nowrap fw-normal">BG Received</th>
+              <th class="text-nowrap fw-normal">BG Submission Date</th>
+              <th class="text-nowrap fw-normal">Code Opened</th>
+              <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">LOI Date</th>
+            </tr>
+          </thead>
+          <tbody class="text-nowrap">
+            <tr *ngFor="let h of followupHistory; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ h.followupdate ? (h.followupdate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.RemarksDescription || '-' }}</td>
+
+              <td>{{ h.create_date ? (h.create_date | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.FollowupRemarks || '-' }}</td>
+
+              up
+              <!--<td>{{ h.CloseEnquiryRemark || '-' }}</td>-->
+              Pl
+
+              <td>{{ h.ActionPlan || '-' }}</td>
+              <td>{{ h.SHInterviewStatus || '-' }}</td>
+              <td>{{ h.SHInterviewDate ? (h.SHInterviewDate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.SHRemarks || '-' }}</td>
+              <td>{{ h.SHRejectionRemark || '-' }}</td>
+              <td>{{ h.HOInterviewStatus || '-' }}</td>
+              <td>{{ h.HOInterviewDate ? (h.HOInterviewDate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.HORemarks || '-' }}</td>
+              <td>{{ h.HORejectionRemark || '-' }}</td>
+              <td>{{ h.SDReceivedStatus || '-' }}</td>
+              <td>{{ h.SDReceivingDate ? (h.SDReceivingDate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.GSTStatus || '-' }}</td>
+              <td>{{ h.GSTRegistrationDate ? (h.GSTRegistrationDate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.FundsReceivedStatus || '-' }}</td>
+              <td>{{ h.FundTransferDate ? (h.FundTransferDate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.BGReceivedStatus || '-' }}</td>
+              <td>{{ h.BGSubmissionDate ? (h.BGSubmissionDate | date:'dd-MM-yyyy') : '-' }}</td>
+              <td>{{ h.CodeOpenedStatus || '-' }}</td>
+              <td>{{ h.LOIDate ? (h.LOIDate | date:'dd-MM-yyyy') : '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- end history tab -->
+
+  </ng-container>
+
+
+  <div class="modal fade" id="selectModal" tabindex="-1" [class.show]="showModal"
+       [style.display]="showModal ? 'block' : 'none'" [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
+    <div class="modal-dialog modal-dialog-top">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header border-0">
+          <h5 class="modal-title">NDA Enquiry Conversion By</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <div class="row">
+            <!-- Sales/Service Filter Dropdown -->
+            <div class="col-6">
+              <div class="form-floating-custom" [class.has-value]="selectedType">
+                <select class="form-select" [(ngModel)]="selectedType" (change)="getEmployeeList()">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Sales">Sales</option>
+                  <option value="Services">Service</option>
+                </select>
+                <label>Select Type</label>
+              </div>
+            </div>
+            <!-- Employee Dropdown -->
+            <div class="col-6">
+              <div class="form-floating-custom" [class.has-value]="selectedValue">
+                <select class="form-select" [(ngModel)]="selectedValue">
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let item of employeeList" [value]="item.id">
+                    {{ item.name }}
+                  </option>
+                </select>
+                <label>Select Employee</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal Footer -->
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            Cancel
+          </button>
+          <button type="button" class="btn text-white px-4"
+                  [disabled]="!selectedValue"
+                  (click)="handleSubmit()"
+                  style="background-color: #4796BD; border-radius: 50px;">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="modal-backdrop fade" *ngIf="showModal" [class.show]="showModal"></div>
+</div>
+

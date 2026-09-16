@@ -1,0 +1,1010 @@
+<div class="review-container container-fluid px-0">
+
+  <!-- ===== FILTER CARD ===== -->
+  <div class="filter-card card shadow-sm border-0 mb-3 p-3" style="border-radius:12px;">
+    <div class="row g-3 align-items-start">
+
+      <!-- Upload Type -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+        <label class="form-label filter-label mb-1">Upload Type <span class="text-danger">*</span></label>
+        <select class="form-select form-select-sm filter-select"
+                [class.is-invalid-field]="filterSubmitted && !selectedUploadId"
+                [(ngModel)]="selectedUploadId"
+                (ngModelChange)="onUploadTypeChange()"
+                name="uploadType">
+          <option [ngValue]="null">-- Select --</option>
+          <option *ngFor="let item of filteredUploadReportList" [ngValue]="item.UploadID">
+            {{ item.UploadName }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Month -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showMonthYearDropdowns">
+        <label class="form-label filter-label mb-1">Month <span class="text-danger">*</span></label>
+        <select class="form-select form-select-sm filter-select"
+                [class.is-invalid-field]="filterSubmitted && !selectedMonth"
+                [(ngModel)]="selectedMonth"
+                name="month"
+                (change)="onMonthChange()">
+          <option [ngValue]="null">-- Select --</option>
+          <option *ngFor="let m of availableMonths" [value]="m.value">{{ m.name }}</option>
+        </select>
+      </div>
+
+      <!-- Year -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showMonthYearDropdowns">
+        <label class="form-label filter-label mb-1">Year <span class="text-danger">*</span></label>
+        <select class="form-select form-select-sm filter-select"
+                [class.is-invalid-field]="filterSubmitted && !selectedYear"
+                [(ngModel)]="selectedYear"
+                name="year">
+          <option [ngValue]="null">-- Select --</option>
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+      </div>
+
+      <!-- State -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6"
+           *ngIf="selectedUploadId && stateBasedUploadTypes.includes(selectedUploadId)">
+        <label class="form-label filter-label mb-1">State <span class="text-danger">*</span></label>
+        <select class="form-select form-select-sm filter-select"
+                [class.is-invalid-field]="filterSubmitted && !selectedState"
+                [(ngModel)]="selectedState"
+                name="state"
+                (ngModelChange)="GetStateHeadByState(selectedState)">
+          <option [ngValue]="null">-- Select --</option>
+          <option *ngFor="let s of stateList" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showSH">
+        <label for="am" class="form-label filter-label mb-1">State Head</label>
+        <select class="form-select form-select-sm filter-select" [(ngModel)]="selectedSH" (change)="onStateChanges(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showAM">
+        <label for="am" class="form-label filter-label mb-1">Area Manager</label>
+        <select class="form-select form-select-sm filter-select" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showTM">
+        <label for="tm" class="form-label filter-label mb-1">Territory Manager</label>
+        <select class="form-select form-select-sm filter-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+      <!-- TTL Filter -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6"
+           *ngIf="selectedUploadId===4">
+        <label class="form-label filter-label mb-1">TTL Filter</label>
+        <select class="form-select form-select-sm filter-select"
+                [(ngModel)]="selectedTTL"
+                name="TTL">
+          <option value="">All</option>
+          <option [value]="0">0</option>
+          <option [value]="1">Greater Than 0</option>
+        </select>
+      </div>
+
+      <!-- Filter Button -->
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 align-self-end">
+        <button class="btn btn-filter px-3" (click)="onFilter()">
+          <i class="fas fa-search me-1"></i> Apply Filter
+        </button>
+        <button class="btn btn-filter px-3" style="background-color: #4796BD; font-size: 14px; margin-left:10px;" *ngIf="selectedUploadId === 4 || selectedUploadId === 3" (click)="ExportTo()">
+          <i class="fas fa-download"></i>
+        </button>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <!-- ===== BDRC TABLE (uploadId = 3) ===== -->
+  <ng-container *ngIf="selectedUploadId === 3">
+    <div class="card border-0 p-3" style="border-radius:12px;" *ngIf="hasSearched">
+
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <span class="table-title">BDRC Review</span>
+          <span class="badge bg-secondary fw-normal py-1 px-2" *ngIf="bdrcRows.length > 0">
+            {{ bdrcRows.length }} Records
+          </span>
+          <span class="month-label" *ngIf="selectedMonth && selectedYear">
+            <i class="fas fa-calendar-alt me-1"></i>{{ getMonthYearLabel() }}
+          </span>
+          <span class="edit-mode-badge" *ngIf="editingCount > 0">
+            <i class="fas fa-pen me-1"></i>{{ editingCount }} row{{ editingCount > 1 ? 's' : '' }} in edit
+            <span *ngIf="dirtyCount > 0" class="dirty-indicator ms-1">({{ dirtyCount }} modified)</span>
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="bdrcRows.length === 0" class="empty-state-card card border-0 text-center py-4">
+        <div class="empty-icon-wrap mx-auto mb-3"><i class="fas fa-clipboard-list"></i></div>
+        <p class="text-muted mb-0">No BDRC data found for the selected filters.</p>
+      </div>
+
+      <div class="bdrc-table-outer" *ngIf="bdrcRows.length > 0">
+
+        <div class="d-flex justify-content-end gap-2 mb-2"
+             *ngIf="editingCount === 0 && hasAnyEditable">
+          <button class="btn btn-danger btn-sm" (click)="rejectAll()" style="font-size:12px">Reject All</button>
+          <button class="btn btn-success btn-sm" (click)="saveAll()" style="font-size:12px">Approve All</button>
+        </div>
+
+        <div class="bdrc-table-wrapper">
+          <table class="table table-bordered table-sm bdrc-table mb-0">
+            <thead>
+              <tr class="thead-row1">
+                <th rowspan="3" class="th-fixed th-state">State</th>
+                <th rowspan="3" class="th-fixed th-dealer">Dlr Name</th>
+                <th rowspan="3" class="th-fixed th-loc">Dlr Loc</th>
+                <th rowspan="3" class="th-fixed th-sap">SAP</th>
+                <th rowspan="3" class="th-fixed th-status">Status</th>
+                <th [attr.colspan]="getWeekCols().length" class="th-section">Bill Plan</th>
+                <th [attr.colspan]="getWeekCols().length" class="th-section">Del Plan</th>
+                <th [attr.colspan]="getWeekCols().length" class="th-section">Ret Plan</th>
+                <th [attr.colspan]="getWeekCols().length" class="th-section">Coll Plan (In Lacs)</th>
+                <th [attr.colspan]="getWeekCols().length" class="th-section">BG Plan (In Lacs)</th>
+                <th rowspan="3" class="th-fixed th-workflow">Uploaded By</th>
+                <th rowspan="3" class="th-fixed th-workflow">Uploader Name</th>
+                <th rowspan="3" class="th-fixed th-workflow">Pending With</th>
+                <th rowspan="3" class="th-fixed th-workflow">Pending Name</th>
+                <th rowspan="3" class="th-fixed th-status">Approval Status</th>
+                <th rowspan="3" class="th-fixed th-status">Reviewed By</th>
+                <th rowspan="3" class="th-fixed th-status" *ngIf="hasAnyRejected" style="min-width:200px;">Rejection Reason</th>
+                <th rowspan="3" class="th-action">Actions</th>
+              </tr>
+              <tr class="thead-row2">
+                <ng-container *ngFor="let sec of planSections">
+                  <th *ngFor="let wk of getWeekCols()" [class.th-w5-disabled]="wk === 'W5' && !hasW5">{{ wk }}</th>
+                </ng-container>
+              </tr>
+              <tr class="thead-row3">
+                <ng-container *ngFor="let sec of planSections">
+                  <ng-container *ngFor="let wk of getWeekCols()">
+                    <th [class.th-ttl]="wk === 'TTL'" [class.th-w5-disabled]="wk === 'W5' && !hasW5">
+                      <ng-container *ngIf="wk === 'TTL'">{{ getSectionTTLTotal(sec.key) }}</ng-container>
+                      <ng-container *ngIf="wk !== 'TTL'">{{ getSectionTotal(sec.key, wk) }}</ng-container>
+                    </th>
+                  </ng-container>
+                </ng-container>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of bdrcRows; let i = index"
+                  [class.row-editing]="row._editing" [class.row-dirty]="row._dirty">
+                <td class="td-locked td-state">{{ $any(row).StateName }}</td>
+                <td class="td-locked td-dealer">{{ $any(row).DealerName }}</td>
+                <td class="td-locked td-loc">{{ $any(row).DlrLoc }}</td>
+                <td class="td-locked td-sap">{{ $any(row).DealerCode }}</td>
+                <td class="td-locked td-status">
+                  <span class="status-badge"
+                        [class.status-active]="$any(row).Status?.toLowerCase() === 'active'"
+                        [class.status-inactive]="$any(row).Status?.toLowerCase() !== 'active'">
+                    {{ $any(row).Status || '—' }}
+                  </span>
+                </td>
+                <ng-container *ngFor="let sec of planSections">
+                  <ng-container *ngFor="let wk of getWeekCols()">
+                    <td *ngIf="wk === 'TTL'" class="td-ttl">{{ getTTLValue(row, sec.key) }}</td>
+                    <td *ngIf="wk === 'W5' && !hasW5" class="td-disabled">—</td>
+                    <td *ngIf="wk !== 'TTL' && !(wk === 'W5' && !hasW5)"
+                        [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                      <ng-container *ngIf="!row._editing">{{ getWeekValue(row, sec.key, wk) }}</ng-container>
+                      <ng-container *ngIf="row._editing">
+                        <input type="number" class="edit-input" min="0"
+                               [(ngModel)]="$any(row)[sec.key + '_' + wk]"
+                               (ngModelChange)="onCellChange(row)"
+                               [name]="sec.key + '_' + wk + '_' + i" />
+                      </ng-container>
+                    </td>
+                  </ng-container>
+                </ng-container>
+                <td class="td-locked td-workflow">{{ $any(row).UploadByPosition || '—' }}</td>
+                <td class="td-locked td-workflow" style="white-space:normal;word-break:break-word;font-size:11px">{{ $any(row).UploadName || '—' }}</td>
+                <td class="td-locked td-workflow td-pending">{{ $any(row).pendingon === 'No' ? '—' : ($any(row).pendingon || '—') }}</td>
+                <td class="td-locked td-workflow td-pending" style="white-space:normal;word-break:break-word;font-size:11px">{{ $any(row).PendingName || '—' }}</td>
+                <td class="td-locked td-status">
+                  <span class="approved-badge" *ngIf="$any(row).IsCommited === 1"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                  <span class="rejected-badge" *ngIf="$any(row).IsCommited === -1"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+                  <span class="text-muted" *ngIf="$any(row).IsCommited !== 1 && $any(row).IsCommited !== -1">—</span>
+                </td>
+                <td class="td-locked td-workflow" style="white-space:normal;word-break:break-word;font-size:11px">{{ $any(row).lastReviewBy || '—' }}</td>
+                <td class="td-locked td-workflow" *ngIf="hasAnyRejected"
+                    style="min-width:200px;white-space:normal;word-break:break-word;font-size:10px;font-weight:600;color:#dc3545;">
+                  <ng-container *ngIf="$any(row).IsCommited === -1">{{ $any(row).Remark || '—' }}</ng-container>
+                  <span class="text-muted" *ngIf="$any(row).IsCommited !== -1">—</span>
+                </td>
+                <td class="td-action">
+                  <ng-container *ngIf="canEdit(row)">
+                    <button *ngIf="!row._editing" class="btn btn-edit btn-xs" (click)="startEdit(i)" title="Edit Row">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button *ngIf="row._editing" class="btn btn-cancel-edit btn-xs" (click)="cancelEdit(i)" title="Cancel">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </ng-container>
+                  <span *ngIf="!canEdit(row)" class="lock-icon" [title]="'Pending on: ' + $any(row).pendingon">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- BDRC Save All Bar -->
+        <div class="save-all-bar" *ngIf="editingCount > 0">
+          <div class="save-all-left">
+            <i class="fas fa-info-circle me-1 text-warning"></i>
+            <span>
+              <strong>{{ editingCount }}</strong> row{{ editingCount > 1 ? 's' : '' }} in edit mode
+              <ng-container *ngIf="dirtyCount > 0">&mdash; <strong class="text-warning">{{ dirtyCount }}</strong> modified</ng-container>
+            </span>
+          </div>
+          <div class="save-all-actions">
+            <button class="btn btn-cancel-all btn-sm me-2" (click)="cancelAllEdits()" [disabled]="isSavingAll">
+              <i class="fas fa-times me-1"></i>Cancel All
+            </button>
+            <button class="btn btn-save-all btn-sm" (click)="saveAll()" [disabled]="isSavingAll || dirtyCount === 0">
+              <span *ngIf="!isSavingAll"><i class="fas fa-save me-1"></i>Save {{ dirtyCount > 0 ? dirtyCount + ' Change' + (dirtyCount > 1 ? 's' : '') : 'All' }}</span>
+              <span *ngIf="isSavingAll"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== FORECAST TABLE (uploadId = 4) ===== -->
+  <ng-container *ngIf="selectedUploadId === 4">
+    <div class="card border-0 p-3" style="border-radius:12px;" *ngIf="hasSearched">
+
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <span class="table-title">Forecast Review</span>
+          <span class="badge bg-secondary fw-normal py-1 px-2" *ngIf="forecastRows.length > 0">
+            {{ forecastRows.length }} Records
+          </span>
+          <span class="month-label" *ngIf="selectedMonth && selectedYear">
+            <i class="fas fa-calendar-alt me-1"></i>{{ getMonthYearLabel() }}
+          </span>
+          <span class="edit-mode-badge" *ngIf="forecastEditingCount > 0">
+            <i class="fas fa-pen me-1"></i>{{ forecastEditingCount }} row{{ forecastEditingCount > 1 ? 's' : '' }} in edit
+            <span *ngIf="forecastDirtyCount > 0" class="dirty-indicator ms-1">({{ forecastDirtyCount }} modified)</span>
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="forecastRows.length === 0" class="empty-state-card card border-0 text-center py-3">
+        <div class="empty-icon-wrap mx-auto mb-3"><i class="fas fa-clipboard-list"></i></div>
+        <p class="text-muted mb-0">No Forecast data found for the selected filters.</p>
+      </div>
+
+      <div class="bdrc-table-outer" *ngIf="forecastRows.length > 0">
+
+        <div class="d-flex justify-content-end gap-2 mb-2"
+             *ngIf="forecastEditingCount === 0 && hasForecastEditable && ShowForecastApproval">
+          <button class="btn btn-danger btn-sm" (click)="rejectAllForecast()" style="font-size:12px">Reject All</button>
+          <button class="btn btn-success btn-sm" (click)="saveAllForecast()" style="font-size:12px">Approve All</button>
+        </div>
+
+        <div class="bdrc-table-wrapper">
+          <table class="table table-bordered table-sm bdrc-table mb-0">
+            <thead>
+              <tr class="thead-row1">
+                <th rowspan="3" class="th-fixed th-state">State</th>
+                <th rowspan="3" class="th-fixed th-dealer">Model</th>
+                <th rowspan="3" class="th-fixed" style="min-width:110px;">Part Code</th>
+                <th rowspan="3" class="th-fixed" style="min-width:50px;">HP</th>
+                <th rowspan="3" class="th-fixed" style="min-width:55px;">FR</th>
+                <th rowspan="3" class="th-fixed" style="min-width:55px;">RR</th>
+                <th rowspan="3" class="th-fixed th-status">Status</th>
+                <th [attr.colspan]="forecastWeekCols().length" class="th-section">Billing Plan</th>
+                <th rowspan="3" class="th-fixed th-workflow">Uploaded By</th>
+                <th rowspan="3" class="th-fixed th-workflow">Uploader Name</th>
+                <th rowspan="3" class="th-fixed th-workflow">Pending With</th>
+                <th rowspan="3" class="th-fixed th-workflow">Pending Name</th>
+                <th rowspan="3" class="th-fixed th-status">Approval Status</th>
+                <th rowspan="3" class="th-fixed th-status">Reviewed By</th>
+                <th rowspan="3" class="th-fixed th-status" *ngIf="hasForecastRejected" style="min-width:200px;">Rejection Reason</th>
+                <th rowspan="3" class="th-action">Actions</th>
+              </tr>
+              <tr class="thead-row2">
+                <th *ngFor="let col of forecastWeekCols()"
+                    [class.th-w5-disabled]="col === 'W5_BillingPlan' && !hasW5">
+                  {{ forecastWeekLabel(col) }}
+                </th>
+              </tr>
+              <tr class="thead-row3">
+                <th *ngFor="let col of forecastWeekCols()"
+                    [class.th-ttl]="col === 'Total_BillingPlan'"
+                    [class.th-w5-disabled]="col === 'W5_BillingPlan' && !hasW5">
+                  {{ getForecastColTotal(col) }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of forecastRows; let i = index"
+                  [class.row-editing]="row._editing" [class.row-dirty]="row._dirty">
+                <td class="td-locked td-state">{{ row.StateName }}</td>
+                <td class="td-locked td-dealer">{{ row.ModelName }}</td>
+                <td class="td-locked" style="font-size:11px;">{{ row.ModelCode }}</td>
+                <td class="td-locked" style="text-align:center;">{{ row.HP }}</td>
+                <td class="td-locked" style="text-align:center;">{{ row.FR }}</td>
+                <td class="td-locked" style="text-align:center;">{{ row.RR }}</td>
+                <td class="td-locked td-status">
+                  <span class="status-badge"
+                        [class.status-active]="row.Status?.toLowerCase() === 'live'"
+                        [class.status-inactive]="row.Status?.toLowerCase() !== 'live'">
+                    {{ row.Status || '—' }}
+                  </span>
+                </td>
+                <ng-container *ngFor="let col of forecastWeekCols()">
+                  <td *ngIf="col === 'Total_BillingPlan'" class="td-ttl">
+                    {{ row.Total_BillingPlan || 0 }}
+                  </td>
+                  <td *ngIf="col === 'W5_BillingPlan' && !hasW5" class="td-disabled">—</td>
+                  <td *ngIf="col !== 'Total_BillingPlan' && !(col === 'W5_BillingPlan' && !hasW5)"
+                      [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                    <ng-container *ngIf="!row._editing">{{ $any(row)[col] || 0 }}</ng-container>
+                    <ng-container *ngIf="row._editing">
+                      <input type="number" class="edit-input" min="0"
+                             [(ngModel)]="$any(row)[col]"
+                             (ngModelChange)="onForecastCellChange(row)"
+                             [name]="col + '_' + i" />
+                    </ng-container>
+                  </td>
+                </ng-container>
+                <td class="td-locked td-workflow">{{ row.UploadByPosition || '—' }}</td>
+                <td class="td-locked td-workflow">{{ row.UploadName || '—' }}</td>
+                <td class="td-locked td-workflow td-pending">{{ row.pendingon === 'No' ? '—' : (row.pendingon || '—') }}</td>
+                <td class="td-locked td-workflow td-pending">{{ row.PendingName || '—' }}</td>
+                <td class="td-locked td-status">
+                  <span class="approved-badge" *ngIf="row.IsCommited === 1"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                  <span class="rejected-badge" *ngIf="row.IsCommited === -1"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+                  <span class="text-muted" *ngIf="row.IsCommited !== 1 && row.IsCommited !== -1">—</span>
+                </td>
+                <td class="td-locked td-workflow" style="white-space:normal;word-break:break-word;font-size:11px">{{ row.lastReviewBy || '—' }}</td>
+                <td class="td-locked td-workflow" *ngIf="hasForecastRejected"
+                    style="min-width:200px;white-space:normal;word-break:break-word;font-size:10px;font-weight:600;color:#dc3545;">
+                  <ng-container *ngIf="row.IsCommited === -1">{{ row.Remark || '—' }}</ng-container>
+                  <span class="text-muted" *ngIf="row.IsCommited !== -1">—</span>
+                </td>
+                <td class="td-action">
+                  <ng-container *ngIf="canEdit(row)">
+                    <button *ngIf="!row._editing" class="btn btn-edit btn-xs" (click)="startEditForecast(i)" title="Edit Row">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button *ngIf="row._editing" class="btn btn-cancel-edit btn-xs" (click)="cancelEditForecast(i)" title="Cancel">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </ng-container>
+                  <span *ngIf="!canEdit(row)" class="lock-icon" [title]="'Pending on: ' + row.pendingon">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Forecast Save All Bar -->
+        <div class="save-all-bar" *ngIf="forecastEditingCount > 0">
+          <div class="save-all-left">
+            <i class="fas fa-info-circle me-1 text-warning"></i>
+            <span>
+              <strong>{{ forecastEditingCount }}</strong> row{{ forecastEditingCount > 1 ? 's' : '' }} in edit mode
+              <ng-container *ngIf="forecastDirtyCount > 0">&mdash; <strong class="text-warning">{{ forecastDirtyCount }}</strong> modified</ng-container>
+            </span>
+          </div>
+          <div class="save-all-actions">
+            <button class="btn btn-cancel-all btn-sm me-2" (click)="cancelAllEditsForecast()" [disabled]="isSavingAllForecast">
+              <i class="fas fa-times me-1"></i>Cancel All
+            </button>
+            <button class="btn btn-save-all btn-sm" (click)="saveAllForecast()" [disabled]="isSavingAllForecast || forecastDirtyCount === 0">
+              <span *ngIf="!isSavingAllForecast"><i class="fas fa-save me-1"></i>Save {{ forecastDirtyCount > 0 ? forecastDirtyCount + ' Change' + (forecastDirtyCount > 1 ? 's' : '') : 'All' }}</span>
+              <span *ngIf="isSavingAllForecast"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== TALUKA INDUSTRY TABLE (uploadId = 1) ===== -->
+  <ng-container *ngIf="selectedUploadId === 1">
+    <div class="card border-0 p-3" style="border-radius:12px;" *ngIf="hasSearched">
+
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <span class="table-title">Taluka Industry Review</span>
+          <span class="badge bg-secondary fw-normal py-1 px-2" *ngIf="talukaRows.length > 0">
+            {{ talukaRows.length }} Records
+          </span>
+          <span class="month-label" *ngIf="selectedState">
+            <i class="fas fa-map-marker-alt me-1"></i>{{ selectedState }}
+          </span>
+          <span class="edit-mode-badge" *ngIf="talukaEditingCount > 0">
+            <i class="fas fa-pen me-1"></i>{{ talukaEditingCount }} row{{ talukaEditingCount > 1 ? 's' : '' }} in edit
+            <span *ngIf="talukaDirtyCount > 0" class="dirty-indicator ms-1">({{ talukaDirtyCount }} modified)</span>
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="talukaRows.length === 0" class="empty-state-card card border-0 text-center py-3">
+        <div class="empty-icon-wrap mx-auto mb-3"><i class="fas fa-clipboard-list"></i></div>
+        <p class="text-muted mb-0">No Taluka Industry data found for the selected filters.</p>
+      </div>
+
+      <div class="bdrc-table-outer" *ngIf="talukaRows.length > 0 && talukaFYMonths">
+
+        <div class="d-flex justify-content-end gap-2 mb-2"
+             *ngIf="talukaEditingCount === 0 && hasTalukaEditable">
+          <button class="btn btn-danger btn-sm" (click)="rejectAllTaluka()" style="font-size:12px">Reject All</button>
+          <button class="btn btn-success btn-sm" (click)="saveAllTaluka()" style="font-size:12px">Approve All</button>
+        </div>
+
+        <div class="bdrc-table-wrapper">
+          <table class="table table-bordered table-sm bdrc-table mb-0">
+            <thead>
+              <!-- Row 1: Section headers -->
+              <tr class="thead-row1">
+                <th rowspan="3" class="th-fixed th-state">State</th>
+                <th rowspan="3" class="th-fixed" style="min-width:110px;">District</th>
+                <th rowspan="3" class="th-fixed" style="min-width:130px;">Taluka</th>
+
+                <!-- LFY — sirf tab dikhao jab months hain -->
+                <ng-container *ngIf="talukaFYMonths!.lfyMonths.length > 0">
+                  <th [attr.colspan]="talukaFYMonths!.lfyMonths.length + 1" class="th-section">
+                    {{ talukaFYMonths!.lfyLabel }}
+                  </th>
+                </ng-container>
+
+                <!-- CFY -->
+                <ng-container *ngIf="talukaFYMonths!.cfyMonths.length > 0">
+                  <th [attr.colspan]="talukaFYMonths!.cfyMonths.length + 1" class="th-section">
+                    {{ talukaFYMonths!.cfyLabel }}
+                  </th>
+                </ng-container>
+
+                <!-- NFY -->
+                <ng-container *ngIf="talukaFYMonths!.nfyMonths.length > 0">
+                  <th [attr.colspan]="talukaFYMonths!.nfyMonths.length + 1" class="th-section">
+                    {{ talukaFYMonths!.nfyLabel }}
+                  </th>
+                </ng-container>
+
+                <!-- Workflow -->
+                <th rowspan="3" class="th-fixed th-workflow">Uploaded By</th>
+                <th rowspan="3" class="th-fixed th-workflow">Uploader Name</th>
+                <th rowspan="3" class="th-fixed th-workflow">Pending With</th>
+                <th rowspan="3" class="th-fixed th-workflow">Pending Name</th>
+                <th rowspan="3" class="th-fixed th-status">Approval Status</th>
+                <th rowspan="3" class="th-fixed th-status">Reviewed By</th>
+                <th rowspan="3" class="th-fixed th-status" *ngIf="hasTalukaRejected" style="min-width:180px;">Rejection Reason</th>
+                <th rowspan="3" class="th-action">Actions</th>
+              </tr>
+
+              <!-- Row 2: Month labels -->
+              <tr class="thead-row2">
+                <ng-container *ngFor="let col of getTalukaAllMonthCols()">
+                  <th [class.th-ttl]="isTTLCol(col)"
+                      style="min-width:52px; font-size:10px;">
+                    {{ talukaColLabel(col) }}
+                  </th>
+                </ng-container>
+              </tr>
+
+              <!-- Row 3: Column totals -->
+              <tr class="thead-row3">
+                <ng-container *ngFor="let col of getTalukaAllMonthCols()">
+                  <th [class.th-ttl]="isTTLCol(col)" style="font-size:10px;">
+                    {{ getTalukaColTotal(col) }}
+                  </th>
+                </ng-container>
+              </tr>
+
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of talukaRows; let i = index"
+                  [class.row-editing]="row._editing" [class.row-dirty]="row._dirty">
+
+                <!-- Fixed info columns -->
+                <td class="td-locked td-state">{{ row.StateName }}</td>
+                <td class="td-locked" style="font-size:11px;">{{ row.DistrictName || '—' }}</td>
+                <td class="td-locked" style="font-size:11px;font-weight:500;">{{ row.TalukaName || '—' }}</td>
+
+                <!-- Month columns -->
+                <ng-container *ngFor="let col of getTalukaAllMonthCols()">
+
+                  <!-- TTL column -->
+                  <td *ngIf="isTTLCol(col)" class="td-ttl">
+                    <ng-container *ngIf="col === 'TTL_LFY'">{{ getTalukaTTL(row, talukaFYMonths!.lfyMonths) }}</ng-container>
+                    <ng-container *ngIf="col === 'TTL_CFY'">{{ getTalukaTTL(row, talukaFYMonths!.cfyMonths) }}</ng-container>
+                    <ng-container *ngIf="col === 'TTL_NFY'">{{ getTalukaTTL(row, talukaFYMonths!.nfyMonths) }}</ng-container>
+                  </td>
+
+                  <!-- Editable month cell -->
+                  <td *ngIf="!isTTLCol(col)"
+                      [class.td-editable]="row._editing"
+                      [class.td-readonly]="!row._editing"
+                      style="text-align:center; min-width:52px;">
+                    <ng-container *ngIf="!row._editing">
+                      {{ row.monthData[col] ?? '—' }}
+                    </ng-container>
+                    <ng-container *ngIf="row._editing">
+                      <input type="number" class="edit-input" min="0"
+                             [(ngModel)]="row.monthData[col]"
+                             (ngModelChange)="onTalukaCellChange(row)"
+                             [name]="col + '_taluka_' + i" />
+                    </ng-container>
+                  </td>
+
+                </ng-container>
+
+                <!-- Workflow columns -->
+                <td class="td-locked td-workflow">{{ row.UploadByPosition || '—' }}</td>
+                <td class="td-locked td-workflow" style="white-space:normal;word-break:break-word;font-size:11px">{{ row.UploadName || '—' }}</td>
+                <td class="td-locked td-workflow td-pending">{{ row.pendingon === 'No' ? '—' : (row.pendingon || '—') }}</td>
+                <td class="td-locked td-workflow td-pending" style="white-space:normal;word-break:break-word;font-size:11px">{{ row.PendingName || '—' }}</td>
+                <td class="td-locked td-status">
+                  <span class="approved-badge" *ngIf="row.IsCommited === 1"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                  <span class="rejected-badge" *ngIf="row.IsCommited === -1"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+                  <span class="text-muted" *ngIf="row.IsCommited !== 1 && row.IsCommited !== -1">—</span>
+                </td>
+                <td class="td-locked td-workflow" style="white-space:normal;word-break:break-word;font-size:11px">{{ row.lastReviewBy || '—' }}</td>
+                <td class="td-locked td-workflow" *ngIf="hasTalukaRejected"
+                    style="min-width:180px;white-space:normal;word-break:break-word;font-size:10px;font-weight:600;color:#dc3545;">
+                  <ng-container *ngIf="row.IsCommited === -1">{{ row.Remark || '—' }}</ng-container>
+                  <span class="text-muted" *ngIf="row.IsCommited !== -1">—</span>
+                </td>
+
+                <!-- Action -->
+                <td class="td-action">
+                  <ng-container *ngIf="canEdit(row)">
+                    <button *ngIf="!row._editing" class="btn btn-edit btn-xs" (click)="startEditTaluka(i)" title="Edit Row">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button *ngIf="row._editing" class="btn btn-cancel-edit btn-xs" (click)="cancelEditTaluka(i)" title="Cancel">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </ng-container>
+                  <span *ngIf="!canEdit(row)" class="lock-icon" [title]="'Pending on: ' + row.pendingon">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Save All Bar -->
+        <div class="save-all-bar" *ngIf="talukaEditingCount > 0">
+          <div class="save-all-left">
+            <i class="fas fa-info-circle me-1 text-warning"></i>
+            <span>
+              <strong>{{ talukaEditingCount }}</strong> row{{ talukaEditingCount > 1 ? 's' : '' }} in edit mode
+              <ng-container *ngIf="talukaDirtyCount > 0">&mdash; <strong class="text-warning">{{ talukaDirtyCount }}</strong> modified</ng-container>
+            </span>
+          </div>
+          <div class="save-all-actions">
+            <button class="btn btn-cancel-all btn-sm me-2" (click)="cancelAllEditsTaluka()" [disabled]="isSavingAllTaluka">
+              <i class="fas fa-times me-1"></i>Cancel All
+            </button>
+            <button class="btn btn-save-all btn-sm" (click)="saveAllTaluka()" [disabled]="isSavingAllTaluka || talukaDirtyCount === 0">
+              <span *ngIf="!isSavingAllTaluka"><i class="fas fa-save me-1"></i>Save {{ talukaDirtyCount > 0 ? talukaDirtyCount + ' Change' + (talukaDirtyCount > 1 ? 's' : '') : 'All' }}</span>
+              <span *ngIf="isSavingAllTaluka"><span class="spinner-border spinner-border-sm me-1"></span>Saving...</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+
+  <!-- ===== price position ===== -->
+  <ng-container *ngIf="selectedUploadId === 9">
+    <div class="card border-0 p-3" style="border-radius:12px;" *ngIf="hasSearched">
+
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <span class="table-title">Price Position Review</span>
+          <span class="badge bg-secondary fw-normal py-1 px-2" *ngIf="pricePositionRows.length > 0">
+            {{ pricePositionRows.length }} Records
+          </span>
+          <span class="month-label" *ngIf="selectedState">
+            <i class="fas fa-map-marker-alt me-1"></i>{{ selectedState }}
+          </span>
+          <span class="edit-mode-badge" *ngIf="pricePositionEditingCount > 0">
+            <i class="fas fa-pen me-1"></i>{{ pricePositionEditingCount }} row{{ pricePositionEditingCount > 1 ? 's' : '' }} in edit
+            <span *ngIf="pricePositionDirtyCount > 0" class="dirty-indicator ms-1">({{ pricePositionDirtyCount }} modified)</span>
+          </span>
+        </div>
+
+        <!-- Approve All / Reject All -->
+        <!--<div class="d-flex gap-2" *ngIf="hasPricePositionEditable && pricePositionEditingCount === 0">
+          <button class="btn btn-danger btn-sm" (click)="rejectAllPricePosition()" style="font-size:12px">
+            Reject All
+          </button>
+          <button class="btn btn-success btn-sm" (click)="approveAllPricePosition()" style="font-size:12px">
+            Approve All
+          </button>
+        </div>-->
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="pricePositionRows.length === 0" class="empty-state-card card border-0 text-center py-3">
+        <div class="empty-icon-wrap mx-auto mb-3"><i class="fas fa-clipboard-list"></i></div>
+        <p class="text-muted mb-0">No Price Position data found for the selected filters.</p>
+      </div>
+
+      <!-- Table -->
+      <div class="bdrc-table-outer" *ngIf="pricePositionRows.length > 0">
+        <div class="bdrc-table-wrapper">
+          <table class="table table-bordered table-sm bdrc-table mb-0">
+            <thead>
+              <tr class="thead-row1">
+                <th style="min-width:100px;">State</th>
+                <th style="min-width:90px;">HP Range</th>
+                <th style="min-width:60px;">HP</th>
+                <th style="min-width:100px;">Make</th>
+                <th style="min-width:120px;">Model</th>
+                <th style="min-width:120px;">Drive</th>
+                <th style="min-width:80px;">BOM</th>
+                <th style="min-width:100px;">Offer Price</th>
+                <th style="min-width:100px;">Implement Price</th>
+                <th style="min-width:100px;">Rto/Insurance</th>
+                <th style="min-width:80px;">MOP</th>
+                <th style="min-width:80px;">Freight</th>
+                <th style="min-width:60px;">DM</th>
+                <th style="min-width:80px;">AccessoryName</th>
+                <th style="min-width:70px;">ACC</th>
+                <th style="min-width:80px;">NDP</th>
+                <th style="min-width:100px;">Avg Vol/Month</th>
+                <!--<th style="min-width:100px;">Implement Price</th>
+                <th style="min-width:100px;">Rto/Insurance</th>-->
+                <th style="min-width:100px;">MOP Proof</th>
+                <th style="min-width:100px;">MOP Date</th>
+                <th style="min-width:100px;">RC Copy</th>
+                <th style="min-width:120px;">Pending With</th>
+                <th style="min-width:120px;">Approval Status</th>
+                <th style="min-width:180px;" *ngIf="hasPricePositionRejected">Rejection Reason</th>
+                <th style="min-width:120px;" *ngIf="positionId==='National Sales Head'">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of pricePositionRows; let i = index"
+                  [class.row-editing]="row._editing" [class.row-dirty]="row._dirty">
+
+                <!-- Locked columns -->
+                <td class="td-locked">{{ row.StateName || '—' }}</td>
+                <td class="td-locked">{{ row.HPRange || '—' }}</td>
+                <td class="td-locked">{{ row.SubHPRange || '—' }}</td>
+                <td class="td-locked">{{ row.Make || '—' }}</td>
+                <td class="td-locked">{{ row.Model || '—' }}</td>
+                <td class="td-locked">{{ row.Drive || '—' }}</td>
+                <td class="td-locked">{{ row.BOM || '—' }}</td>
+                <!--<td class="td-locked">
+    {{ row.offerPrice ?? '—' }}
+  </td>-->
+                <!--rto/insurance -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.offerPrice ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.offerPrice"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'offerPrice' + i" />
+                  </ng-container>
+                </td>
+                <!-- Implement -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.implementPrice ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.implementPrice"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'implementPrice_' + i" />
+                  </ng-container>
+                </td>
+                <!--rto/insurance -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.rtoInsurance ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.rtoInsurance"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'rtoInsurance_' + i" />
+                  </ng-container>
+                </td>
+                <!-- MOP -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.MOP ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.MOP"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'MOP_' + i" />
+                  </ng-container>
+                </td>
+
+                <!-- Freight -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.Freight ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.Freight"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'Freight_' + i" />
+                  </ng-container>
+                </td>
+                <!-- DM -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.DM ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.DM"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'DM_' + i" />
+                  </ng-container>
+                </td>
+
+                <!-- ACC name-->
+
+                <td class="td-locked">{{ row.AccessoryName || '—' }}</td>
+
+                <!-- ACC -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.ACC ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.ACC"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'ACC_' + i" />
+                  </ng-container>
+                </td>
+                <!-- BOM -->
+                <!--<td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+    <ng-container *ngIf="!row._editing">{{ row.BOM ?? '—' }}</ng-container>
+    <ng-container *ngIf="row._editing">
+      <input type="text" class="edit-input" min="0"
+             [(ngModel)]="row.BOM"
+             (ngModelChange)="onPricePositionCellChange(row)"
+             [name]="'BOM_' + i" />
+    </ng-container>
+  </td>-->
+                <!-- NDP -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.NDP ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.NDP"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'NDP_' + i" />
+                  </ng-container>
+                </td>
+
+
+
+
+
+
+
+
+                <!-- Avg Vol/Month -->
+                <td [class.td-editable]="row._editing" [class.td-readonly]="!row._editing">
+                  <ng-container *ngIf="!row._editing">{{ row.AvgVolPerMonth ?? '—' }}</ng-container>
+                  <ng-container *ngIf="row._editing">
+                    <input type="number" class="edit-input" min="0"
+                           [(ngModel)]="row.AvgVolPerMonth"
+                           (ngModelChange)="onPricePositionCellChange(row)"
+                           [name]="'AvgVolPerMonth_' + i" />
+                  </ng-container>
+                </td>
+
+
+                <!-- MOP Proof -->
+                <td>
+                  <a *ngIf="row.ProofUrl" [href]="row.ProofUrl" target="_blank"
+                     class="btn btn-outline-primary btn-xs" style="font-size:10px;">
+                    <i class="fas fa-eye me-1"></i>View
+                  </a>
+                  <span *ngIf="!row.ProofUrl" class="text-muted">—</span>
+                </td>
+                <td class="td-locked">{{ row.mopDate || '—' }}</td>
+
+
+                <!-- RC Copy -->
+                <td>
+                  <a *ngIf="row.RcCopy" [href]="row.RcCopy" target="_blank"
+                     class="btn btn-outline-secondary btn-xs" style="font-size:10px;">
+                    <i class="fas fa-eye me-1"></i>View
+                  </a>
+                  <span *ngIf="!row.RcCopy" class="text-muted">—</span>
+                </td>
+
+                <!-- Pending With -->
+                <td class="td-locked td-workflow td-pending" style="font-size:11px;">
+                  {{ row.pendingon === 'No' ? '—' : (row.pendingon || '—') }}
+                </td>
+
+                <!-- Approval Status -->
+                <td class="td-locked td-status">
+                  <span class="approved-badge" *ngIf="row.IsCommited === 1">
+                    <i class="fas fa-check-circle me-1"></i>Approved
+                  </span>
+                  <span class="rejected-badge" *ngIf="row.IsCommited === -1">
+                    <i class="fas fa-times-circle me-1"></i>Rejected
+                  </span>
+                  <span class="text-muted" *ngIf="row.IsCommited !== 1 && row.IsCommited !== -1">Pending</span>
+                </td>
+
+                <!-- Rejection Reason -->
+                <td *ngIf="hasPricePositionRejected"
+                    style="min-width:180px; white-space:normal; word-break:break-word;
+                         font-size:10px; font-weight:600; color:#dc3545;">
+                  <ng-container *ngIf="row.IsCommited === -1">{{ row.Remark || '—' }}</ng-container>
+                  <span class="text-muted" *ngIf="row.IsCommited !== -1">—</span>
+                </td>
+
+                <!-- Actions -->
+                <td class="td-action" *ngIf="positionId==='National Sales Head'">
+                  <ng-container>
+                    <!-- Edit / Cancel edit button -->
+                    <button *ngIf="!row._editing && row.IsCommited !== -1"
+                            class="btn btn-edit btn-xs me-1"
+                            (click)="startEditPricePosition(i)"
+                            title="Edit Row">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button *ngIf="row._editing"
+                            class="btn btn-cancel-edit btn-xs me-1"
+                            (click)="cancelEditPricePosition(i)"
+                            title="Cancel">
+                      <i class="fas fa-times"></i>
+                    </button>
+
+                    <!--Reject button-->
+                    <button class="btn btn-danger btn-xs me-1" *ngIf="canEditPricePosition(row)"
+                            (click)="openRejectModalPrice(row)"
+                            title="Reject" style="font-size:10px;">
+                      <i class="fas fa-times me-1"></i>Reject
+                    </button>
+                    <!--Approve button-->
+                    <button class="btn btn-success btn-xs" *ngIf="canEditPricePosition(row)"
+                            (click)="approvePricePosition(row)"
+                            title="Approve" style="font-size:10px;">
+                      <i class="fas fa-check me-1"></i>Approve
+                    </button>
+                  </ng-container>
+                  <span *ngIf="!canEditPricePosition(row)" class="lock-icon"
+                        [title]="'Pending on: ' + row.pendingon">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Save All Bar -->
+        <div class="save-all-bar" *ngIf="pricePositionEditingCount > 0">
+          <div class="save-all-left">
+            <i class="fas fa-info-circle me-1 text-warning"></i>
+            <span>
+              <strong>{{ pricePositionEditingCount }}</strong> row{{ pricePositionEditingCount > 1 ? 's' : '' }} in edit mode
+              <ng-container *ngIf="pricePositionDirtyCount > 0">
+                &mdash; <strong class="text-warning">{{ pricePositionDirtyCount }}</strong> modified
+              </ng-container>
+            </span>
+          </div>
+          <div class="save-all-actions">
+            <button class="btn btn-cancel-all btn-sm me-2"
+                    (click)="cancelAllEditsPricePosition()"
+                    [disabled]="isSavingAllPricePosition">
+              <i class="fas fa-times me-1"></i>Cancel All
+            </button>
+            <button class="btn btn-save-all btn-sm"
+                    (click)="saveAllPricePosition()"
+                    [disabled]="isSavingAllPricePosition || pricePositionDirtyCount === 0">
+              <span *ngIf="!isSavingAllPricePosition">
+                <i class="fas fa-save me-1"></i>Save {{ pricePositionDirtyCount > 0 ? pricePositionDirtyCount + ' Change' + (pricePositionDirtyCount > 1 ? 's' : '') : 'All' }}
+              </span>
+              <span *ngIf="isSavingAllPricePosition">
+                <span class="spinner-border spinner-border-sm me-1"></span>Saving...
+              </span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Reject Modal -->
+  <div class="modal fade" id="rejectPricePositionModal" tabindex="-1"
+       [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'"
+       style="background:rgba(0,0,0,0.4)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius:12px;">
+        <div class="modal-header border-0">
+          <h6 class="modal-title fw-bold">Reject Price Position</h6>
+          <button type="button" class="btn-close" (click)="closeRejectModal()"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label fw-semibold" style="font-size:13px;">
+            Rejection Reason <span class="text-danger">*</span>
+          </label>
+          <textarea class="form-control" rows="3" placeholder="Enter reason..."
+                    [(ngModel)]="rejectRemark" name="rejectRemark"
+                    style="font-size:13px; border-radius:8px;"></textarea>
+          <div *ngIf="rejectRemarkError" class="text-danger mt-1" style="font-size:11px;">
+            Reason is required.
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button class="btn btn-secondary btn-sm" (click)="closeRejectModal()">Cancel</button>
+          <button class="btn btn-danger btn-sm" (click)="confirmRejectPricePosition()">
+            Confirm Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ===== EMPTY STATE ===== -->
+  <div class="empty-state-card card border-0 text-center py-4 mt-3"
+       *ngIf="!hasSearched && selectedUploadId !== 3 && selectedUploadId !== 4 && selectedUploadId !== 1">
+    <div class="empty-icon-wrap mx-auto mb-3"><i class="fas fa-clipboard-list"></i></div>
+    <p class="empty-title mb-1">No Data to Display</p>
+    <p class="text-muted mb-0" style="font-size:13px;">
+      Select filters above and click <strong>Apply Filter</strong> to load data.
+    </p>
+  </div>
+
+</div>
+
+<!-- ===== SHARED REJECT REMARK MODAL ===== -->
+<div class="modal fade" id="rejectRemarkModal" tabindex="-1" aria-labelledby="rejectRemarkModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0">Reject Remark</h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="cancelReject()"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Reason for Rejection <span class="text-danger">*</span></label>
+        <textarea class="form-control h-auto p-2"
+                  [class.is-invalid]="rejectRemarkSubmitted && !rejectRemark.trim()"
+                  rows="3" maxlength="300"
+                  placeholder="Enter rejection reason..."
+                  [(ngModel)]="rejectRemark"
+                  name="rejectRemark"></textarea>
+        <div class="invalid-feedback d-block" *ngIf="rejectRemarkSubmitted && !rejectRemark.trim()">
+          Remark is required.
+        </div>
+        <small class="text-muted">{{ rejectRemark.length }}/300</small>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-danger" (click)="confirmReject()">
+          <i class="fas fa-times-circle me-1"></i> Confirm Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

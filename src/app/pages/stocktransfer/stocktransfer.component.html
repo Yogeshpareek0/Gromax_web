@@ -1,0 +1,409 @@
+<div class="container-fluid px-0">
+
+  <div class="stock-tabs d-flex justify-content-between text-center">
+    <div class="tab-item" *ngIf="positionId === 'Dealer'||isSuperAdmin"
+         [class.active]="activeTab === 'myStock'"
+         (click)="setActiveTab('myStock')">
+      My Stock
+    </div>
+    <div class="tab-item" *ngIf="positionId === 'Dealer'"
+         [class.active]="activeTab === 'transferred'"
+         (click)="setActiveTab('transferred')">
+      Transferred
+    </div>
+    <div class="tab-item" *ngIf="positionId === 'Dealer'"
+         [class.active]="activeTab === 'received'"
+         (click)="setActiveTab('received')">
+      Received
+    </div>
+    <div class="tab-item" *ngIf="positionId !== 'Dealer'"
+         [class.active]="activeTab === ''"
+         (click)="setActiveTab('')">Stock Transfer Request</div>
+  </div>
+
+
+
+  <div class="search-wrapper mt-4" *ngIf="activeTab === 'myStock' && (positionId==='Dealer'||isSuperAdmin)">
+    <div class="input-group custom-search-group">
+      <span class="input-group-text bg-white border-0">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      </span>
+      <input #mobileInput type="text" class="form-control border-0 shadow-none" placeholder="Search chassis no & tractor sr no..." aria-label="Search">
+      <button class="btn search-btn text-white" type="button" (click)="searchValue(mobileInput)">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="enquiry-table-wrapper mt-3" *ngIf="activeTab === 'myStock'">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Tractor Sr.Number</th>
+          <th class="text-nowrap fw-normal">Model</th>
+          <th class="text-nowrap fw-normal">Drive Type</th>
+          <th class="text-nowrap fw-normal">Colour</th>
+          <th class="text-nowrap fw-normal">Chassis Number</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;"></th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of stockTransferList; let i = index">
+          <td>{{i + 1 }}</td>
+          <td class="text-nowrap">{{ item.TractorSrNumber }}</td>
+          <td class="text-nowrap">{{ item.Model }}</td>
+          <td class="text-nowrap">{{ item.DriveType }}</td>
+          <td class="text-nowrap">{{ item.Colour }}</td>
+          <td class="text-nowrap">{{ item.chasisno }}</td>
+          <td class="text-nowrap text-center">
+            <button class="btn btn-sm text-white" style="background-color: #4796BD; font-size: 11px "
+                    (click)="transferStock(item)">
+              Transfer Stock
+            </button>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+  <!-- ==================== TRANSFERRED TAB ==================== -->
+  <div class="row g-3 mt-2" *ngIf="activeTab === 'transferred'">
+    <div class="col-12 col-sm-6 col-xl-4" *ngFor="let item of transferredList">
+      <div class="tc-card h-100">
+
+        <!-- Status Strip -->
+        <div class="tc-status-strip"
+             [class.tc-approved]="item.ApprovalStatus?.toLowerCase() === 'approved'"
+             [class.tc-rejected]="item.ApprovalStatus?.toLowerCase() === 'reject'"
+             [class.tc-pending]="item.ApprovalStatus?.toLowerCase() === 'pending'">
+          <span class="tc-dot"></span>
+          {{ item.ApprovalStatus }}
+        </div>
+
+        <!-- Header -->
+        <div class="tc-head">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <p class="tc-head-label">Chassis No</p>
+              <p class="tc-head-value">{{ item.ChassisNo }}</p>
+            </div>
+            <div class="tc-head-icon">
+              <i class="fa-solid fa-right-left"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="tc-body">
+          <div class="tc-row">
+            <div class="tc-field">
+              <div class="tc-field-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">From</span>
+                <span class="tc-field-value">{{ item.DealerCodeFrom }}</span>
+              </div>
+            </div>
+            <div class="tc-field">
+              <div class="tc-field-icon"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">To</span>
+                <span class="tc-field-value">{{ item.DealerCodeTo }} <span class="tc-name-tag">{{ item.DlrToName }}</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="tc-divider"></div>
+          <div class="tc-row">
+            <div class="tc-field tc-field-full">
+              <div class="tc-field-icon">
+                <i class="fa-solid"
+                   [class.fa-circle-check]="item.ApprovalStatus?.toLowerCase() === 'approved'"
+                   [class.fa-circle-xmark]="item.ApprovalStatus?.toLowerCase() === 'reject'"
+                   [class.fa-hourglass-half]="item.ApprovalStatus?.toLowerCase() === 'pending'"></i>
+              </div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">
+                  {{
+ item.ApprovalStatus?.toLowerCase() === 'approved' ? 'Approved By' :
+                   item.ApprovalStatus?.toLowerCase() === 'reject' ? 'Rejected By' : 'Pending On'
+                  }}
+                </span>
+                <span class="tc-field-value">
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'approved'">
+                    {{ positionId === 'Dealer' && item.ApprovedBy === 'Dealer To' ? 'Dealer' : item.ApprovedBy }}
+                  </ng-container>
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'reject'">
+                    {{ positionId === 'Dealer' && item.ApprovedBy === 'Dealer To' ? 'Dealer' : item.ApprovedBy }}
+                  </ng-container>
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'pending'">
+                    {{
+                    (positionId === 'Territory Manager' && item.PendingOn === 'Territory Manager') ||
+                    (positionId === 'State Head' && item.PendingOn === 'State Head')
+                      ? 'You' : item.PendingOn
+                    }}
+                  </ng-container>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== RECEIVED TAB ==================== -->
+  <div class="row g-3 mt-2" *ngIf="activeTab === 'received'">
+    <div class="col-12 col-sm-6 col-xl-4" *ngFor="let item of transferredReceivedList">
+      <div class="tc-card h-100">
+
+        <!-- Status Strip -->
+        <div class="tc-status-strip"
+             [class.tc-approved]="item.ApprovalStatus?.toLowerCase() === 'approved'"
+             [class.tc-rejected]="item.ApprovalStatus?.toLowerCase() === 'reject'"
+             [class.tc-pending]="item.ApprovalStatus?.toLowerCase() === 'pending'">
+          <span class="tc-dot"></span>
+          {{ item.ApprovalStatus }}
+        </div>
+
+        <!-- Header -->
+        <div class="tc-head">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <p class="tc-head-label">Chassis No</p>
+              <p class="tc-head-value">{{ item.ChassisNo }}</p>
+            </div>
+            <div class="tc-head-icon">
+              <i class="fa-solid fa-truck-ramp-box"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="tc-body">
+          <div class="tc-row">
+            <div class="tc-field">
+              <div class="tc-field-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">From</span>
+                <span class="tc-field-value">{{ item.DealerCodeFrom }}</span>
+              </div>
+            </div>
+            <div class="tc-field">
+              <div class="tc-field-icon"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">To</span>
+                <span class="tc-field-value">{{ item.DealerCodeTo }} <span class="tc-name-tag">{{ item.DlrToName }}</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="tc-divider"></div>
+          <div class="tc-row">
+            <div class="tc-field tc-field-full">
+              <div class="tc-field-icon">
+                <i class="fa-solid"
+                   [class.fa-circle-check]="item.ApprovalStatus?.toLowerCase() === 'approved'"
+                   [class.fa-circle-xmark]="item.ApprovalStatus?.toLowerCase() === 'reject'"
+                   [class.fa-hourglass-half]="item.ApprovalStatus?.toLowerCase() === 'pending'"></i>
+              </div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">
+                  {{
+ item.ApprovalStatus?.toLowerCase() === 'approved' ? 'Approved By' :
+                   item.ApprovalStatus?.toLowerCase() === 'reject' ? 'Rejected By' : 'Pending On'
+                  }}
+                </span>
+                <span class="tc-field-value">
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'approved'">
+                    {{ positionId === 'Dealer' && item.ApprovedBy === 'Dealer To' ? 'You' : item.ApprovedBy }}
+                  </ng-container>
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'reject'">
+                    {{ positionId === 'Dealer' && item.ApprovedBy === 'Dealer To' ? 'You' : item.ApprovedBy }}
+                  </ng-container>
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'pending'">
+                    {{
+                    (positionId === 'Territory Manager' && item.PendingOn === 'Territory Manager') ||
+                    (positionId === 'State Head' && item.PendingOn === 'State Head')
+                      ? 'You' : item.PendingOn
+                    }}
+                  </ng-container>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approve / Reject Buttons -->
+        <div class="tc-action-footer"
+             *ngIf="item.ApprovalStatus?.toLowerCase() === 'pending' && item.PendingOn?.toLowerCase() === 'dealer to'">
+          <button class="tc-btn-approve" (click)="approveStock(item, 'Approved')">
+            <i class="fa-solid fa-check me-1"></i> Approve
+          </button>
+          <button class="tc-btn-reject" (click)="approveStock(item, 'Reject')">
+            <i class="fa-solid fa-xmark me-1"></i> Reject
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== ALL / TOTAL TAB ==================== -->
+  <div class="row g-3 mt-2" *ngIf="activeTab === ''">
+    <div class="col-12 col-sm-6 col-xl-4" *ngFor="let item of totalTransferredList">
+      <div class="tc-card h-100">
+
+        <!-- Status Strip -->
+        <div class="tc-status-strip"
+             [class.tc-approved]="item.ApprovalStatus?.toLowerCase() === 'approved'"
+             [class.tc-rejected]="item.ApprovalStatus?.toLowerCase() === 'reject'"
+             [class.tc-pending]="item.ApprovalStatus?.toLowerCase() === 'pending'">
+          <span class="tc-dot"></span>
+          {{ item.ApprovalStatus }}
+        </div>
+
+        <!-- Header -->
+        <div class="tc-head">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <p class="tc-head-label">Chassis No</p>
+              <p class="tc-head-value">{{ item.ChassisNo }}</p>
+            </div>
+            <div class="tc-head-icon">
+              <i class="fa-solid fa-right-left"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="tc-body">
+          <div class="tc-row">
+            <div class="tc-field">
+              <div class="tc-field-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">From</span>
+                <span class="tc-field-value">{{ item.DealerCodeFrom }}</span>
+              </div>
+            </div>
+            <div class="tc-field">
+              <div class="tc-field-icon"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">To</span>
+                <span class="tc-field-value">{{ item.DealerCodeTo }} <span class="tc-name-tag">{{ item.DlrToName }}</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="tc-divider"></div>
+          <div class="tc-row">
+            <div class="tc-field tc-field-full">
+              <div class="tc-field-icon">
+                <i class="fa-solid"
+                   [class.fa-circle-check]="item.ApprovalStatus?.toLowerCase() === 'approved'"
+                   [class.fa-circle-xmark]="item.ApprovalStatus?.toLowerCase() === 'reject'"
+                   [class.fa-hourglass-half]="item.ApprovalStatus?.toLowerCase() === 'pending'"></i>
+              </div>
+              <div class="tc-field-text">
+                <span class="tc-field-label">
+                  {{
+ item.ApprovalStatus?.toLowerCase() === 'approved' ? 'Approved By' :
+                   item.ApprovalStatus?.toLowerCase() === 'reject' ? 'Rejected By' : 'Pending On'
+                  }}
+                </span>
+                <span class="tc-field-value">
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'approved'">
+                    {{ positionId === 'Dealer' && item.ApprovedBy === 'Dealer To' ? 'You' : item.ApprovedBy }}
+                  </ng-container>
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'reject'">
+                    {{ positionId === 'Dealer' && item.ApprovedBy === 'Dealer To' ? 'You' : item.ApprovedBy }}
+                  </ng-container>
+                  <ng-container *ngIf="item.ApprovalStatus?.toLowerCase() === 'pending'">
+                    {{
+                    (positionId === 'Territory Manager' && item.PendingOn === 'Territory Manager') ||
+                    (positionId === 'State Head' && item.PendingOn === 'State Head')
+                      ? 'You' : item.PendingOn
+                    }}
+                  </ng-container>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approve / Reject Buttons -->
+        <div class="tc-action-footer"
+             *ngIf="item.ApprovalStatus?.toLowerCase() === 'pending' &&
+            (
+             (item.PendingOn?.toLowerCase() === 'territory manager' && positionId?.toLowerCase() === 'territory manager')
+             ||
+             (item.PendingOn?.toLowerCase() === 'state head' && positionId?.toLowerCase() === 'state head')
+             ||
+             isSuperAdmin
+             )">
+          <button class="tc-btn-approve" (click)="approveStock(item, 'Approved')">
+            <i class="fa-solid fa-check me-1"></i> Approve
+          </button>
+          <button class="tc-btn-reject" (click)="approveStock(item, 'Reject')">
+            <i class="fa-solid fa-xmark me-1"></i> Reject
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Stock Transfer Modal -->
+<div class="modal fade" id="stocktransferModal" tabindex="-1" aria-labelledby="stocktransferModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0" id="viewMoreLabel">
+            <i class="bi bi-pencil-square me-2"></i>Transfer This Tractor
+          </h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="closetransferModal()"></button>
+      </div>
+
+      <div class="modal-body p-3" style="background-color: #E5E5E5">
+        <div *ngIf="selectedStock" class="card border-0">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6 col-12 mb-2" style="font-size:14px">
+                <span>Tractor Sr. Number : </span> <span style="color: #4796BD">{{ selectedStock.TractorSrNumber }}</span>
+              </div>
+              <div class="col-lg-6 col-12 mb-2" style="font-size:14px">
+                <span>Chassis No : </span> <span style="color: #4796BD">{{ selectedStock.chasisno }}</span>
+              </div>
+              <div class="col-lg-6 col-12 mb-2" style="font-size:14px">
+                <span>Model : </span> <span style="color: #4796BD">{{ selectedStock.Model }}</span>
+              </div>
+              <div class="col-lg-6 col-12 mb-2" style="font-size:14px">
+                <span>Colour : </span> <span style="color: #4796BD">{{ selectedStock.Colour }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-6 mt-3">
+          <label for="am" class="form-label fw-medium mb-1" style="color: #215378">Select Dealer to Transfer</label>
+          <select class="form-select" style="font-size: 14px;" [(ngModel)]="selectedDealer">
+            <option value="" disabled selected>Select Dealer</option>
+            <option *ngFor="let i of dealerList" [ngValue]="i.DealerCode">
+              {{ i.DealerName }} ({{ i.DealerCode }})
+            </option>
+          </select>
+        </div>
+
+      </div>
+      <div class="modal-footer d-flex justify-content-end px-4 py-3">
+        <button *ngIf="selectedDealer" class="btn btn-sm ms-2 text-white" style="background-color: #4796BD; font-size: 14px;" (click)="confirmTransfer()">Confirm Transfer</button>
+      </div>
+    </div>
+  </div>
+</div>

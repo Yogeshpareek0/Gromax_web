@@ -1,0 +1,137 @@
+<div class="container-fluid px-0">
+
+  <!-- Dashboard Header -->
+  <div class="card p-3 mb-3">
+    <div class="row">
+      <div class="col-md-4">
+        <label>Dashboard Name</label>
+        <input class="form-control"
+               placeholder="Enter dashboard name"
+               [(ngModel)]="dashboardName">
+      </div>
+
+      <div class="col-md-3">
+        <label>Theme</label>
+        <select class="form-control" [(ngModel)]="theme">
+          <option value="">Select Theme</option>
+          <option *ngFor="let t of themes" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div class="card p-3 mb-3">
+    <h5>Sections (12 Grid System)</h5>
+
+    <div class="row">
+      <div *ngFor="let s of sections"
+           class="mb-3"
+           [ngClass]="'col-md-' + s.columnWidth">
+
+        <div class="border rounded p-2 h-100">
+
+          <input class="form-control mb-2"
+                 placeholder="Section Title"
+                 [(ngModel)]="s.title">
+
+          <label>Width</label>
+          <select class="form-control mb-2"
+                  [(ngModel)]="s.columnWidth">
+            <option *ngFor="let i of grid" [value]="i">{{ i }}</option>
+          </select>
+
+          <button class="btn btn-sm btn-outline-primary w-100 mb-2"
+                  (click)="openReportBuilder(s)">
+            {{ s.savedReportId ? 'Edit Report' : 'Add Report' }}
+          </button>
+
+          <span *ngIf="s.savedReportId"
+                class="badge bg-success w-100 text-center">
+            Report Configured
+          </span>
+
+          <button class="btn btn-sm btn-outline-danger w-100 mt-2"
+                  (click)="removeSection(s.id)">
+            Remove Section
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-outline-primary mt-2"
+            (click)="addSection()">
+      + Add Section
+    </button>
+  </div>
+
+  <!-- Save -->
+  <div class="text-end">
+    <button class="btn btn-success btn-lg"
+            (click)="saveDashboard()">
+      Save Dashboard
+    </button>
+  </div>
+
+</div>
+
+<!-- REPORT BUILDER MODAL -->
+<div class="modal fade show"
+     *ngIf="showReportBuilder"
+     style="display:block;background:rgba(0,0,0,0.4)">
+
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Section Report Builder</h5>
+        <button type="button"
+                class="btn-close"
+                (click)="closeReportBuilder()"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <label>Source Type</label>
+        <select class="form-control mb-2"
+                [(ngModel)]="currentReport.sourceType">
+          <option value="Query">Table</option>
+          <option value="StoredProcedure">Stored Procedure</option>
+        </select>
+
+        <div *ngIf="currentReport.sourceType === 'Query'">
+          <label>Base Table</label>
+          <select class="form-control"
+                  [(ngModel)]="currentReport.baseTable">
+            <option value="">Select Table</option>
+            <option *ngFor="let t of tables" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <div *ngIf="currentReport.sourceType === 'StoredProcedure'">
+          <label>Stored Procedure</label>
+          <select class="form-control"
+                  [(ngModel)]="currentReport.storedProcedureName">
+            <option value="">Select Procedure</option>
+            <option *ngFor="let sp of procedures" [value]="sp">{{ sp }}</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary"
+                (click)="closeReportBuilder()">
+          Cancel
+        </button>
+
+        <button class="btn btn-primary"
+                (click)="saveSectionReport()">
+          Save Report
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

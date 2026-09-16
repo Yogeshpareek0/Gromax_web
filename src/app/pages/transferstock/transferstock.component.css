@@ -1,0 +1,140 @@
+
+.enquiry-table-wrapper {
+  height: calc(100vh - 156px);
+  max-height: unset;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 12px 8px
+}
+
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 8px
+}
+
+.form-control-file {
+  height: 0px !important; 
+ /* border: 1px solid #accddb;
+  border-radius: 10px;*/
+  padding: 3px 15px !important; 
+/*  font-size: 14px;
+  color: #2c3e50;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04)*/
+}
+
+
+.search-wrapper {
+  max-width: 420px;
+}
+
+.custom-search-group {
+  border: 1px solid #4796BD;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: 0.3s ease;
+}
+
+
+.search-btn {
+  background-color: #4796BD;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 0;
+}
+
+  .search-btn:hover {
+    background-color: #3a7fa1;
+    border: 1px solid #3a7fa1;
+  }
+
+
+.form-control,
+.form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+}
+
+.form-floating-custom {
+  position: relative;
+}
+
+  .form-floating-custom input {
+    height: 40px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .form-floating-custom label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0 4px;
+    font-size: 14px;
+    color: #212529bf;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+
+  .form-floating-custom input:focus + label,
+  .form-floating-custom input:not(:placeholder-shown) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.form-control:focus,
+.form-select:focus {
+  box-shadow: none !important;
+}
+
+.form-floating-custom select {
+  height: 40px;
+  padding: 10px 14px;
+  font-size: 14px;
+  appearance: none;
+}
+
+  .form-floating-custom select:focus + label,
+  .form-floating-custom select:not([value=""]) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+.custom-btn {
+  background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);
+  color: white !important;
+  border-radius: 10px;
+  border: none !important;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 10px !important;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+  .custom-btn:hover {
+    background: linear-gradient(135deg, #3a7a9a 0%, #2d5f7a 100%);
+    transform: translateY(-2px);
+  }

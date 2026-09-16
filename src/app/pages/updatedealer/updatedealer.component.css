@@ -1,0 +1,88 @@
+.payment-card {
+  background: #f0f4f8;
+  border-radius: 12px;
+  border-left: 4px solid #1976d2;
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1976d2;
+  margin-bottom: 16px;
+}
+
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  flex: 1;
+}
+
+.field-label {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.required {
+  color: red;
+  margin-left: 2px;
+}
+
+.field-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  color: #333;
+  outline: none;
+  transition: border 0.2s;
+}
+
+  .field-input:focus {
+    border-color: #1976d2;
+  }
+
+  .field-input[readonly] {
+    background: #f5f5f5;
+    color: #666;
+    cursor: default;
+  }
+
+
+.btn-submit {
+  background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  justify-content: center;
+}
+
+  .btn-submit:hover {
+    background: linear-gradient(135deg, #3a7a9a 0%, #2d5f7a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(71, 150, 189, 0.3);
+    color: white;
+  }
+
+  .btn-cancel:active,
+  .btn-submit:active {
+    transform: translateY(0);
+  }

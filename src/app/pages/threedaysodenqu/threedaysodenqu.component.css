@@ -1,0 +1,82 @@
+.card h6 {
+  font-size: 1rem;
+}
+
+.card h4 {
+  font-size: 1.5rem;
+}
+
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+::ng-deep .error-snackbar {
+  background: linear-gradient(135deg, #214557, #4796BD);
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+  min-height: unset !important;
+  line-height: 20px !important;
+}
+
+.active-total {
+  background-color: #4D963A;
+  transition: 0.3s;
+}
+
+.active-overdue {
+  background-color: #AA3232;
+  transition: 0.3s;
+}
+
+.active-today {
+  background-color: #8966E0;
+  transition: 0.3s;
+}
+
+.active-hot {
+  background-color: #E45E2E;
+  transition: 0.3s;
+}
+
+.active-warm {
+  background-color: #D59D3E;
+  transition: 0.3s;
+}
+
+  .active-warm p, .active-cold p, .active-hot p, .active-total p, .active-today p, .active-overdue p {
+    color: white !important;
+  }
+
+.active-cold {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+.enquiry-table-wrapper {
+  max-height: 440px;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-size: 13px;
+  padding: 12px 8px
+}
+
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  padding: 12px 8px
+}

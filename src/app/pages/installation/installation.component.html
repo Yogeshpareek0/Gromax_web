@@ -1,0 +1,301 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+
+    <!-- Summary Cards -->
+    <div class="row mt-2" *ngFor="let i of installationCount">
+      <div class="col-xl-4 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('TotalDelivery')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-hot': activeLead === 'TotalDelivery'}"
+             style="border-radius: 14px; border: 1px solid #E45E2E !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #E45E2E">Total Delivery</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.TotalDelivery ?? 0}}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px 4px 2px 6px">
+              <i class="fa-solid fa-truck" style="color:#E45E2E; font-size:20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('TotalPending')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-warm': activeLead === 'TotalPending'}"
+             style="border-radius: 14px; border: 1px solid #D59D3E !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #D59D3E">Total Pending</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.TotalPending ?? 0}}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px 4px 2px 6px">
+              <i class="fa-solid fa-hourglass-half" style="color:#D59D3E; font-size:20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('TotalDone')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-total': activeLead === 'TotalDone'}"
+             style="border-radius: 14px; border: 1px solid #4D963A !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #4D963A">Total Done</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.TotalDone ?? 0}}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px 4px 2px 6px">
+              <i class="fa-solid fa-check" style="color:#4D963A; font-size:20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Row -->
+    <div class="row align-items-end g-2 mb-2">
+
+      <!-- Duration -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">Duration</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedDuration" (change)="onDurationChange()">
+          <option value="thisMonth">This Month</option>
+          <option value="thisQuarter">This Quarter</option>
+          <option value="lastQuarter">Last Quarter</option>
+          <option value="thisFY">This FY</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <!-- Custom Date Range -->
+      <ng-container *ngIf="selectedDuration === 'custom'">
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Start Month</label>
+          <div class="d-flex gap-1">
+            <select class="form-select form-select-sm" [(ngModel)]="customStartMonth">
+              <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+            </select>
+            <select class="form-select form-select-sm" [(ngModel)]="customStartYear" style="max-width: 90px;">
+              <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">End Month</label>
+          <div class="d-flex gap-1">
+            <select class="form-select form-select-sm" [(ngModel)]="customEndMonth">
+              <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+            </select>
+            <select class="form-select form-select-sm" [(ngModel)]="customEndYear" style="max-width: 90px;">
+              <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- State -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">State Name</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedState" (change)="onStateChange()">
+          <option *ngFor="let s of stateList" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <!-- Dealership -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">Dealership Name</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedDealership">
+          <option value="All">All Dealerships</option>
+          <option *ngFor="let d of dealerList" [value]="d.DealerCode">
+            {{ d.DealerName }} ({{ d.DlrLoc }})
+          </option>
+        </select>
+      </div>
+
+      <!-- Show Report -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <button class="btn w-100 custom-btn py-2" (click)="onShowReport()" style="font-size:13px;">
+          <i class="bi bi-clipboard-data me-1"></i> Show Report
+        </button>
+      </div>
+
+      <!-- Download -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <button class="btn w-100 custom-btn py-2" (click)="exportToExcel()" style="font-size:13px;">
+          <i class="fas fa-download me-1"></i> Download
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">State</th>
+
+          <th class="text-nowrap fw-normal">Dealer Code</th>
+          <th class="text-nowrap fw-normal">Dealer Name</th>
+          <th class="text-nowrap fw-normal">Location</th>
+
+          <th class="text-nowrap fw-normal">Chassis Number</th>
+          <th class="text-nowrap fw-normal">Model</th>
+
+          <th class="text-nowrap fw-normal">Customer Name</th>
+          <th class="text-nowrap fw-normal">Address</th>
+          <th class="text-nowrap fw-normal">Prospect City</th>
+          <th class="text-nowrap fw-normal">Prospect Tehsil</th>
+          <th class="text-nowrap fw-normal">Mobile</th>
+          <th class="text-nowrap fw-normal">Date Of Delivery</th>
+          <th class="text-nowrap fw-normal">Date Of PDI</th>
+          <th class="text-nowrap fw-normal">Date Of Installation</th>
+          <th class="text-nowrap fw-normal">Working Hrs</th>
+          <th class="text-nowrap fw-normal">Days Taken</th>
+          <th class="text-nowrap fw-normal">Status</th>
+          <th class="text-nowrap fw-normal">HO Status</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">HO Status Remark</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of installationList; let i = index;" style="cursor:pointer">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+
+          <td class="text-center">
+            <button class="action-icon-btn" title="View Installation Images" (click)="onRowClick(item.InstallationId)">
+              <i class="fa-solid fa-images"></i>
+            </button>
+          </td>
+
+          <td class="text-nowrap">{{ item.state }}</td> <!-- State -->
+
+          <td class="text-nowrap">{{ item.DealerCode }}</td>
+          <td class="text-nowrap">{{ item.DealerName }}</td>
+          <td class="text-nowrap">{{ item.location }}</td> <!-- Location -->
+          <td class="text-nowrap">{{ item.ChassisNumber }}</td>
+          <td class="text-nowrap">{{ item.Model }}</td>
+
+          <td class="text-nowrap">{{ item.CustomerName }}</td>
+          <td class="text-nowrap">{{ item.address }}</td> <!-- Address -->
+          <td class="text-nowrap">{{ item.ProsVillageName }}</td> <!-- city -->
+          <td class="text-nowrap">{{ item.ProspectTehName }}</td> <!-- tehsil-->
+
+
+          <td class="text-nowrap">{{ item.Mobile || '' }}</td>
+
+          <td class="text-nowrap">
+            {{ item.DeliveryDate ? (item.DeliveryDate | date:'dd-MM-yyyy') : '-' }}
+          </td>
+
+          <td class="text-nowrap">{{ item.PDIDate }}</td>
+          <td class="text-nowrap">{{ item.installationDate }}</td>
+          <td class="text-nowrap">{{ item.workHrs }}</td>
+          <td class="text-nowrap">{{ item.daysTaken }}</td>
+
+          <td class="text-nowrap">{{ item.Status }}</td>
+
+          <td class="text-nowrap">{{ item.hoStatus }}</td>
+          <td class="text-nowrap">{{ item.hoRemark }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>
+
+
+<!-- Installation Images Modal -->
+<div class="modal fade" id="installationModal" tabindex="-1" aria-labelledby="installationModalLabel">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" style="margin-top: 60px;">
+    <div class="modal-content installation-modal-content">
+
+      <!-- Header -->
+      <div class="modal-header installation-modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="modal-icon-wrap">
+            <i class="fa-solid fa-images"></i>
+          </div>
+          <div>
+            <h5 class="modal-title mb-0" id="installationModalLabel">Installation Images</h5>
+            <small *ngIf="installationImages.length > 0">
+              {{ installationImages.length }} image{{ installationImages.length !== 1 ? 's' : '' }} found
+            </small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-3 p-md-4">
+
+        <!-- Images Grid -->
+        <div *ngIf="installationImages.length > 0; else noImages">
+          <div class="img-gallery-grid">
+            <div class="img-gallery-item" *ngFor="let img of installationImages; let idx = index"
+                 (click)="openLightbox(idx)">
+              <div class="img-card">
+                <img [src]="img.Url" [alt]="'Installation Image ' + (idx + 1)" loading="lazy" />
+                <div class="img-overlay">
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </div>
+                <span class="img-badge">{{ idx + 1 }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Images State -->
+        <ng-template #noImages>
+          <div class="no-images-state">
+            <div class="no-images-icon">
+              <i class="fa-regular fa-image"></i>
+            </div>
+            <h6 class="mt-3 mb-1">No Images Found</h6>
+            <p class="text-muted mb-0" style="font-size:13px;">
+              Installation needs to be completed via mobile app.
+            </p>
+          </div>
+        </ng-template>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Lightbox Modal -->
+<div class="modal fade" id="lightboxModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered lightbox-dialog">
+    <div class="modal-content lightbox-content">
+
+      <button type="button" class="lightbox-close" data-bs-dismiss="modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <img *ngIf="installationImages[lightboxIndex]"
+           [src]="installationImages[lightboxIndex].Url"
+           class="lightbox-img"
+           alt="Installation Image" />
+
+      <div class="lightbox-footer" *ngIf="installationImages.length > 1">
+        <button class="lightbox-arrow" (click)="prevImage()" [disabled]="lightboxIndex === 0">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <span class="lightbox-counter">{{ lightboxIndex + 1 }} / {{ installationImages.length }}</span>
+        <button class="lightbox-arrow" (click)="nextImage()" [disabled]="lightboxIndex === installationImages.length - 1">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

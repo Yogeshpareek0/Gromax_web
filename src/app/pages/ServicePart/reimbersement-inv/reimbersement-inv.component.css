@@ -1,0 +1,292 @@
+.card h6 {
+  font-size: 1rem;
+}
+
+.card h4 {
+  font-size: 1.5rem;
+}
+
+.card h5 {
+  font-size: 1.25rem;
+}
+
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+  transition: background-color 0.2s, transform 0.15s;
+  font-weight: 500;
+}
+
+  .custom-btn:hover:not(:disabled) {
+    background-color: #3a7fa6 !important;
+    transform: translateY(-1px);
+  }
+
+  .custom-btn:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .custom-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+::ng-deep .error-snackbar {
+  background: linear-gradient(135deg, #214557, #4796BD);
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+  min-height: unset !important;
+  line-height: 20px !important;
+}
+
+.active-total {
+  background-color: #4D963A;
+  transition: 0.3s;
+}
+
+  .active-total p {
+    color: white !important;
+  }
+
+.active-hot {
+  background-color: #E45E2E;
+  transition: 0.3s;
+}
+
+  .active-hot p {
+    color: white !important;
+  }
+
+.active-warm {
+  background-color: #D59D3E;
+  transition: 0.3s;
+}
+
+  .active-warm p {
+    color: white !important;
+  }
+
+.active-cold {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+  .active-cold p {
+    color: white !important;
+  }
+
+.enquiry-table-wrapper {
+  max-height: 600px; /* Add fixed height */
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+#freeServiceTable thead th,
+#installationTable thead th,
+#generatedInvoicesTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20; /* Increase z-index */
+  font-weight: 500;
+  font-size: 13px;
+  padding: 12px 8px;
+  background-color: #215378; /* Add explicit background */
+  color: white; /* Add explicit color */
+}
+
+#freeServiceTable tbody td,
+#installationTable tbody td,
+#generatedInvoicesTable tbody td {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+.table-active {
+  background-color: #f0f7ff !important;
+}
+
+  .table-active:hover {
+    background-color: #e8f2fa !important;
+  }
+
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Tab Styling */
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #4796BD !important;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  position: relative;
+}
+
+  .nav-tabs .nav-link:hover {
+    color: #3a7fa6 !important;
+    background-color: #f9f9f9;
+  }
+
+  .nav-tabs .nav-link.active {
+    color: #4796BD !important;
+    background-color: transparent;
+    border-bottom-color: #4796BD !important;
+  }
+
+.nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #4796BD;
+}
+
+  input[type="checkbox"]:hover {
+    opacity: 0.8;
+  }
+
+/* Loading Spinner */
+.spinner-border {
+  color: #4796BD !important;
+}
+
+/* Action Bar Styling */
+.action-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+  .action-bar span {
+    font-size: 14px;
+    color: #666;
+  }
+
+    .action-bar span strong {
+      color: #4796BD;
+      font-weight: 600;
+    }
+
+/* Download Button */
+.download-btn {
+  background-color: #f0f0f0;
+  color: #4796BD;
+  border: 0.5px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+  .download-btn:hover {
+    background-color: #4796BD;
+    color: white;
+    border-color: #4796BD;
+  }
+
+  .download-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #999;
+  font-size: 14px;
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+  .enquiry-table-wrapper {
+    font-size: 11px;
+  }
+
+  #freeServiceTable thead th,
+  #installationTable thead th,
+  #generatedInvoicesTable thead th {
+    font-size: 11px;
+    padding: 8px 4px;
+  }
+
+  #freeServiceTable tbody td,
+  #installationTable tbody td,
+  #generatedInvoicesTable tbody td {
+    font-size: 10px;
+    padding: 8px 4px;
+  }
+
+  .custom-btn {
+    font-size: 12px !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+}
+
+/* Scrollbar Customization */
+.enquiry-table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.enquiry-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.enquiry-table-wrapper::-webkit-scrollbar-thumb {
+  background: #4796BD;
+  border-radius: 10px;
+}
+
+  .enquiry-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #3a7fa6;
+  }
+
+.download-btn {
+  background: #215378;
+  color: #fff;
+  border: 0.5px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+  .download-btn:hover {
+    background: #163d5a;
+    border-color: #163d5a;
+    transform: translateY(-1px);
+    cursor: pointer;
+  }
+
+

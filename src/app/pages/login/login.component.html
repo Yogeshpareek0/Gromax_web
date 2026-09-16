@@ -1,0 +1,292 @@
+<div class="container login-container">
+  <div class="row login-box shadow-sm border-0">
+    <div class="login-corner-decor"></div>
+    <div class="login-left-bottom-decor"></div>
+
+    <div class="col-md-6 left-box d-flex align-items-center justify-content-center  d-none d-md-flex">
+      <img src="assets/images/mobile.png" alt="Phone" class="img-fluid phone-img" />
+    </div>
+
+    <div class="col-md-6 right-box d-flex flex-column justify-content-center align-items-center">
+      <div class="text-center mb-2">
+        <div class="logo-wrapper">
+          <img class="px-2" src="assets/images/login_logo.png" alt="Logo" width="88" height="24" />
+        </div>
+        <h4 class="my-2">WELCOME</h4>
+      </div>
+
+      <!--<form class="w-75" (keydown.enter)="otpStep ? onLogin() : getOtp()">
+        <div class="custom-input mb-4 d-flex align-items-center" *ngIf="!otpStep">
+          <i class="fa-solid fa-user me-2 input-icon"></i>
+          <input type="text"
+                 class="form-control border-0 shadow-none"
+                 placeholder="Enter Mobile Number"
+                 [(ngModel)]="mobileNumber"
+                 name="mobileNumber" />
+        </div>
+
+        <div class="text-center mb-3" *ngIf="!otpStep">
+          <button type="button" class="custom-login-btn" (click)="getOtp()">Get OTP</button>
+        </div>
+
+        <div *ngIf="otpStep">
+          <div class="custom-input mb-3 d-flex align-items-center justify-content-between">
+            <input type="text"
+                   class="form-control border-0 me-3"
+                   placeholder="Captcha Code"
+                   style="border-color: #4796BD; font-size:14px" [(ngModel)]="captchaInput"
+                   name="captchaInput" />
+
+            <div class="captcha-box d-flex align-items-center">
+              <span class="captcha-text me-3"
+                    style="user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:none;">
+                {{ generatedCaptcha }}
+              </span>
+              <i class="fa-solid fa-rotate-right refresh-icon"
+                 [style.transform]="'rotate(' + rotationAngle + 'deg)'"
+                 (click)="rotateCaptchaIcon()"></i>
+            </div>
+          </div>
+
+          <div class="custom-input mb-2 d-flex align-items-center">
+            <i class="fa-solid fa-key me-2 input-icon"></i>
+            <input type="text"
+                   class="form-control border-0 shadow-none"
+                   placeholder="Enter OTP"
+                   [(ngModel)]="otp"
+                   name="otp" />
+          </div>
+
+          <div class="text-center mb-3">
+            <span *ngIf="otpTimer > 0" class="otp-timer">
+              OTP expires in {{ otpTimer }} sec
+            </span>
+
+            <button *ngIf="otpTimer === 0"
+                    type="button"
+                    class="resend-otp-btn"
+                    (click)="resendOtp()">
+              Resend OTP
+            </button>
+          </div>
+
+
+          <div class="text-center">
+            <button type="button" class="custom-login-btn" (click)="onLogin()">LogIn</button>
+          </div>
+        </div>
+
+      </form>-->
+
+      <form class="w-75" (keydown.enter)="onLogin()">
+        <div class="custom-input mb-3 d-flex align-items-center">
+          <i class="fa-solid fa-user me-2 input-icon"></i>
+          <input type="text"
+                 class="form-control border-0 shadow-none"
+                 placeholder="Enter Mobile Number"
+                 maxlength="10"
+                 [(ngModel)]="mobileNumber"
+                 name="mobileNumber" />
+        </div>
+
+        <div class="custom-input mb-3 position-relative d-flex align-items-center">
+          <i class="fa-solid fa-lock me-2 input-icon"></i>
+          <input [type]="showPassword ? 'text' : 'password'"
+                 class="form-control border-0 shadow-none password-input"
+                 placeholder="Enter Password"
+                 [(ngModel)]="password"
+                 name="password" />
+          <i class="fa-solid toggle-password"
+             [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'"
+             (click)="togglePassword()"></i>
+        </div>
+
+
+        <div class="custom-input d-flex align-items-center justify-content-between">
+          <input type="text"
+                 class="form-control border-0 me-3"
+                 placeholder="Captcha Code"
+                 style="border-color: #4796BD; font-size:14px" [(ngModel)]="captchaInput"
+                 name="captchaInput" />
+
+          <div class="captcha-box d-flex align-items-center">
+            <span class="captcha-text me-3"
+                  style="user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:none;">
+              {{ generatedCaptcha }}
+            </span>
+            <i class="fa-solid fa-rotate-right refresh-icon"
+               [style.transform]="'rotate(' + rotationAngle + 'deg)'"
+               (click)="rotateCaptchaIcon()"></i>
+          </div>
+        </div>
+
+        <div class="text-center mb-4">
+          <a class="text-danger small" style="cursor:pointer" (click)="openForgotPasswordModal()">Reset Password?</a>
+        </div>
+
+        <div class="text-center">
+          <button type="button" class="custom-login-btn" (click)="onLogin()">LogIn</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FORGOT PASSWORD MODAL ===== -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered fp-modal-dialog">
+    <div class="modal-content fp-modal-content">
+
+      <!-- Decorative blobs -->
+      <div class="fp-blob fp-blob-1"></div>
+      <div class="fp-blob fp-blob-2"></div>
+
+      <!-- HEADER -->
+      <div class="fp-header">
+        <div class="fp-header-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="fp-header-text">
+          <h5 id="forgotPasswordModalLabel">Reset Password</h5>
+          <p>Secure your account with a new password</p>
+        </div>
+        <button type="button" class="fp-close-btn" (click)="closeConvertedModal()" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- STEP INDICATOR -->
+      <div class="fp-steps">
+        <div class="fp-step" [class.active]="forgotStep === 1" [class.done]="forgotStep > 1">
+          <div class="fp-step-dot">
+            <i class="fa-solid fa-check" *ngIf="forgotStep > 1"></i>
+            <span *ngIf="forgotStep <= 1">1</span>
+          </div>
+          <span class="fp-step-label">Details</span>
+        </div>
+        <div class="fp-step-line" [class.done]="forgotStep > 1"></div>
+        <div class="fp-step" [class.active]="forgotStep === 2">
+          <div class="fp-step-dot">
+            <span>2</span>
+          </div>
+          <span class="fp-step-label">Verify OTP</span>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="fp-body">
+
+        <!-- Alert Message -->
+        <div class="fp-alert"
+             *ngIf="forgotPasswordError"
+             [class.fp-alert-success]="forgotPasswordError === 'Password updated successfully.'"
+             [class.fp-alert-error]="forgotPasswordError !== 'Password updated successfully.'">
+          <i class="fa-solid"
+             [class.fa-circle-check]="forgotPasswordError === 'Password updated successfully.'"
+             [class.fa-circle-exclamation]="forgotPasswordError !== 'Password updated successfully.'"></i>
+          <span>{{ forgotPasswordError }}</span>
+        </div>
+
+        <!-- ===== STEP 1 ===== -->
+        <div class="fp-form-section" *ngIf="forgotStep === 1">
+
+          <!-- Mobile Number -->
+          <div class="fp-input-group">
+            <label class="fp-label">Mobile Number</label>
+            <div class="fp-input-wrap" [class.verified]="isMobileVerified">
+              <i class="fa-solid fa-mobile-screen-button fp-input-icon"></i>
+              <input type="text"
+                     class="fp-input"
+                     placeholder="Enter 10-digit mobile number"
+                     maxlength="10"
+                     [(ngModel)]="forgotMobile"
+                     (input)="onForgotMobileChange()" />
+              <span class="fp-verified-badge" *ngIf="isMobileVerified">
+                <i class="fa-solid fa-circle-check"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- Password fields — only shown after mobile verified -->
+          <div class="fp-password-section" *ngIf="isMobileVerified">
+
+            <div class="fp-input-group">
+              <label class="fp-label">New Password</label>
+              <div class="fp-input-wrap">
+                <i class="fa-solid fa-lock fp-input-icon"></i>
+                <input type="password"
+                       class="fp-input"
+                       placeholder="Enter new password"
+                       [(ngModel)]="forgotPassword" />
+              </div>
+            </div>
+
+            <div class="fp-input-group">
+              <label class="fp-label">Confirm Password</label>
+              <div class="fp-input-wrap">
+                <i class="fa-solid fa-lock fp-input-icon"></i>
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="fp-input"
+                       placeholder="Re-enter new password"
+                       [(ngModel)]="forgotConfirmPassword" />
+                <button type="button" class="fp-eye-btn" (click)="togglePassword()">
+                  <i class="fa-solid" [class.fa-eye]="showPassword" [class.fa-eye-slash]="!showPassword"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="fp-submit-btn" (click)="sendOtp()">
+              <span>Send OTP</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 2 ===== -->
+        <div class="fp-form-section" *ngIf="forgotStep === 2">
+
+          <div class="fp-otp-info">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <p>OTP sent to <strong>{{ forgotMobile }}</strong></p>
+          </div>
+
+          <div class="fp-input-group">
+            <label class="fp-label">Enter OTP</label>
+            <div class="fp-input-wrap">
+              <i class="fa-solid fa-key fp-input-icon"></i>
+              <input type="text"
+                     class="fp-input fp-otp-input"
+                     placeholder="Enter 4-digit OTP"
+                     maxlength="4"
+                     [(ngModel)]="forgotOtp" />
+            </div>
+          </div>
+
+          <!-- Timer / Resend -->
+          <div class="fp-timer-row">
+            <div class="fp-timer" *ngIf="otpTimer > 0">
+              <i class="fa-regular fa-clock"></i>
+              <span>OTP expires in <strong>{{ otpTimer }}s</strong></span>
+            </div>
+            <button type="button" class="fp-resend-btn" *ngIf="otpTimer === 0" (click)="resendOtp()">
+              <i class="fa-solid fa-rotate-right"></i> Resend OTP
+            </button>
+          </div>
+
+          <button type="button" class="fp-submit-btn" (click)="updatePassword()">
+            <span>Update Password</span>
+            <i class="fa-solid fa-shield-halved"></i>
+          </button>
+
+          <button type="button" class="fp-back-btn" (click)="forgotStep = 1">
+            <i class="fa-solid fa-chevron-left"></i> Back
+          </button>
+        </div>
+
+      </div>
+      <!-- /fp-body -->
+
+    </div>
+  </div>
+</div>
+

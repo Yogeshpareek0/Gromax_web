@@ -1,0 +1,114 @@
+.cms-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(3px);
+  background-color: rgba(245, 245, 245, 0.7);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cms-loader-content {
+  text-align: center;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.cms-emblem img {
+  height: 60px;
+  margin-bottom: 15px;
+  filter: brightness(0) saturate(100%) invert(18%) sepia(94%) saturate(2214%) hue-rotate(5deg) brightness(97%) contrast(102%);
+}
+
+.cms-text {
+  font-size: 26px;
+  font-weight: 600;
+  color: #215378;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+/* ── Wave Bars ── */
+.wave-loader {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+  height: 32px;
+}
+
+  .wave-loader .bar {
+    width: 6px;
+    border-radius: 6px 6px 3px 3px;
+    animation: wave 0.9s infinite ease-in-out;
+  }
+
+  .wave-loader .bar1 {
+    height: 10px;
+    animation-delay: 0.0s;
+    background: #164A70;
+  }
+
+  .wave-loader .bar2 {
+    height: 14px;
+    animation-delay: 0.1s;
+    background: #1e5f8e;
+  }
+
+  .wave-loader .bar3 {
+    height: 17px;
+    animation-delay: 0.2s;
+    background: #2e7ab0;
+  }
+
+  .wave-loader .bar4 {
+    height: 22px;
+    animation-delay: 0.3s;
+    background: #f29903;
+  }
+
+  .wave-loader .bar5 {
+    height: 17px;
+    animation-delay: 0.4s;
+    background: #2e7ab0;
+  }
+
+  .wave-loader .bar6 {
+    height: 14px;
+    animation-delay: 0.5s;
+    background: #1e5f8e;
+  }
+
+  .wave-loader .bar7 {
+    height: 10px;
+    animation-delay: 0.6s;
+    background: #164A70;
+  }
+
+@keyframes wave {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(1.8);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

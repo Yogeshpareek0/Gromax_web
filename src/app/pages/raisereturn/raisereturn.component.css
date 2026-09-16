@@ -1,0 +1,337 @@
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+.btn-outline {
+  color: #4796BD;
+  border-radius: 8px;
+  border: 1px solid #4796BD;
+}
+
+.form-control,
+.form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+}
+
+.form-floating-custom {
+  position: relative;
+}
+
+  .form-floating-custom input {
+    height: 40px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .form-floating-custom label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0 4px;
+    font-size: 14px;
+    color: #212529bf;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+
+  .form-floating-custom input:focus + label,
+  .form-floating-custom input:not(:placeholder-shown) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.form-control:focus,
+.form-select:focus {
+  box-shadow: none !important;
+}
+
+.form-floating-custom select {
+  height: 40px;
+  padding: 10px 14px;
+  font-size: 14px;
+  appearance: none;
+}
+
+  .form-floating-custom select:focus + label,
+  .form-floating-custom select:not([value=""]) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.status-badge {
+  border-radius: 16px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.label-text {
+  color: #4796BD;
+  font-weight: 500;
+}
+
+.enquiry-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-size: 13px;
+  padding: 12px 8px;
+  text-align: center;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid #e9f3f8 !important;
+}
+
+p {
+  font-size: 13px;
+}
+
+
+/* --- Card wrapper --- */
+.rc-card {
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+  .rc-card:hover {
+    transform: translateY(-2px);
+  }
+
+/* --- Status strip --- */
+.rc-status-strip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.rc-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.rc-approved {
+  background: #ecfdf5;
+  color: #15803d;
+  border-bottom: 1.5px solid #bbf7d0;
+}
+
+.rc-pending {
+  background: #fffbeb;
+  color: #b45309;
+  border-bottom: 1.5px solid #fde68a;
+}
+
+.rc-rejected {
+  background: #fef2f2;
+  color: #dc2626;
+  border-bottom: 1.5px solid #fecaca;
+}
+
+/* --- Card header (gradient bg) --- */
+.rc-head {
+  background: linear-gradient(120deg, #214557 0%, #2e6382 55%, #4796BD 100%);
+  padding: 12px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+  .rc-head::after {
+    content: '';
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+    top: -38px;
+    right: -28px;
+    pointer-events: none;
+  }
+
+.rc-head-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 3px;
+  line-height: 1.3;
+}
+
+.rc-head-mobile {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.70);
+  margin: 0;
+}
+
+  .rc-head-mobile i {
+    font-size: 10px;
+  }
+
+.rc-avatar {
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1.5px solid rgba(255, 255, 255, 0.26);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+  .rc-avatar i {
+    color: #fff;
+    font-size: 16px;
+  }
+
+/* --- Card body --- */
+.rc-body {
+  padding: 6px 14px 4px;
+  flex: 1;
+}
+
+/* --- Divider between rows --- */
+.rc-divider {
+  height: 1px;
+  background: #eef5f9;
+  margin: 2px 0;
+}
+
+/* --- Info item --- */
+.rc-info-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 4px;
+}
+
+.rc-info-icon {
+  width: 30px;
+  height: 30px;
+  background: #eaf4fb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+  .rc-info-icon i {
+    color: #4796BD;
+    font-size: 12px;
+  }
+
+.rc-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rc-info-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #1c3a4a;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.rc-info-value {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #1c3a4a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.rc-info-wrap {
+  white-space: normal;
+  word-break: break-word;
+  max-width: unset;
+}
+
+/* --- Card footer --- */
+.rc-footer {
+  background: #f7fbfd;
+  border-top: 1px solid #e6f0f6;
+  padding: 11px 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rc-view-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 20px;
+  background: linear-gradient(90deg, #4796BD, #214557);
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+  .rc-view-btn:hover {
+    background: linear-gradient(90deg, #214557, #4796BD);
+    transform: translateY(-2px);
+    color: #ffffff;
+  }
+
+  .rc-view-btn:active {
+    transform: translateY(0);
+  }
+
+/* --- Responsive --- */
+@media (max-width: 400px) {
+  .rc-info-value {
+    max-width: 90px;
+  }
+}

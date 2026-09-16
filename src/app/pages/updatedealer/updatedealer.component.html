@@ -1,0 +1,66 @@
+<div class="p-4 rounded" style="background-color:white;">
+  <div class="payment-card rounded">
+    <div class="card-title">Filter Details</div>
+    <div class="form-grid">
+
+      <!-- State Head -->
+      <div class="form-group" *ngIf="showSH">
+        <label class="field-label">State Head <span class="required">*</span></label>
+        <select class="field-input" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option value="" disabled selected>Select State Head</option>
+          <option *ngFor="let sh of stateHead" [value]="sh.Mail">{{ sh.Name }}</option>
+        </select>
+      </div>
+
+      <!-- Area Manager -->
+      <div class="form-group" *ngIf="showAM">
+        <label class="field-label">Area Manager <span class="required">*</span></label>
+        <select class="field-input" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option value="" disabled selected>Select Area Manager</option>
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <!-- Territory Manager -->
+      <div class="form-group" *ngIf="showTM">
+        <label class="field-label">Territory Manager <span class="required">*</span></label>
+        <select class="field-input" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option value="" disabled selected>Select Territory Manager</option>
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+
+      <!-- Dealer Code -->
+      <div class="form-group" *ngIf="showDealer">
+        <label class="field-label">Dealer Code <span class="required">*</span></label>
+        <select class="field-input" [(ngModel)]="selectedDealer" (change)="onDealerChange(selectedDealer)">
+          <option value="" disabled selected>Select Dealer Code</option>
+          <option *ngFor="let d of dealersList" [value]="d.Mail">{{ d.Name }}</option>
+        </select>
+      </div>
+
+      <!-- Dealer Name (Auto-filled) -->
+      <div class="form-group" *ngIf="showDealer">
+        <label class="field-label">Dealer Name</label>
+        <input class="field-input" type="text" [value]="selectedDealerName" placeholder="Auto-filled dealer name" readonly />
+      </div>
+
+      <!-- Active Status -->
+      <div class="form-group">
+        <label class="field-label">Status <span class="required">*</span></label>
+        <select class="field-input" [(ngModel)]="selectedStatus">
+          <option value="" disabled selected>Select Status</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
+        </select>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="modal-footer d-flex justify-content-center">
+    <button type="button" class="btn btn-submit mt-3" (click)="onSubmit()">
+      Update Enquiry
+    </button>
+  </div>
+</div>

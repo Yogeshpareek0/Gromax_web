@@ -1,0 +1,706 @@
+<div class="container-fluid px-0">
+  <div class="filter-box">
+    <ul class="nav nav-tabs mb-3 px-4" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="add-dealer-tab" data-bs-toggle="tab" data-bs-target="#add-dealer-pane" type="button" role="tab" (click)="tabChange('add')">
+          Add Dealer
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="update-dealer-tab" data-bs-toggle="tab" data-bs-target="#update-dealer-pane" type="button" role="tab" (click)="tabChange('update')">
+          Update Dealer
+        </button>
+      <!--</li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="base-location-tab" data-bs-toggle="tab" data-bs-target="#base-location-pane" type="button" role="tab" (click)="tabChange('baselocation')">
+          Add Base Location
+        </button>
+      </li>-->
+    </ul>
+  </div>
+
+  <div class="tab-content">
+
+    <!-- ======================== TAB 1: ADD DEALER ======================== -->
+    <div class="tab-pane fade show active" id="add-dealer-pane" role="tabpanel">
+      <div class="card shadow-sm px-4 border-0 py-2 mt-2" style="border-radius: 12px;">
+
+        <form [formGroup]="dealerForm" (ngSubmit)="onSubmit()">
+          <div class="row pt-4">
+
+            <!-- Dealer Code -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('dealerCode')?.value">
+                <input type="text" class="form-control" formControlName="dealerCode" />
+                <label>Dealer Code</label>
+                <small class="text-danger" *ngIf="hasError('dealerCode')">Dealer Code is required</small>
+              </div>
+            </div>
+
+            <!-- Dealer Name -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('dealerName')?.value">
+                <input type="text" class="form-control" formControlName="dealerName" />
+                <label>Dealer Name</label>
+                <small class="text-danger" *ngIf="hasError('dealerName')">Dealer Name is required</small>
+              </div>
+            </div>
+
+            <!-- GST No -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('gstNo')?.value">
+                <input type="text" class="form-control" formControlName="gstNo" style="text-transform:uppercase" maxlength="15" />
+                <label>GST No</label>
+                <small class="text-danger" *ngIf="hasError('gstNo')">Enter valid GST Number</small>
+              </div>
+            </div>
+
+            <!-- PAN No -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('panNo')?.value">
+                <input type="text" class="form-control" formControlName="panNo" style="text-transform:uppercase" maxlength="10" />
+                <label>PAN No</label>
+                <small class="text-danger" *ngIf="hasError('panNo')">Enter valid PAN Number</small>
+              </div>
+            </div>
+
+            <!-- Dealer Mobile -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('dealerMobile')?.value">
+                <input type="text" class="form-control" formControlName="dealerMobile" maxlength="10" inputmode="numeric" />
+                <label>Dealer Mobile</label>
+                <small class="text-danger" *ngIf="hasError('dealerMobile')">Enter valid 10 digit mobile</small>
+              </div>
+            </div>
+
+            <!-- Dealer Alternate Mobile -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('dealerAlternateMobile')?.value">
+                <input type="text" class="form-control" formControlName="dealerAlternateMobile" maxlength="10" inputmode="numeric" />
+                <label>Dealer Alternate Mobile</label>
+                <small class="text-danger" *ngIf="hasError('dealerAlternateMobile')">Enter valid 10 digit mobile</small>
+              </div>
+            </div>
+
+            <!-- Dealer Email -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('dealerEmail')?.value">
+                <input type="email" class="form-control" formControlName="dealerEmail" />
+                <label>Dealer Email</label>
+                <small class="text-danger" *ngIf="hasError('dealerEmail')">Enter valid Email</small>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('address')?.value">
+                <input type="text" class="form-control" formControlName="address" />
+                <label>Address</label>
+                <small class="text-danger" *ngIf="hasError('address')">Address is required</small>
+              </div>
+            </div>
+
+            <!-- State -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('stateCode')?.value">
+                <select class="form-select" formControlName="stateCode" (change)="onStateChange($event)">
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let st of hoStateList" [value]="st.stateCode">{{ st.stateName }}</option>
+                </select>
+                <label>State</label>
+                <small class="text-danger" *ngIf="hasError('stateCode')">State is required</small>
+              </div>
+            </div>
+
+            <!-- District -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('district')?.value">
+                <select class="form-select" formControlName="district" (change)="onDistrictChange()">
+                  <option [ngValue]="null" disabled selected hidden></option>
+                  <option *ngFor="let d of districtList" [ngValue]="d">{{ d.DistrictName }}</option>
+                </select>
+                <label>District</label>
+                <small class="text-danger" *ngIf="hasError('district')">District is required</small>
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('city')?.value">
+                <input type="text" class="form-control" formControlName="city" />
+                <label>City</label>
+                <small class="text-danger" *ngIf="hasError('city')">City is required</small>
+              </div>
+            </div>
+
+            <!-- TEHSIL - MULTI SELECT (checkbox dropdown) -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom multi-select-wrapper"
+                   [class.has-value]="dealerForm.get('tehsils')?.value?.length">
+                <div class="form-control multi-select-display" (click)="toggleTehsilDropdown()">
+                  {{ selectedTehsilLabel }}
+                </div>
+                <label>Tehsil (Multiple)</label>
+
+                <div class="multi-select-dropdown" *ngIf="isTehsilDropdownOpen">
+                  <div *ngIf="!tehsilList.length" class="px-3 py-2 text-muted" style="font-size:13px">
+                    Select district first
+                  </div>
+                  <div class="form-check px-3 py-1" *ngFor="let t of tehsilList">
+                    <input class="form-check-input" type="checkbox"
+                           [id]="'tehsil_' + t.TehsilCode"
+                           [checked]="isTehsilSelected(t)"
+                           (change)="onTehsilToggle(t, $event)" />
+                    <label class="form-check-label" [for]="'tehsil_' + t.TehsilCode" style="font-size:14px">
+                      {{ t.TehsilName }}
+                    </label>
+                  </div>
+                </div>
+                <small class="text-danger" *ngIf="hasError('tehsils')">Select at least one Tehsil</small>
+              </div>
+            </div>
+
+            <!-- ===================== STATE HEAD ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingStateHead">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('stateHeadMail')?.value">
+                    <select class="form-select" formControlName="stateHeadMail" (change)="onStateHeadChange()">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let sh of stateHeadList" [value]="sh.Mail">{{ sh.Name }}</option>
+                    </select>
+                    <label>State Head</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddStateHead(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasError('stateHeadMail')">State Head is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingStateHead">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('stateHeadName')?.value">
+                  <input type="text" class="form-control" formControlName="stateHeadName" />
+                  <label>State Head Name</label>
+                  <small class="text-danger" *ngIf="hasError('stateHeadName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('stateHeadMobile')?.value">
+                  <input type="text" class="form-control" formControlName="stateHeadMobile" maxlength="10" inputmode="numeric" />
+                  <label>State Head Mobile</label>
+                  <small class="text-danger" *ngIf="hasError('stateHeadMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('stateHeadMail')?.value">
+                      <input type="email" class="form-control" formControlName="stateHeadMail" />
+                      <label>State Head Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddStateHead(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasError('stateHeadMail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ===================== AREA MANAGER ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingAm">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('amMail')?.value">
+                    <select class="form-select" formControlName="amMail" (change)="onAmChange()">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+                    </select>
+                    <label>Area Manager</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddAm(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasError('amMail')">Area Manager is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingAm">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('amName')?.value">
+                  <input type="text" class="form-control" formControlName="amName" />
+                  <label>Area Manager Name</label>
+                  <small class="text-danger" *ngIf="hasError('amName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('amMobile')?.value">
+                  <input type="text" class="form-control" formControlName="amMobile" maxlength="10" inputmode="numeric" />
+                  <label>Area Manager Mobile</label>
+                  <small class="text-danger" *ngIf="hasError('amMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('amMail')?.value">
+                      <input type="email" class="form-control" formControlName="amMail" />
+                      <label>Area Manager Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddAm(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasError('amMail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ===================== TERRITORY MANAGER ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingTm">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('tmMail')?.value">
+                    <select class="form-select" formControlName="tmMail" (change)="onTmChange()">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+                    </select>
+                    <label>Territory Manager</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddTm(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasError('tmMail')">Territory Manager is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingTm">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('tmName')?.value">
+                  <input type="text" class="form-control" formControlName="tmName" />
+                  <label>Territory Manager Name</label>
+                  <small class="text-danger" *ngIf="hasError('tmName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('tmMobile')?.value">
+                  <input type="text" class="form-control" formControlName="tmMobile" maxlength="10" inputmode="numeric" />
+                  <label>Territory Manager Mobile</label>
+                  <small class="text-danger" *ngIf="hasError('tmMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('tmMail')?.value">
+                      <input type="email" class="form-control" formControlName="tmMail" />
+                      <label>Territory Manager Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddTm(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasError('tmMail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ===================== SERVICE CCM ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingCcm">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('serviceCcmEmail')?.value">
+                    <select class="form-select" formControlName="serviceCcmEmail" (change)="onCcmChange()">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let c of ccmList" [value]="c.Mail">{{ c.Name }}</option>
+                    </select>
+                    <label>Service CCM</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddCcm(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasError('serviceCcmEmail')">Service CCM is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingCcm">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('serviceCcmName')?.value">
+                  <input type="text" class="form-control" formControlName="serviceCcmName" />
+                  <label>Service CCM Name</label>
+                  <small class="text-danger" *ngIf="hasError('serviceCcmName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="dealerForm.get('serviceCcmMobile')?.value">
+                  <input type="text" class="form-control" formControlName="serviceCcmMobile" maxlength="10" inputmode="numeric" />
+                  <label>Service CCM Mobile</label>
+                  <small class="text-danger" *ngIf="hasError('serviceCcmMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="dealerForm.get('serviceCcmEmail')?.value">
+                      <input type="email" class="form-control" formControlName="serviceCcmEmail" />
+                      <label>Service CCM Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddCcm(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasError('serviceCcmEmail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Date of Appointment -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="dealerForm.get('dateOfAppointment')?.value">
+                <input type="date" class="form-control" style="font-size:14px" [max]="todayDate" formControlName="dateOfAppointment" />
+                <label>Date Of Appointment</label>
+                <small class="text-danger" *ngIf="hasError('dateOfAppointment')">Required</small>
+              </div>
+            </div>
+
+            <!-- Active Status -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom has-value">
+                <select class="form-select" formControlName="activeStatus">
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+                <label>Active Status</label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Submit / Reset -->
+          <div class="text-center py-3">
+            <button type="submit" class="btn text-white px-4" style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+              Save Dealer
+            </button>
+            <button type="button" class="btn btn-secondary px-4 ms-2" style="border-radius: 50px; font-size: 14px;" (click)="resetForm()">
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ======================== TAB 2: UPDATE DEALER ======================== -->
+    <div class="tab-pane fade" id="update-dealer-pane" role="tabpanel">
+      <div class="card shadow-sm px-4 border-0 py-2 mt-2" style="border-radius: 12px;">
+        <form [formGroup]="updateDealerForm" (ngSubmit)="onUpdateSubmit()">
+          <div class="row pt-4">
+
+            <!-- SELECT DEALER -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('dealerId')?.value">
+                <select class="form-select" formControlName="dealerId" (change)="onSelectDealerForUpdate()">
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let dealer of dealersList" [value]="dealer.DealerCode">{{ dealer.DealerName }} - {{ dealer.DealerCode }}</option>
+                </select>
+                <label>Select Dealer</label>
+                <small class="text-danger" *ngIf="hasUpdateError('dealerId')">Please select a dealer</small>
+              </div>
+            </div>
+
+            <!-- ===================== STATE HEAD ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingStateHeadUpdate && updateDealerId">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('stateHeadMail')?.value">
+                    <select class="form-select" formControlName="stateHeadMail">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let sh of stateHeadList" [value]="sh.Mail">{{ sh.Name }}</option>
+                    </select>
+                    <label>State Head</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddStateHeadUpdate(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasUpdateError('stateHeadMail')">State Head is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingStateHeadUpdate && updateDealerId">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('stateHeadName')?.value">
+                  <input type="text" class="form-control" formControlName="stateHeadName" />
+                  <label>State Head Name</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('stateHeadName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('stateHeadMobile')?.value">
+                  <input type="text" class="form-control" formControlName="stateHeadMobile" maxlength="10" inputmode="numeric" />
+                  <label>State Head Mobile</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('stateHeadMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('stateHeadMail')?.value">
+                      <input type="email" class="form-control" formControlName="stateHeadMail" />
+                      <label>State Head Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddStateHeadUpdate(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasUpdateError('stateHeadMail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ===================== AREA MANAGER ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingAmUpdate && updateDealerId">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('amMail')?.value">
+                    <select class="form-select" formControlName="amMail">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+                    </select>
+                    <label>Area Manager</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddAmUpdate(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasUpdateError('amMail')">Area Manager is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingAmUpdate && updateDealerId">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('amName')?.value">
+                  <input type="text" class="form-control" formControlName="amName" />
+                  <label>Area Manager Name</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('amName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('amMobile')?.value">
+                  <input type="text" class="form-control" formControlName="amMobile" maxlength="10" inputmode="numeric" />
+                  <label>Area Manager Mobile</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('amMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('amMail')?.value">
+                      <input type="email" class="form-control" formControlName="amMail" />
+                      <label>Area Manager Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddAmUpdate(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasUpdateError('amMail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ===================== TERRITORY MANAGER ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingTmUpdate && updateDealerId">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('tmMail')?.value">
+                    <select class="form-select" formControlName="tmMail">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+                    </select>
+                    <label>Territory Manager</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddTmUpdate(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasUpdateError('tmMail')">Territory Manager is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingTmUpdate && updateDealerId">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('tmName')?.value">
+                  <input type="text" class="form-control" formControlName="tmName" />
+                  <label>Territory Manager Name</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('tmName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('tmMobile')?.value">
+                  <input type="text" class="form-control" formControlName="tmMobile" maxlength="10" inputmode="numeric" />
+                  <label>Territory Manager Mobile</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('tmMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('tmMail')?.value">
+                      <input type="email" class="form-control" formControlName="tmMail" />
+                      <label>Territory Manager Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddTmUpdate(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasUpdateError('tmMail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ===================== SERVICE CCM ===================== -->
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="!isAddingCcmUpdate && updateDealerId">
+              <div class="field-with-add">
+                <div class="d-flex align-items-start dropdown-with-add">
+                  <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('serviceCcmEmail')?.value">
+                    <select class="form-select" formControlName="serviceCcmEmail">
+                      <option value="" disabled selected hidden></option>
+                      <option *ngFor="let c of ccmList" [value]="c.Mail">{{ c.Name }}</option>
+                    </select>
+                    <label>Service CCM</label>
+                  </div>
+                  <button type="button" class="btn-add-new" (click)="toggleAddCcmUpdate(true)">+ Add New</button>
+                </div>
+                <small class="text-danger d-block" *ngIf="hasUpdateError('serviceCcmEmail')">Service CCM is required</small>
+              </div>
+            </div>
+
+            <ng-container *ngIf="isAddingCcmUpdate && updateDealerId">
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('serviceCcmName')?.value">
+                  <input type="text" class="form-control" formControlName="serviceCcmName" />
+                  <label>Service CCM Name</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('serviceCcmName')">Name is required</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('serviceCcmMobile')?.value">
+                  <input type="text" class="form-control" formControlName="serviceCcmMobile" maxlength="10" inputmode="numeric" />
+                  <label>Service CCM Mobile</label>
+                  <small class="text-danger" *ngIf="hasUpdateError('serviceCcmMobile')">Enter valid mobile</small>
+                </div>
+              </div>
+              <div class="col-xl-3 col-lg-4 col-sm-6">
+                <div class="field-with-add">
+                  <div class="d-flex align-items-start dropdown-with-add">
+                    <div class="form-floating-custom flex-fill" [class.has-value]="updateDealerForm.get('serviceCcmEmail')?.value">
+                      <input type="email" class="form-control" formControlName="serviceCcmEmail" />
+                      <label>Service CCM Email</label>
+                    </div>
+                    <button type="button" class="btn-add-new" (click)="toggleAddCcmUpdate(false)">↩ List</button>
+                  </div>
+                  <small class="text-danger d-block" *ngIf="hasUpdateError('serviceCcmEmail')">Enter valid email</small>
+                </div>
+              </div>
+            </ng-container>
+
+          </div>
+
+          <!-- Submit / Reset -->
+          <div class="text-center py-3" *ngIf="updateDealerId">
+            <button type="submit" class="btn text-white px-4" style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+              Update Dealer
+            </button>
+            <button type="button" class="btn btn-secondary px-4 ms-2" style="border-radius: 50px; font-size: 14px;" (click)="resetUpdateForm()">
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- END TAB 2 -->
+
+    <div class="tab-pane fade" id="base-location-pane" role="tabpanel">
+      <div class="card shadow-sm px-4 border-0 py-2 mt-2" style="border-radius: 12px;">
+
+        <form [formGroup]="baseLocationForm" (ngSubmit)="submitBaseLocation()">
+          <div class="row pt-4">
+
+            <!-- Employee Type -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('employeeType')?.value">
+                <select class="form-select" formControlName="employeeType" (change)="onEmployeeTypeChange()">
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let opt of employeeTypeOptions" [value]="opt.value">{{ opt.label }}</option>
+                </select>
+                <label>Employee Type</label>
+                <small class="text-danger" *ngIf="hasBaseLocationError('employeeType')">Required</small>
+              </div>
+            </div>
+
+            <!-- Employee List -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('employeeId')?.value">
+                <select class="form-select" formControlName="employeeId" (change)="onEmployeeChange()">
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let emp of employeeList" [value]="emp.id">{{ emp.name}}</option>
+                </select>
+                <label>Employee</label>
+                <small class="text-danger" *ngIf="hasBaseLocationError('employeeId')">Required</small>
+              </div>
+            </div>
+
+            <!-- State -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('stateCode')?.value">
+                <select class="form-select" formControlName="stateCode" (change)="onBaseStateChange()">
+                  <option value="" disabled selected hidden></option>
+                  <option *ngFor="let st of hoStateList" [value]="st.stateCode">{{ st.stateName }}</option>
+                </select>
+                <label>State</label>
+                <small class="text-danger" *ngIf="hasBaseLocationError('stateCode')">Required</small>
+              </div>
+            </div>
+
+            <!-- District -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('districtCode')?.value">
+                <select class="form-select" formControlName="districtCode" (change)="onBaseDistrictChange()">
+                  <option [ngValue]="null" disabled selected hidden></option>
+                  <option *ngFor="let d of districtListBaseLocation" [ngValue]="d.DistrictCode">{{ d.DistrictName }}</option>
+                </select>
+                <label>District</label>
+                <small class="text-danger" *ngIf="hasBaseLocationError('districtCode')">Required</small>
+              </div>
+            </div>
+
+            <!-- Tehsil -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('tehsilCode')?.value">
+                <select class="form-select" formControlName="tehsilCode" (change)="onBasetehsilCodeChange()">
+                  <option [ngValue]="null" disabled selected hidden></option>
+                  <option *ngFor="let t of tehsilListBaseLocation" [ngValue]="t.TehsilCode">{{ t.TehsilName }}</option>
+                </select>
+                <label>Tehsil</label>
+                <small class="text-danger" *ngIf="hasBaseLocationError('tehsilCode')">Required</small>
+              </div>
+            </div>
+
+            <!-- Village -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('villageCode')?.value">
+                <select class="form-select" formControlName="villageCode">
+                  <option [ngValue]="null" disabled selected hidden></option>
+                  <option *ngFor="let v of villageList" [ngValue]="v">{{ v.VillageName }}</option>
+                </select>
+                <label>Village</label>
+                <small class="text-danger" *ngIf="hasBaseLocationError('villageCode')">Required</small>
+              </div>
+            </div>
+
+            <!-- Other Location -->
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+              <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('otherLocation')?.value">
+                <input type="text" class="form-control" formControlName="otherLocation" />
+                <label>Other Location</label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Submit / Reset -->
+          <div class="text-center py-3">
+            <button type="submit" class="btn text-white px-4" style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+              Add Base Location
+            </button>
+            <button type="button" class="btn btn-secondary px-4 ms-2" style="border-radius: 50px; font-size: 14px;" (click)="resetBaseLocationForm()">
+              Reset
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+    <!--END TAB - 3-->
+
+  </div>
+  <!-- END TAB CONTENT -->
+
+</div>

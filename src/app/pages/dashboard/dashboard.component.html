@@ -1,0 +1,467 @@
+<div class="dash-wrapper">
+  <!-- Ticker -->
+  @if (tickerItems.length > 0 && possitionId?.trim()?.toLowerCase() !== 'dealer') {
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <div class="ticker-content">
+        @for (item of tickerItems; track $index) {
+        <span class="ticker-item">
+          <i class="fa-solid fa-circle-dot ticker-dot"></i>
+          {{ item }}
+        </span>
+        }
+        <!--@for (item of tickerItems; track item) {
+        <span class="ticker-item">
+          <i class="fa-solid fa-circle-dot ticker-dot"></i>
+          {{ item }}
+        </span>
+        }-->
+      </div>
+    </div>
+  </div>
+  }
+
+
+  <div class="filter-bar">
+    <div class="duration-filter">
+      <div class="filter-tabs">
+        <button class="filter-tab"
+                [class.active]="selectedFilter === 'This Month'"
+                (click)="onDurationChange('This Month')">
+          <i class="fa-solid fa-calendar-day"></i>
+          <span>This Month</span>
+        </button>
+        <button class="filter-tab"
+                [class.active]="selectedFilter === 'This Quarter'"
+                (click)="onDurationChange('This Quarter')">
+          <i class="fa-solid fa-calendar-week"></i>
+          <span>This Quarter</span>
+        </button>
+        <button class="filter-tab"
+                [class.active]="selectedFilter === 'This Year'"
+                (click)="onDurationChange('This Year')">
+          <i class="fa-solid fa-calendar"></i>
+          <span>This Financial Year</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-group" *ngIf="displayDateInputs">
+      <label class="filter-label">Start Date</label>
+      <input type="date" class="filter-select" id="startDate" [(ngModel)]="startdate_val" />
+    </div>
+
+    <div class="filter-group" *ngIf="displayDateInputs">
+      <label class="filter-label">End Date</label>
+      <input type="date" class="filter-select" id="endDate" [(ngModel)]="enddate_val" />
+    </div>
+  </div>
+
+  <!-- SALES TARGET -->
+  <div class="section-card">
+    <div class="section-heading">
+      <span class="section-bar"></span>
+      <h6 class="section-title">Sales Target</h6>
+    </div>
+
+    <div class="row g-3" *ngFor="let item of salesTargetList">
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-info">
+            <p class="metric-label">Target</p>
+            <p class="metric-value">{{ item.Target }}</p>
+          </div>
+          <div class="metric-icon-wrap">
+            <img src="assets/images/achive.png" alt="target" class="metric-img" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-info">
+            <p class="metric-label">Achieved</p>
+            <p class="metric-value">{{ item.Achieve }}</p>
+          </div>
+          <div class="metric-icon-wrap">
+            <img src="assets/images/total.png" alt="achieved" class="metric-img" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-info">
+            <p class="metric-label">Remaining</p>
+            <p class="metric-value">{{ item.Remaining }}</p>
+          </div>
+          <div class="metric-icon-wrap">
+            <img src="assets/images/remain.png" alt="remaining" class="metric-img" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="col-12">
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span class="progress-label">Achievement Progress</span>
+            <span class="progress-pct">{{ getProgress(item.Achieve, item.Target) | number:'1.1-1' }}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="getProgress(item.Achieve, item.Target)"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!--  LEADS FOLLOWUP  -->
+  <div class="section-card">
+    <div class="section-heading">
+      <span class="section-bar"></span>
+      <h6 class="section-title">Leads Followup</h6>
+    </div>
+
+    <div class="row g-3" *ngFor="let i of leadCount">
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="stat-card border-green"
+             [class.active-green]="activeType === 'Total'"
+             (click)="setActiveType('Total')">
+          <div class="stat-info">
+            <p class="stat-label color-green">Total Leads</p>
+            <p class="stat-value">{{ i.TotalLeads ?? 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-green">
+            <img src="assets/images/totalleeds.png" alt="total" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="stat-card border-red"
+             [class.active-red]="activeType === 'Overdue'"
+             (click)="setActiveType('Overdue')">
+          <div class="stat-info">
+            <p class="stat-label color-red">Overdue Leads</p>
+            <p class="stat-value">{{ i.OverDueTarget ?? 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-red">
+            <img src="assets/images/OverdueLeads.png" alt="overdue" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="stat-card border-purple"
+             [class.active-purple]="activeType === 'Today'"
+             (click)="setActiveType('Today')">
+          <div class="stat-info">
+            <p class="stat-label color-purple">Today Followup Leads</p>
+            <p class="stat-value">{{ i.TodayLeads ?? 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-purple">
+            <img src="assets/images/TodayLeads.png" alt="today" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="stat-card border-orange"
+             [class.active-orange]="activeLead === 'Hot'"
+             (click)="setActiveLead('Hot')">
+          <div class="stat-info">
+            <p class="stat-label color-orange">Hot Leads</p>
+            <p class="stat-value">{{ i.HotLeads ?? 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-orange">
+            <img src="assets/images/HotLeads.png" alt="hot" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="stat-card border-yellow"
+             [class.active-yellow]="activeLead === 'Warm'"
+             (click)="setActiveLead('Warm')">
+          <div class="stat-info">
+            <p class="stat-label color-yellow">Warm Leads</p>
+            <p class="stat-value">{{ i.WarmLeads ?? 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-yellow">
+            <img src="assets/images/ColdLeads.png" alt="warm" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6">
+        <div class="stat-card border-blue"
+             [class.active-blue]="activeLead === 'Cold'"
+             (click)="setActiveLead('Cold')">
+          <div class="stat-info">
+            <p class="stat-label color-blue">Cold Leads</p>
+            <p class="stat-value">{{ i.ColdLeads ?? 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-blue">
+            <img src="assets/images/WarmLeads.png" alt="cold" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!--  ENQUIRY PERFORMANCE  -->
+  <div class="section-card">
+    <div class="section-heading">
+      <span class="section-bar"></span>
+      <h6 class="section-title">Enquiry Performance</h6>
+    </div>
+
+    <div class="row g-3" *ngFor="let i of enquiryBox">
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="stat-card border-green"
+             [class.active-green]="activeLead === 'Booking'"
+             (click)="setActiveEnquiryType('Booking')">
+          <div class="stat-info">
+            <p class="stat-label color-green">Booking</p>
+            <p class="stat-value">{{ i.TotalBookingEnquiry || 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-green">
+            <i class="fa-solid fa-calendar-check color-green" style="font-size:20px;"></i>
+          </div>
+        </div>
+      </div>
+
+      <!--<div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="stat-card border-red"
+             [class.active-red]="activeLead === 'Delivered'"
+             (click)="setActiveEnquiryType('Delivered')">
+          <div class="stat-info">
+            <p class="stat-label color-red">Delivered</p>
+            <p class="stat-value">{{ i.Delivered || 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-red">
+            <img src="assets/images/Delivered.png" alt="delivered" width="28" height="28" />
+          </div>
+        </div>
+      </div>-->
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="stat-card border-red"
+             [class.active-red]="activeLead === 'Delivered'"
+             (click)="setActiveEnquiryType('Delivered')">
+
+          <div class="stat-info">
+            <!--<p class="stat-label color-red">Delivered</p>-->
+
+            <div class="delivery-split">
+              <div>
+                <span class="stat-label color-red">Gross Delivery</span>
+                <p class="stat-value">{{ i.Delivered || 0 }}</p>
+              </div>
+
+              <div class="divider"></div>
+
+              <div>
+                <span class="stat-label color-red">Net Delivery</span>
+                <p class="stat-value">{{ i.NetDelivery || 0 }}</p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="stat-icon-wrap bg-red">
+            <img src="assets/images/Delivered.png" alt="delivered" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="stat-card border-purple"
+             [class.active-purple]="activeLead === 'CompetitionLost'"
+             (click)="setActiveEnquiryType('CompetitionLost')">
+          <div class="stat-info">
+            <p class="stat-label color-purple">Sale Lost</p>
+            <p class="stat-value">{{ i.CompetitionLost || 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-purple">
+            <img src="assets/images/CompetitionLost.png" alt="lost" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="stat-card border-orange"
+             [class.active-orange]="activeLead === 'Cancelled'"
+             (click)="setActiveEnquiryType('Cancelled')">
+          <div class="stat-info">
+            <p class="stat-label color-orange">Dropped</p>
+            <p class="stat-value">{{ i.Cancelled || 0 }}</p>
+          </div>
+          <div class="stat-icon-wrap bg-orange">
+            <img src="assets/images/Cancelled.png" alt="cancelled" width="28" height="28" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- DLR POPUP — Bootstrap Modal  -->
+<div class="modal fade" id="dlrPopupModal" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content dlr-modal-content">
+
+      <!-- HEADER -->
+      <div class="modal-header dlr-header">
+        <div class="d-flex align-items-center justify-content-between w-100">
+          <div>
+            <h5 class="modal-title dlr-title">Business Performance Matrix</h5>
+            <p class="dlr-subtitle mb-0">
+              {{ dealerName ? dealerName : '' }} &nbsp;|&nbsp; {{mobileNo}}
+            </p>
+          </div>
+          <!-- Active / Inactive Badges -->
+          <!--<div class="d-flex gap-2">
+            <span class="dlr-status-badge dlr-active-badge">
+              <i class="fa-solid fa-circle-check me-1"></i>TTL Active: {{ totalActive }}
+            </span>
+            <span class="dlr-status-badge dlr-inactive-badge">
+              <i class="fa-solid fa-circle-xmark me-1"></i>TTL Inactive: {{ totalInactive }}
+            </span>
+          </div>-->
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body p-3">
+        <div class="row g-3">
+          @for (m of metrics; track m.key) {
+          <div class="col-lg-4 col-md-6 col-sm-6">
+            <div class="dlr-card"
+                 [style.background]="m.bg"
+                 [style.border-color]="m.border">
+
+              <!-- Icon + Badge -->
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="dlr-card-icon me-2">
+                  <i [class]="m.icon" [style.color]="m.color"></i>
+                </span>
+                <span class="dlr-card-badge" [style.background]="m.border">
+                  {{ m.key }}
+                </span>
+              </div>
+
+              <!-- Active / Inactive Values -->
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="dlr-av-box dlr-av-active">
+                  <span class="dlr-av-label">Active</span>
+                  <span class="dlr-av-value" [style.color]="m.color">{{ m.keyActiveValue || 0 }}</span>
+                </div>
+                <div class="dlr-av-divider"></div>
+                <div class="dlr-av-box dlr-av-inactive">
+                  <span class="dlr-av-label">Inactive</span>
+                  <span class="dlr-av-value dlr-inactive-val">{{ m.keyInActiveValue || 0 }}</span>
+                </div>
+              </div>
+              <!-- Label -->
+              <div class="dlr-card-label mt-1">{{ m.label }}</div>
+
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-footer dlr-footer">
+        <span class="dlr-footer-ts me-auto">
+          <i class="fa-solid fa-clock-rotate-left me-1"></i> Last updated: {{ lastUpdated }}
+        </span>
+        <button type="button" class="btn dlr-ok-btn" (click)="closeModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL 1: Unassigned Enquiries ===================== -->
+<div class="modal fade" id="unassignedModal" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 340px;">
+    <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none;">
+      <!-- Header -->
+      <div class="modal-header" style="background: #1a3a5c; border: none; padding: 18px 20px;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="ti ti-bell-ringing" style="font-size: 19px; color: #fff;"></i>
+          <h5 class="modal-title mb-0" style="color: #fff; font-size: 15px; font-weight: 500;">Enquiry Alert</h5>
+        </div>
+        <!-- <button type="button" class="btn-close btn-close-white" (click)="closeUnassignedModal()"></button> -->
+      </div>
+      <!-- Body -->
+      <div class="modal-body" style="padding: 20px;">
+        <div class="d-flex align-items-center gap-3" style="background: #fff1f2; border: 1px solid #ffd2d2; border-radius: 12px; padding: 16px;">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1.5px solid #ff0101;">
+            <span style="font-size: 16px; font-weight: 500; color: #ff0101;">{{ unassignedCount }}</span>
+          </div>
+          <div class="flex-grow-1" style="min-width: 0;">
+            <p class="mb-0" style="font-size: 13px; font-weight: 600; color: #501313;">Unassigned Enquiries</p>
+            <p class="mb-2" style="font-size: 11px; color: #993c3c; font-weight: 600">Not yet assigned to a dealership</p>
+            <button class="btn d-flex align-items-center justify-content-center gap-1 px-3"
+                    style="background: #ff0101; color: #fff; border: none; border-radius: 8px; padding: 8px 0; font-size: 12px; font-weight: 500;"
+                    (click)="goToUnassigned()">
+              <i class="ti ti-user-check"></i> Assign Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL 2: Overdue Enquiries ===================== -->
+<div class="modal fade" id="overdueModal" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 340px;">
+    <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none;">
+      <!-- Header -->
+      <div class="modal-header" style="background: #1a3a5c; border: none; padding: 18px 20px;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="ti ti-clock-exclamation" style="font-size: 19px; color: #fff;"></i>
+          <h5 class="modal-title mb-0" style="color: #fff; font-size: 15px; font-weight: 500;">Enquiry Alert</h5>
+        </div>
+        <!-- <button type="button" class="btn-close btn-close-white" (click)="closeOverdueModal()"></button> -->
+      </div>
+      <!-- Body -->
+      <div class="modal-body" style="padding: 20px;">
+        <div class="d-flex align-items-center gap-3" style="background: #fff8ec; border: 1px solid #f9d896; border-radius: 12px; padding: 16px;">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1.5px solid #e67700;">
+            <span style="font-size: 16px; font-weight: 500; color: #e67700;">{{ threeDaysOveEnq }}</span>
+          </div>
+          <div class="flex-grow-1" style="min-width: 0;">
+            <p class="mb-0" style="font-size: 13px; font-weight: 600; color: #412402;">Overdue 3+ Days</p>
+            <p class="mb-2" style="font-size: 11px; color: #8a5a12; font-weight: 600">These enquiries will become overdue within the next 3 days.</p>
+            <button class="btn d-flex align-items-center justify-content-center gap-1 px-3"
+                    style="background: #e67700; color: #fff; border: none; border-radius: 8px; padding: 8px 0; font-size: 12px; font-weight: 500;"
+                    (click)="goToOverdue()">
+              <i class="ti ti-clock-exclamation"></i> View Overdue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

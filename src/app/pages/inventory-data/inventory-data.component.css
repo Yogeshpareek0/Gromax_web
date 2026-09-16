@@ -1,0 +1,552 @@
+.menu-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+@media (min-width: 1200px) {
+  .col-xl-2_4 {
+    flex: 0 0 auto;
+    width: 20%;
+  }
+}
+
+.col-xl-2_4 {
+  cursor: pointer;
+}
+
+h6 {
+  font-size: 14px;
+}
+
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+.active-box {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+  .active-box h5, .active-box h6, .active-box small {
+    color: white !important;
+  }
+
+/* ── Table Wrapper ─────────────────────────────────────────────── */
+.enquiry-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-size: 13px;
+  padding: 0;
+}
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+/* ── Column Header Cell ────────────────────────────────────────── */
+.th-cell {
+  white-space: nowrap;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 10px;
+  white-space: nowrap;
+}
+
+/* ── Column Filter Button (inside th) ──────────────────────────── */
+.col-filter-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+  .col-filter-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .col-filter-btn.col-filter-active {
+    color: #FFD700;
+  }
+
+    .col-filter-btn.col-filter-active i {
+      color: #FFD700;
+    }
+
+/* ── Column Filter Dropdown ────────────────────────────────────── */
+.col-filter-dropdown {
+  position: fixed;
+  z-index: 99999;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  min-width: 200px;
+  max-width: 260px;
+  display: none;
+}
+
+  .col-filter-dropdown.open {
+    display: block;
+  }
+
+.filter-search-input {
+  width: 100%;
+  padding: 5px 9px;
+  font-size: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  outline: none;
+  color: #333;
+}
+
+  .filter-search-input:focus {
+    border-color: #4796BD;
+  }
+
+.filter-select-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+  .filter-select-actions button {
+    flex: 1;
+    font-size: 11px;
+    padding: 3px 6px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background: #f8f9fa;
+    cursor: pointer;
+    color: #555;
+    transition: background 0.15s;
+  }
+
+    .filter-select-actions button:hover {
+      background: #e9ecef;
+    }
+
+.filter-values-list {
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+  margin-bottom: 8px;
+}
+
+.filter-value-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: #333;
+  padding: 4px 3px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+}
+
+  .filter-value-item:hover {
+    background: #f0f7fb;
+  }
+
+  .filter-value-item input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: #4796BD;
+  }
+
+.no-values-msg {
+  font-size: 12px;
+  color: #aaa;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.filter-dropdown-actions {
+  display: flex;
+  gap: 7px;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+}
+
+  .filter-dropdown-actions .btn-cancel {
+    flex: 1;
+    font-size: 12px;
+    padding: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: #f8f9fa;
+    cursor: pointer;
+    color: #555;
+  }
+
+  .filter-dropdown-actions .btn-apply {
+    flex: 1;
+    font-size: 12px;
+    padding: 5px;
+    border: none;
+    border-radius: 6px;
+    background: #4796BD;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+    .filter-dropdown-actions .btn-apply:hover {
+      background: #3a7fa1;
+    }
+
+/* ── Active Filters Bar ────────────────────────────────────────── */
+.active-filters-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 7px 10px;
+  background: #eef7fb;
+  border: 1px solid #c8e4f0;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.filter-bar-label {
+  font-size: 12px;
+  color: #4796BD;
+  font-weight: 500;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid #4796BD;
+  border-radius: 20px;
+  padding: 2px 8px 2px 10px;
+  font-size: 11px;
+  color: #215378;
+}
+
+.filter-chip-col {
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.filter-chip-vals {
+  color: #555;
+}
+
+.filter-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4796BD;
+  font-size: 10px;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+  .filter-chip-remove:hover {
+    color: #c0392b;
+  }
+
+.btn-clear-all-filters {
+  background: none;
+  border: 1px solid #c0392b;
+  border-radius: 20px;
+  color: #c0392b;
+  font-size: 11px;
+  padding: 2px 10px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+  .btn-clear-all-filters:hover {
+    background: #c0392b;
+    color: #fff;
+  }
+
+/* ── Toolbar ───────────────────────────────────────────────────── */
+.search-wrapper {
+  max-width: 380px;
+}
+
+.custom-search-group {
+  border: 1px solid #4796BD;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: 0.3s ease;
+}
+
+.search-btn {
+  background-color: #4796BD;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 0;
+}
+
+  .search-btn:hover {
+    background-color: #3a7fa1;
+    border: 1px solid #3a7fa1;
+  }
+
+/* ── Group By ─────────────────────────────────────────────────── */
+.group-by-wrap {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.group-label {
+  font-size: 12px;
+  color: #555;
+  white-space: nowrap;
+}
+
+.group-select {
+  font-size: 12px;
+  padding: 3px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  min-width: 130px;
+  cursor: pointer;
+}
+
+.clear-group-btn {
+  background: none;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #888;
+  padding: 3px 7px;
+}
+
+  .clear-group-btn:hover {
+    color: #c0392b;
+    border-color: #c0392b;
+  }
+
+.group-header-row td {
+  background: #d6eaf5 !important;
+  font-size: 12px;
+  color: #215378;
+  padding: 6px 12px !important;
+  border-bottom: 2px solid #4796BD;
+}
+
+.group-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #215378;
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+.group-key-label {
+  font-size: 12px;
+  color: #215378;
+}
+
+.group-count-badge {
+  background: #4796BD;
+  color: #fff;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 20px;
+}
+
+/* ── Freeze Button ────────────────────────────────────────────── */
+.btn-freeze {
+  background: #f5a623;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+  .btn-freeze:hover {
+    background: #e0941a;
+  }
+
+.freeze-badge {
+  background: #fff;
+  color: #f5a623;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+}
+
+/* ── Customize Columns Button ─────────────────────────────────── */
+.btn-customize {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+  .btn-customize:hover {
+    background: #5a6268;
+  }
+
+/* ── Freeze / Customize Panel ─────────────────────────────────── */
+.tool-panel,
+.freeze-panel,
+.customize-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  min-width: 200px;
+}
+
+  .tool-panel.open,
+  .freeze-panel.open,
+  .customize-panel.open {
+    display: block;
+  }
+
+.tool-panel-title,
+.freeze-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #215378;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.tool-panel-options,
+.freeze-options {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.tool-panel-option,
+.freeze-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #333;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 0;
+  user-select: none;
+}
+
+  .tool-panel-option:hover,
+  .freeze-option:hover {
+    background: #f0f7fb;
+  }
+
+  .tool-panel-option input[type="checkbox"],
+  .freeze-option input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: #4796BD;
+  }
+
+.btn-primary-custom {
+  background: #4796BD;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+  .btn-primary-custom:hover {
+    background: #3a7fa1;
+  }
+
+/* ── Frozen Columns ───────────────────────────────────────────── */
+.frozen-col {
+  position: sticky !important;
+  z-index: 3;
+  background-color: #ffffff;
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.10);
+}
+
+/* Frozen thead — must sit above both sticky-top AND sticky-left body cells */
+thead .frozen-col {
+  z-index: 30 !important;
+  background-color: #215378 !important;
+  color: #fff !important;
+}
+
+/* Even striped rows - keep solid bg so no bleed-through */
+.table-striped > tbody > tr:nth-of-type(odd) > td.frozen-col {
+  background-color: #f7fbfd !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(even) > td.frozen-col {
+  background-color: #ffffff !important;
+}
+
+/* Hover - keep frozen cell visible */
+#enquiryTable tbody tr:hover > td.frozen-col {
+  background-color: #dff0f8 !important;
+}
+
+/* Striped rows */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-bg-type: rgba(0, 0, 0, 0.025);
+}

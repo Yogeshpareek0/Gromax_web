@@ -1,0 +1,338 @@
+<!-- ══════════════ LIST VIEW ══════════════ -->
+<div *ngIf="view === 'list'" class="pdi-wrap pdi-list-scroll">
+
+  <div class="search-box">
+    <input type="text"
+           placeholder="Search by Chassis No. or Model..."
+           [(ngModel)]="searchQuery"
+           (blur)="searchData()" />
+    <span *ngIf="searchQuery" class="clear-btn" (click)="removeSearchQuery()">✕</span>
+  </div>
+
+  <!--<div *ngIf="loading" class="center-text">Loading stock list...</div>-->
+
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0"
+            style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">
+            S.No.
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            Action
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            Model Code
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            Chassis No.
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            Drive Type
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            Colour
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            SAP
+          </th>
+
+          <th class="text-nowrap fw-normal">
+            Dealer Name
+          </th>
+
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">
+            Status
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody style="font-size: 14px;">
+
+        <tr *ngFor="let item of stockList; let i = index"
+            style="cursor:pointer">
+
+          <!-- S.No. -->
+          <td>
+            {{ ((currentPage - 1) * itemsPerPage) + i + 1 }}
+          </td>
+
+          <!-- Action -->
+          <!--<td class="text-center">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+               style="font-size:14px"
+               [title]="item.Status === 'Done' ? 'View PDI' : 'Fill PDI'"
+               (click)="openForm(item)">
+            </i>
+          </td>-->
+          <td class="text-center">
+            <button type="button"
+                    class="btn btn-sm btn-primary action-btn"
+                    (click)="openForm(item)">
+              {{ item.NTIRMasterId == null ? 'Fill NTIR' : 'Update NTIR' }}
+            </button>
+          </td>
+          <!-- Tractor Sr. No. -->
+          <td class="text-nowrap">
+            {{ item.TractorSrNumber || '-' }}
+          </td>
+
+          <!-- Chassis No. -->
+          <td class="text-nowrap">
+            {{ item.chasisno || '-' }}
+          </td>
+
+          <!-- Drive Type -->
+          <td class="text-nowrap">
+            {{ item.DriveType || '-' }}
+          </td>
+
+          <!-- Colour -->
+          <td class="text-nowrap">
+            {{ item.Colour || '-' }}
+          </td>
+
+          <!-- SAP / Dealer Code -->
+          <td class="text-nowrap">
+            {{ item.DealerCode || '-' }}
+          </td>
+
+          <!-- Dealer Name -->
+          <td class="text-nowrap">
+            {{ item.DealershipName || '-' }}
+          </td>
+
+          <!-- Status -->
+          <td class="text-nowrap">
+            <span class="status-badge"
+                  [class.status-done]="item.Status === 'Done'"
+                  [class.status-pending]="item.Status !== 'Done'">
+              {{ item.Status || 'Pending' }}
+            </span>
+          </td>
+
+        </tr>
+
+        <!-- No Data -->
+        <tr *ngIf="!stockList || stockList.length === 0">
+          <td colspan="9" class="text-center py-4">
+
+            <div class="mb-2 d-flex justify-content-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:48px;height:48px;background:linear-gradient(135deg,#4e73df,#1cc88a);color:white;">
+                <i class="fa-solid fa-hand-point-right fs-5"></i>
+              </div>
+            </div>
+
+            <h6 class="fw-normal mb-1"
+                style="font-size:15px;color:#2c3e50;">
+              No Tractors Found
+            </h6>
+
+            <p class="mb-0 text-muted" style="font-size:13px;">
+              There is currently no stock data available.
+              Try adjusting your search.
+            </p>
+
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>
+
+<!-- ══════════════ FORM VIEW ══════════════ -->
+<div *ngIf="view === 'form'" class="pdi-wrap">
+  <div class="form-header">
+    <button class="back-btn" (click)="backToList()">← Back</button>
+    <h3>NTIR Form</h3>
+  </div>
+
+  <div class="info-card">
+    <div class="info-cell">
+      <span>DealerCode</span>
+      <b>{{ selectedItem?.DealerCode || '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Model Code</span>
+      <b>{{ selectedItem?.TractorSrNumber || '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Chassis No</span>
+      <b>{{ selectedItem?.chasisno || '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Engine No</span>
+      <b>{{ '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Plant Code</span>
+      <b>{{ '—' }}</b>
+    </div>
+  </div>
+
+  <div class="field-box">
+    <label>Hour (Running Time from Plant to Dealership) <span class="req-star">*</span></label>
+    <input type="number" [(ngModel)]="runningHrs" [disabled]="isDone" />
+    <span class="err" *ngIf="errors['runningHrs']">{{ errors['runningHrs'] }}</span>
+  </div>
+
+  <!-- OK + PHOTO SECTIONS -->
+  <ng-container *ngFor="let sec of okPhotoSectionsGrouped | keyvalue">
+    <div class="section-header-sm">{{ sec.key }}</div>
+
+    <ng-container *ngFor="let field of sec.value">
+      <div class="row-flex" *ngIf="!(field.label === 'Front Axle 4wd' && selectedItem?.DriveType !== '4WD')">
+        <div class="row-flex-label" [class.row-label-err]="errors[field.key + '_status']">
+          {{ field.label }} <span class="req-star">*</span>
+        </div>
+
+        <div class="row-flex-status">
+          <select class="ok-select" [ngModel]="okStatus[field.key]" (ngModelChange)="setStatus(field.key, $event)">
+            <option value="" disabled>Select</option>
+            <option *ngFor="let opt of okOptions" [value]="opt">{{ opt }}</option>
+          </select>
+          <span class="err" *ngIf="errors[field.key + '_status']">{{ errors[field.key + '_status'] }}</span>
+        </div>
+
+        <div class="row-flex-remark" *ngIf="okStatus[field.key] === 'Not OK'">
+          <textarea placeholder="Remark" [(ngModel)]="remarks[field.key]"></textarea>
+          <span class="err" *ngIf="errors[field.key + '_remark']">{{ errors[field.key + '_remark'] }}</span>
+        </div>
+
+        <div class="row-flex-photos" *ngIf="okStatus[field.key] === 'Not OK'">
+          <div class="photo-slot-sm">
+            <ng-container *ngIf="photos1[field.key].previewUrl; else empty1">
+              <img [src]="photos1[field.key].previewUrl" (error)="onImageBroken(field.key, 1)" />
+              <div class="upl-overlay-sm" *ngIf="photos1[field.key].uploading">…</div>
+              <span class="remove-btn-sm" *ngIf="!photos1[field.key].uploading" (click)="removePhoto(field.key,1)">✕</span>
+            </ng-container>
+            <ng-template #empty1>
+              <label class="empty-photo-sm">
+                📷 P1
+                <input type="file" accept="image/*" hidden (change)="onPhotoSelected($event, field.key, 1)" />
+              </label>
+            </ng-template>
+          </div>
+          <div class="photo-slot-sm">
+            <ng-container *ngIf="photos2[field.key].previewUrl; else empty2">
+              <img [src]="photos2[field.key].previewUrl" (error)="onImageBroken(field.key, 2)" />
+              <div class="upl-overlay-sm" *ngIf="photos2[field.key].uploading">…</div>
+              <span class="remove-btn-sm" *ngIf="!photos2[field.key].uploading" (click)="removePhoto(field.key,2)">✕</span>
+            </ng-container>
+            <ng-template #empty2>
+              <label class="empty-photo-sm">
+                📷 P2
+                <input type="file" accept="image/*" hidden (change)="onPhotoSelected($event, field.key, 2)" />
+              </label>
+            </ng-template>
+          </div>
+          <span class="err full-width-err" *ngIf="errors[field.key + '_photo']">{{ errors[field.key + '_photo'] }}</span>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngFor="let f of serialBrandFields; let i = index">
+    <div class="section-header-sm" *ngIf="i === 0 || serialBrandFields[i-1].section !== f.section">
+      {{ f.section }}
+    </div>
+    <div class="row-flex">
+      <div class="row-flex-label" [class.row-label-err]="errors[f.key+'_serial'] || errors[f.key+'_brand'] || errors[f.key+'_customBrand']">
+        {{ f.label }} <span class="req-star">*</span>
+      </div>
+
+      <!-- Serial No. - conditional -->
+      <div class="row-flex-serial" *ngIf="f.hasSerial !== false">
+        <input type="text" placeholder="Serial No." [(ngModel)]="serialBrand[f.key].serial" />
+        <span class="err" *ngIf="errors[f.key+'_serial']">{{ errors[f.key+'_serial'] }}</span>
+      </div>
+
+      <!-- Brand -->
+      <div class="row-flex-brand">
+        <select *ngIf="f.brandOptions && f.brandOptions.length > 0"
+                [(ngModel)]="serialBrand[f.key].brand"
+                class="brand-select">
+          <option value="" disabled>Select Brand</option>
+          <option *ngFor="let opt of f.brandOptions" [value]="opt">{{ opt }}</option>
+        </select>
+
+        <input *ngIf="!f.brandOptions || f.brandOptions.length === 0"
+               type="text"
+               placeholder="Brand"
+               [(ngModel)]="serialBrand[f.key].brand" />
+
+        <span class="err" *ngIf="errors[f.key+'_brand']">{{ errors[f.key+'_brand'] }}</span>
+      </div>
+
+      <!-- Custom Brand Input (when "Other" is selected) -->
+      <div class="row-flex-brand" *ngIf="serialBrand[f.key].brand === 'Other'">
+        <input type="text"
+               placeholder="Enter custom brand"
+               [(ngModel)]="customBrandInputs[f.key]"
+               class="custom-brand-input" />
+        <span class="err" *ngIf="errors[f.key+'_customBrand']">{{ errors[f.key+'_customBrand'] }}</span>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- OK ONLY SECTIONS -->
+  <ng-container *ngFor="let sec of okOnlySectionsGrouped | keyvalue">
+    <div class="section-header-sm">{{ sec.key }}</div>
+
+    <ng-container *ngFor="let field of sec.value">
+      <div class="row-flex">
+        <div class="row-flex-label" [class.row-label-err]="errors[field.key + '_status']">
+          {{ field.label }} <span class="req-star">*</span>
+        </div>
+
+        <div class="row-flex-status">
+          <select class="ok-select" [ngModel]="okStatus[field.key]" (ngModelChange)="setStatus(field.key, $event)">
+            <option value="" disabled>Select</option>
+            <option *ngFor="let opt of okOptions" [value]="opt">{{ opt }}</option>
+          </select>
+          <span class="err" *ngIf="errors[field.key + '_status']">{{ errors[field.key + '_status'] }}</span>
+        </div>
+
+        <div class="row-flex-remark" *ngIf="okStatus[field.key] === 'Not OK'">
+          <textarea placeholder="Remark" [(ngModel)]="remarks[field.key]"></textarea>
+          <span class="err" *ngIf="errors[field.key + '_remark']">{{ errors[field.key + '_remark'] }}</span>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- OTHER -->
+  <div class="section-header-sm">Other</div>
+  <div class="field-box">
+    <label>Other Remarks</label>
+    <textarea placeholder="Enter remarks (optional)" [(ngModel)]="otherText" [disabled]="isDone"></textarea>
+  </div>
+
+  <button *ngIf="!isDone && !selectedItem?.NTIRMasterId" class="btn custom-btn px-3" (click)="onSubmit()">
+    {{'Submit' }}
+  </button>
+
+  <button *ngIf="!isDone && selectedItem?.NTIRMasterId" class="btn custom-btn px-3" (click)="updateNTIR()">
+    {{'Update' }}
+  </button>
+
+  <div *ngIf="isDone" class="done-banner">✓ NTIR Completed</div>
+</div>

@@ -1,0 +1,285 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+
+    <div class="row mt-2" *ngFor="let i of leadCount">
+      <div class="col-lg-4 col-sm-6 mb-3" (click)="setActiveType('Total')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-total': activeType === 'Total'}"
+             style="border-radius: 14px; border: 1px solid #4D963A !important;cursor:pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #4D963A">Total Leads</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{ i.TotalLeads ?? 0 }}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px;">
+              <img src="assets/images/totalleeds.png" alt="ticket" class="menu-icon" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6 mb-3" (click)="setActiveType('Overdue')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-overdue': activeType === 'Overdue'}"
+             style="border-radius: 14px; border: 1px solid #AA3232 !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #AA3232; font-weight: 500">Overdue Leads</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{ i.OverDueTarget ?? 0 }}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px;">
+              <img src="assets/images/OverdueLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6 mb-3" (click)="setActiveType('Today')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-today': activeType === 'Today'}"
+             style="border-radius: 14px; border: 1px solid #8966E0 !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #8966E0; font-weight: 500">Today's Due Leads</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{ i.TodayLeads ?? 0 }}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px;">
+              <img src="assets/images/TodayLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Hot')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-hot': activeLead === 'Hot'}"
+             style="border-radius: 14px; border: 1px solid #E45E2E !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #E45E2E">Hot Leads</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.HotLeads ?? 0 }}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px;">
+              <img src="assets/images/HotLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Warm')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-warm': activeLead === 'Warm'}"
+             style="border-radius: 14px; border: 1px solid #D59D3E !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #D59D3E">Warm Leads</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.WarmLeads ?? 0 }}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px;">
+              <img src="assets/images/ColdLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Cold')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-cold': activeLead === 'Cold'}"
+             style="border-radius: 14px; border: 1px solid #2E8FC4 !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #2E8FC4">Cold Leads</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.ColdLeads ?? 0 }}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px;">
+              <img src="assets/images/WarmLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row align-items-center mt-3">
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showSH">
+        <label class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showAM">
+        <label class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showTM">
+        <label class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showDealer">
+        <label class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedDealer">
+          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+        </select>
+      </div>-->
+
+
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showStatename">
+        <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
+        <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
+          <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showLocation">
+        <label for="location" class="form-label fw-medium mb-0">Location</label>
+        <select class="form-select" [(ngModel)]="selectedLocation">
+          <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Dealer Category</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedCategory">
+          <option value="">All</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="enquiry" class="form-label fw-medium mb-0">Source</label>
+        <select class="form-select" [(ngModel)]="selectSource" (change)="onSourceChange()">
+          <option value="">All</option>
+          <option *ngFor="let source of sourceList" [value]="source">
+            {{ source }}
+          </option>
+        </select>
+      </div>
+      <!--sub Source-->
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Sub Source</label>
+        <select class="form-select mt-2"
+                [(ngModel)]="selectSubSource">
+          <option value="">All</option>
+          <option *ngFor="let sub of subSourceList" [value]="sub">
+            {{ sub }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="enquiry" class="form-label fw-medium mb-0">Enquiry Type</label>
+        <select class="form-select" [(ngModel)]="selectStatus">
+          <option value="">All</option>
+          <option value="Hot">Hot</option>
+          <option value="Warm">Warm</option>
+          <option value="Cold">Cold</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="enquiry" class="form-label fw-medium mb-0">Follow Up Type</label>
+        <select class="form-select" [(ngModel)]="selectType">
+          <option value="">All</option>
+          <option value="Today">Today</option>
+          <option value="Total">Total</option>
+          <option value="Overdue">Overdue</option>
+        </select>
+      </div>
+
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 align-self-end mb-3">
+        <button class="btn w-100 custom-btn py-2" (click)="onShowReport()">
+          <i class="bi bi-clipboard-data"></i> Show Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row align-items-end mt-4">
+    <div class="col-12">
+      <div class="card shadow-sm rounded-3 p-3" style="background-color: #f8f9fa;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div class="search-wrapper">
+            <div class="input-group custom-search-group">
+              <span class="input-group-text bg-white border-0">
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
+              </span>
+              <input #mobileInput type="text" class="form-control border-0 shadow-none" placeholder="Search mobile no..." aria-label="Search">
+              <button class="btn search-btn text-white" type="button" (click)="searchValue(mobileInput)">
+                Search
+              </button>
+            </div>
+          </div>
+
+          <button class="text-white border-0 rounded"
+                  style="background-color: #4796BD; padding: 6px 12px;font-size:14px"
+                  (click)="exportToExcel()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">State</th>
+          <th class="text-nowrap fw-normal" *ngIf="showSH">SH Name</th>
+          <th class="text-nowrap fw-normal" *ngIf="showAM">AM Name</th>
+          <th class="text-nowrap fw-normal" *ngIf="showTM">TM Name</th>
+          <th class="text-nowrap fw-normal">SAP</th>
+          <th class="text-nowrap fw-normal">Dlr Name</th>
+          <th class="text-nowrap fw-normal">Dlr Loc</th>
+          <th class="text-nowrap fw-normal">Prospect Name</th>
+          <th class="text-nowrap fw-normal">Prospect Mobile</th>
+          <th class="text-nowrap fw-normal">Enquiry Status</th>
+          <th class="text-nowrap fw-normal">Enquiry Source</th>
+          <th class="text-nowrap fw-normal">Varient & BOM Code</th>
+          <th class="text-nowrap fw-normal">Enquiry Date</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Next FollowUp Date</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of paginatedfollowupList; let i = index;" (click)="onRowClick(item.Id)" style="cursor:pointer">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-center">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+               title="Go to Enquiry"
+               (click)="onRowClick(item.Id)">
+            </i>
+          </td>
+          <td class="text-nowrap">{{ item.state}}</td>
+
+          <td class="text-nowrap" *ngIf="showSH">{{ item.StateHead ? item.StateHead : 'VACANT'  }}</td>
+          <td class="text-nowrap" *ngIf="showAM">{{ item.Am ? item.Am : 'VACANT' }}</td>
+          <td class="text-nowrap" *ngIf="showTM">{{ item.Tm ? item.Tm : 'VACANT' }}</td>
+          <td class="text-nowrap">{{ item.DealerCode ? item.DealerCode : 'VACANT'  }}</td>
+          <td class="text-nowrap">{{ item.DealerName ? item.DealerName : 'VACANT'  }}</td>
+          <td class="text-nowrap">{{ item.DealerLocation ? item.DealerLocation : 'VACANT'  }}</td>
+          <td class="text-nowrap">{{ item.ProspectName }}</td>
+          <td class="text-nowrap">{{ item.ProspectMobile }}</td>
+          <td class="text-nowrap">{{ item.EnquiryStatus }}</td>
+          <td class="text-nowrap">{{ item.EnquirySource }}</td>
+          <td class="text-nowrap">{{ item.VarientOrBOMCode }}</td>
+          <td class="text-nowrap">{{ item.enquiryDate }}</td>
+          <td class="text-nowrap">{{ item.NextFollowUpDate  | date:'dd-MMM-yyyy' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination *ngIf="totalItems && totalItems > 0" [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>

@@ -1,0 +1,130 @@
+.card h6 {
+  font-size: 1rem;
+}
+
+.card h4 {
+  font-size: 1.5rem;
+}
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius:8px;
+  border: none !important;
+}
+
+::ng-deep .error-snackbar {
+  background: linear-gradient(135deg, #214557, #4796BD);
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+  min-height: unset !important;
+  line-height: 20px !important;
+}
+.active-opening {
+  background-color: #3a6796;
+  transition: 0.3s;
+}
+
+  .active-opening p {
+    color: white !important;
+  }
+
+.active-total {
+  background-color: #4D963A;
+  transition: 0.3s;
+}
+
+  .active-total p {
+    color: white !important;
+  }
+
+.active-hot {
+  background-color: #E45E2E;
+  transition: 0.3s;
+}
+
+  .active-hot p {
+    color: white !important;
+  }
+
+.active-warm {
+  background-color: #D59D3E;
+  transition: 0.3s;
+}
+
+  .active-warm p {
+    color: white !important;
+  }
+
+.active-cold {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+  .active-cold p {
+    color: white !important;
+  }
+
+.enquiry-table-wrapper {
+  max-height: 420px; 
+  overflow-y: auto; 
+  overflow-x: auto; 
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+
+#enquiryTable {
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+
+  #enquiryTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  #enquiryTable tbody td {
+    border: 1px solid #dee2e6;
+  }
+
+  #enquiryTable thead tr:first-child th {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;
+  }
+
+  #enquiryTable thead tr:nth-child(2) th {
+    position: sticky;
+    top: 37px; 
+    z-index: 10;
+    box-shadow: inset 0 -1px 0 #1a4a65;
+  }
+
+.search-wrapper {
+  max-width: 420px;
+}
+
+.custom-search-group {
+  border: 1px solid #4796BD;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: 0.3s ease;
+}
+
+
+.search-btn {
+  background-color: #4796BD;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 0;
+}
+
+  .search-btn:hover {
+    background-color: #3a7fa1;
+    border: 1px solid #3a7fa1;
+  }

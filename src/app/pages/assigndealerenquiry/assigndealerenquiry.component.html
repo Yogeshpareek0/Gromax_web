@@ -1,0 +1,162 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row align-items-end g-2 mb-2">
+
+      <!-- Duration -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">Duration</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedDuration" (change)="onDurationChange()">
+          <option value="thisMonth">This Month</option>
+          <option value="thisQuarter">This Quarter</option>
+          <option value="lastQuarter">Last Quarter</option>
+          <option value="thisFY">This FY</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <!-- Custom Date Range -->
+      <ng-container *ngIf="selectedDuration === 'custom'">
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Start Date</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="customStartDate" />
+        </div>
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">End Date</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="customEndDate" />
+        </div>
+      </ng-container>
+
+      <!-- Show Report -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <button class="btn w-100 custom-btn py-2" (click)="onShowReport()" style="font-size:13px;">
+          <i class="bi bi-clipboard-data me-1"></i> Show Report
+        </button>
+      </div>
+
+      <!-- Assign Selected Button -->
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12" *ngIf="selectedIds.length > 0">
+        <button class="btn w-100 btn-success py-2" (click)="openAssignModalMultiple()" style="font-size:13px; border-radius:8px;">
+          <i class="bi bi-person-check me-1"></i> Assign Selected ({{ selectedIds.length }})
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1300px;">
+      <thead>
+        <tr style="--bs-table-bg: #215378; --bs-table-color: white;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">
+            <input type="checkbox" (change)="onSelectAll($event)" [checked]="isAllSelected()" />
+          </th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">State</th>
+          <th class="text-nowrap fw-normal">Prospect Name</th>
+          <th class="text-nowrap fw-normal">Prospect Mobile</th>
+          <th class="text-nowrap fw-normal">District</th>
+          <th class="text-nowrap fw-normal">Tehsil</th>
+          <th class="text-nowrap fw-normal">Village</th>
+          <th class="text-nowrap fw-normal">Enquiry Source</th>
+          <th class="text-nowrap fw-normal">Enquiry Sub Source</th>
+          <th class="text-nowrap fw-normal">Enquiry Status</th>
+          <th class="text-nowrap fw-normal">BOM Code</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Enquiry Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of installationList; let i = index;"
+            [class.table-active]="isSelected(item.Id)">
+          <td>
+            <input type="checkbox"
+                   [checked]="isSelected(item.Id)"
+                   (change)="onSelectRow($event, item.Id)" />
+          </td>
+          <td class="text-nowrap">
+            <button class="btn btn-sm custom-btn px-3" (click)="openAssignModal(item)">Assign</button>
+          </td>
+          <td class="text-nowrap">{{ item.StateName }}</td>
+          <td class="text-nowrap">{{ item.ProspectName }}</td>
+          <td class="text-nowrap">{{ item.ProspectMobile }}</td>
+          <td class="text-nowrap">{{ item.ProspectDistrict }}</td>
+          <td class="text-nowrap">{{ item.ProspectTehsil }}</td>
+          <td class="text-nowrap">{{ item.ProspectVillage }}</td>
+          <td class="text-nowrap">{{ item.enquirySource }}</td>
+          <td class="text-nowrap">{{ item.EnquirySubSource }}</td>
+          <td class="text-nowrap">{{ item.EnquiryStatus }}</td>
+          <td class="text-nowrap">{{ item.BomCode }}</td>
+          <td class="text-nowrap">{{ item.EnquiryDate ? (item.EnquiryDate | date:'dd-MM-yyyy') : '-' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>
+
+<!-- Assign Dealer Modal -->
+<div class="modal fade" id="assignDealerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h6 class="modal-title" style="color: #4796BD;">
+          Assign Dealer
+          <span class="badge ms-2" style="background:#4796BD; font-size:11px;">
+            {{ selectedIds.length > 1 ? selectedIds.length + ' Enquiries Selected' : '1 Enquiry' }}
+          </span>
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <!-- State Head -->
+          <div class="col-xl-3 col-lg-4 col-sm-6 col-12" *ngIf="showSH">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">State Head</label>
+            <select class="form-select form-select-sm" [(ngModel)]="modalSelectedSH" (change)="onModalStateChange(modalSelectedSH)">
+              <option *ngFor="let sh of modalStateHead" [value]="sh.Mail">{{ sh.Name }}</option>
+            </select>
+          </div>
+
+          <!-- Area Manager -->
+          <div class="col-xl-3 col-lg-4 col-sm-6 col-12" *ngIf="showAM">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">Area Manager</label>
+            <select class="form-select form-select-sm" [(ngModel)]="modalSelectedAM" (change)="onModalAreaChange(modalSelectedAM)">
+              <option *ngFor="let am of modalAreaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+            </select>
+          </div>
+
+          <!-- Territory Manager -->
+          <div class="col-xl-3 col-lg-4 col-sm-6 col-12" *ngIf="showTM">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">Territory Manager</label>
+            <select class="form-select form-select-sm" [(ngModel)]="modalSelectedTM" (change)="onModalTerritoryChange(modalSelectedTM)">
+              <option *ngFor="let tm of modalTerritoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+            </select>
+          </div>
+
+          <!-- Dealer -->
+          <div class="col-xl-3 col-lg-4 col-sm-6 col-12">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">Dealer</label>
+            <select class="form-select form-select-sm" [(ngModel)]="modalSelectedDealer">
+              <option *ngFor="let dealer of modalDealersList" [value]="dealer.Name">{{ dealer.Name }}</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn custom-btn btn-sm px-4" (click)="onAssignDealer()">Assign</button>
+      </div>
+
+    </div>
+  </div>
+</div>

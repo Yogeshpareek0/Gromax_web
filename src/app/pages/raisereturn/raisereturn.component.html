@@ -1,0 +1,531 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm rounded-3 p-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
+        <div class="form-floating-custom">
+          <select class="form-select" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+            <option value="">Select State Head</option>
+            <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+          </select>
+          <label>State Head</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
+        <div class="form-floating-custom">
+          <select class="form-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+            <option value="">Select Territory Manager</option>
+            <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+          </select>
+          <label>Territory Manager</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDealer">
+        <div class="form-floating-custom">
+          <select class="form-select" [(ngModel)]="selectedDealer" name="dealer">
+            <option value="All">Select Dealer</option>
+            <option *ngFor="let dealer of dealersList" [value]="dealer.Name">{{ dealer.Name }}</option>
+          </select>
+          <label>Dealer</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom">
+          <select class="form-select" [(ngModel)]="returnType">
+            <option value="All">All</option>
+            <option value="Approved">Approved</option>
+            <option value="Pending">Pending</option>
+            <option value="Reject">Reject</option>
+          </select>
+          <label>Return Type</label>
+        </div>
+      </div>
+
+
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom">
+          <select class="form-select" [(ngModel)]="searchType" (change)="onSearchTypeChange()">
+            <option value="">Select Search Type</option>
+            <option value="Name.">Name</option>
+            <option value="Chassis No.">ChassisNo</option>
+            <option value="Mobile No.">MobileNo</option>
+          </select>
+          <label>Search By</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="searchType">
+        <div class="form-floating-custom">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="searchValue" />
+          <label>Search Value</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 align-self-start d-flex align-items-center gap-4">
+        <button class="btn w-50 py-2 custom-btn d-flex align-items-center justify-content-center" (click)="onShowReport()">
+          <i class="bi bi-clipboard-data me-1"></i> Filter
+        </button>
+
+        <button *ngIf="isDealer||isSuperAdmin"
+                class="btn custom-btn d-flex align-items-center gap-2 px-3"
+                style="white-space: nowrap;"
+                (click)="onAddNew()">
+          <i class="fa-solid fa-plus"></i>
+          Raise Return
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==================== RETURN CARDS ==================== -->
+  <div class="mt-3" *ngIf="(returnList?.length ?? 0) > 0">
+    <div class="row g-3">
+      <div class="col-12 col-md-6 col-xl-4" *ngFor="let item of returnList">
+        <div class="rc-card h-100">
+
+          <!-- Status Strip -->
+          <div class="rc-status-strip"
+               [class.rc-approved]="item.ReturnStatus?.toLowerCase() === 'approved'"
+               [class.rc-pending]="item.ReturnStatus?.toLowerCase() === 'pending'"
+               [class.rc-rejected]="item.ReturnStatus?.toLowerCase() === 'reject'">
+            <span class="rc-dot"></span>
+            {{ item.ReturnStatus }}
+          </div>
+
+          <!-- Card Header -->
+          <div class="rc-head">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <p class="rc-head-name">{{ item.CustomerName }}</p>
+                <p class="rc-head-mobile">
+                  <i class="fa-solid fa-phone me-1"></i>{{ item.Mobile }}
+                </p>
+              </div>
+              <div class="rc-avatar">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="rc-body">
+
+            <div class="row g-0">
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-tag"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Dealer Code</span>
+                    <span class="rc-info-value">{{ item.DealerCode }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-tractor"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Model</span>
+                    <span class="rc-info-value">{{ item.Model }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rc-divider"></div>
+
+            <div class="row g-0">
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-barcode"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Chassis No</span>
+                    <span class="rc-info-value">{{ item.ChasisNumber }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Sale Date</span>
+                    <span class="rc-info-value">{{ item.SaleDate | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rc-divider"></div>
+
+            <div class="row g-0">
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Pending On</span>
+                    <span class="rc-info-value">{{ getPendingOn(item) }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-calendar-plus"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Generate Date</span>
+                    <span class="rc-info-value">{{ item.create_date | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rc-divider"></div>
+
+            <div class="row g-0">
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-comment-dots"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Remarks</span>
+                    <span class="rc-info-value rc-info-wrap">
+                      {{
+                      positionId === 'Territory Manager' ? item.TmRemarks :
+                      positionId === 'State Head' ? item.StateHeadRemarks :
+                      positionId === 'National Sales Head' ? item.NationalsalesHeadRemarks :
+                      item.Remarks || 'N/A'
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="rc-info-item">
+                  <div class="rc-info-icon"><i class="fa-solid fa-rotate-left"></i></div>
+                  <div class="rc-info-text">
+                    <span class="rc-info-label">Return Reason</span>
+                    <span class="rc-info-value rc-info-wrap">{{ item.Reason }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Card Footer -->
+          <div class="rc-footer">
+            <button class="rc-view-btn" (click)="openEnquiryModal(item.Id)">
+              <i class="fa-solid fa-eye me-2"></i>View More
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--Status Modal -->
+<div class="modal fade" id="viewMoreModal" tabindex="-1" aria-labelledby="viewMoreLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header p-3 border-0" style="background-color: #215378">
+        <div class="text-white">
+          <h6 class="modal-title mb-0" id="viewMoreLabel">
+            Return Details
+          </h6>
+        </div>
+        <button type="button" class="btn-close" style="filter: invert(1);" data-bs-dismiss="modal" aria-label="Close" (click)="message = ''">
+        </button>
+      </div>
+      <div class="modal-body px-3 pb-3 pt-2">
+        <div class="row" style="font-size:16px">
+          <div class="d-flex mb-4">
+            <div class="flex-fill text-center py-2"
+                 [ngStyle]="{
+                     'border-bottom': activeTab === 'vehicle' ? '2px solid #4796BD' : '',
+                     'color': activeTab === 'vehicle' ? '#4796BD' : '#000',
+                     'cursor': 'pointer'
+                   }"
+                 (click)="activeTab = 'vehicle'">
+              Vehicle Info
+            </div>
+
+            <div class="flex-fill text-center py-2"
+                 [ngStyle]="{
+                     'border-bottom': activeTab === 'history' ? '2px solid #4796BD' : '',
+                     'color': activeTab === 'history' ? '#4796BD' : '#000',
+                     'cursor': 'pointer'
+                   }"
+                 (click)="activeTab = 'history'">
+              History
+            </div>
+          </div>
+
+
+          <div class="row" *ngIf="activeTab === 'vehicle'">
+            <input type="hidden" [(ngModel)]="returnRequestId" />
+
+            <div class="col-sm-6">
+              <div class="form-floating-custom mb-4">
+                <input type="text" [(ngModel)]="name" class="form-control" readonly>
+                <label>Name</label>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-floating-custom mb-4">
+                <input type="text" [(ngModel)]="model" class="form-control" readonly>
+                <label>Model</label>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-floating-custom mb-4">
+                <input type="date" [(ngModel)]="saleDate" class="form-control" readonly>
+                <label>Sale Date</label>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-floating-custom mb-4">
+                <input type="date" [(ngModel)]="returnDate" class="form-control" readonly>
+                <label>Return Date</label>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-floating-custom mb-4">
+                <input type="text" [(ngModel)]="status" class="form-control" readonly>
+                <label>Status</label>
+              </div>
+            </div>
+
+            <div class="col-sm-6" *ngIf="positionId !== 'Dealer' && !isSuperAdmin">
+              <div class="form-floating-custom">
+                <input type="text" [(ngModel)]="remark" class="form-control"
+                       [readonly]="!showButtons"
+                       (ngModelChange)="message = ''">
+                <label>Remark</label>
+              </div>
+              <div *ngIf="message" class="text-danger mt-2" style="font-size: 12px;">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>{{ message }}
+              </div>
+            </div>
+
+            <div class="col-sm-6" *ngIf="isSuperAdmin">
+              <div class="form-floating-custom">
+                <input type="text" [(ngModel)]="remark" class="form-control"
+                       (ngModelChange)="message = ''">
+                <label>Remark</label>
+              </div>
+              <div *ngIf="message" class="text-danger mt-2" style="font-size: 12px;">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>{{ message }}
+              </div>
+            </div>
+
+            <div class="row text-center mt-3" *ngIf="showButtons||isSuperAdmin">
+              <div class="col-6 d-flex justify-content-center">
+                <button style="display: inline-flex;align-items: center;gap: 6px;padding: 8px 24px;border: none;border-radius: 50px;font-size: 13px;
+        font-weight: 500;cursor: pointer;background: linear-gradient(90deg, #22c55e, #16a34a);color: #fff;transition: all 0.22s ease;letter-spacing: 0.2px;"
+                        (click)="onStatusChange('Approved')">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+              </div>
+              <div class="col-6 d-flex justify-content-center">
+                <button style="display: inline-flex;align-items: center;gap: 6px;padding: 8px 24px;border: none;border-radius: 50px;font-size: 13px;
+        font-weight: 500;cursor: pointer;background: linear-gradient(90deg, #ef4444, #dc2626);color: #fff;transition: all 0.22s ease;letter-spacing: 0.2px;"
+                        (click)="onStatusChange('Reject')">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="activeTab === 'history'">
+            <div class="enquiry-table-wrapper mt-3">
+              <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+                <thead>
+                  <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+                    <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+                    <th class="text-nowrap fw-normal">Date</th>
+                    <th class="text-nowrap fw-normal">Status</th>
+                    <th class="text-nowrap fw-normal">Level</th>
+                    <th class="text-nowrap fw-normal">Name</th>
+                    <th class="text-nowrap fw-normal">Reason</th>
+                    <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody style="font-size: 14px;">
+                  <tr *ngFor="let item of statusHistoryList; let i = index;">
+                    <td>{{i + 1 }}</td>
+                    <td class="text-nowrap">{{item.Date | date:'yyyy/MM/dd'}}</td>
+                    <td class="text-nowrap">{{item.Status}}</td>
+                    <td class="text-nowrap">{{item.Level}}</td>
+                    <td class="text-nowrap">{{item.Name}}</td>
+                    <td class="text-nowrap">{{item.Reason}}</td>
+                    <td class="text-nowrap">{{item.Remarks}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add New Modal -->
+<div class="modal fade" id="saleHistoryList" tabindex="-1" aria-labelledby="addNewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-0">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0" id="viewMoreLabel">
+            {{ showTableSection ? 'Sale List' : 'Sale Details' }}
+          </h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="closeSaleModal()"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="row border-bottom">
+
+          <input type="hidden" [(ngModel)]="SalesEnquiryMasterId" />
+
+          <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+            <div class="form-floating-custom">
+              <select class="form-select" [(ngModel)]="searchHistoryType" (change)="onSearchHistoryTypeChange()">
+                <option value="">Select Search Type</option>
+                <option value="Name.">Name</option>
+                <option value="Chassis No.">ChassisNo</option>
+                <option value="Mobile No.">MobileNo</option>
+              </select>
+              <label>Search By</label>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-lg-4 col-sm-6 mb-4" *ngIf="searchHistoryType">
+            <div class="form-floating-custom">
+              <input type="text" class="form-control" placeholder="" [(ngModel)]="searchHistoryValue" />
+              <label>Search Value</label>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+            <button class="btn w-50 py-2 custom-btn d-flex align-items-center justify-content-center" (click)="onHistoryReport()">
+              <i class="bi bi-clipboard-data me-1"></i> Filter
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-3" *ngIf="showTableSection">
+          <div style="overflow-x: auto; width: 100%;">
+            <table class="table table-bordered table-striped" id="enquiryTable" style="min-width: 1200px;">
+              <thead>
+                <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+                  <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">Action</th>
+                  <th class="text-nowrap fw-normal">Customer Name</th>
+                  <th class="text-nowrap fw-normal">Mobile</th>
+                  <th class="text-nowrap fw-normal">ChassisNo</th>
+                  <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Sale Date</th>
+                </tr>
+              </thead>
+              <tbody style="font-size: 14px;">
+                <tr *ngFor="let item of saleHistoryList; let i = index;" (click)="onRowClick(item.Id)" style="cursor:pointer">
+                  <td class="text-center"><i class="fa-solid fa-compass text-primary"></i> </td>
+                  <td class="text-nowrap">{{item.CustomerName}}</td>
+                  <td class="text-nowrap">{{item.Mobile}}</td>
+                  <td class="text-nowrap">{{item.ChassisNumber}}</td>
+                  <td class="text-nowrap">{{item.CreateDate | date:'yyyy/MM/dd'}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div *ngIf="!showTableSection">
+          <div class="row mt-4">
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="text" class="form-control" placeholder="" [(ngModel)]="customerName" readonly />
+                <label>Customer Name</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="text" class="form-control" placeholder="" [(ngModel)]="chassisNumber" readonly />
+                <label>ChassisNo</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="text" class="form-control" placeholder="" [(ngModel)]="mobileNumber" readonly />
+                <label>MobileNo</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="text" class="form-control" placeholder="" [(ngModel)]="modelSales" readonly />
+                <label>Model</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="date" class="form-control" placeholder="" [(ngModel)]="saleDateReturn" readonly />
+                <label>Sale Date</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="text" class="form-control" placeholder="" [(ngModel)]="soldBy" readonly />
+                <label>Sold By</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <select class="form-select"
+                        [(ngModel)]="returnReason"
+                        [ngClass]="{'border-danger': submitted && (!returnReason || returnReason.trim() === '')}">
+                  <option value="" disabled selected hidden></option>
+                  <option value="Product Issue">Product Issue</option>
+                  <option value="Finance Issue">Finance Issue</option>
+                  <option value="MM Issue">MM Issue</option>
+                  <option value="Advanced Delivery">Advanced Delivery</option>
+                </select>
+                <label>Return Reason</label>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-4 col-sm-6 mb-4">
+              <div class="form-floating-custom">
+                <input type="text"
+                       class="form-control"
+                       [(ngModel)]="remarkReturn"
+                       [ngClass]="{'border-danger': submitted && (!remarkReturn || remarkReturn.trim() === '')}" />
+                <label>Remark</label>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3">
+              <button class="btn py-2 px-3 custom-btn" style="font-size: 14px;" (click)="submitReturn()">
+                <i class="bi bi-clipboard-data me-1"></i> Submit
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,213 @@
+<!-- ══════════════ LIST VIEW ══════════════ -->
+<div *ngIf="view === 'list'" class="pdi-wrap pdi-list-scroll">
+
+  <div class="search-box">
+    <input type="text"
+           placeholder="Search by Chassis No. or Model..."
+           [(ngModel)]="searchQuery"
+           (blur)="searchData()" />
+    <span *ngIf="searchQuery" class="clear-btn" (click)="removeSearchQuery()">✕</span>
+  </div>
+
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0"
+            style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">Model Code</th>
+          <th class="text-nowrap fw-normal">Chassis No.</th>
+          <th class="text-nowrap fw-normal">Drive Type</th>
+          <th class="text-nowrap fw-normal">Colour</th>
+          <th class="text-nowrap fw-normal">SAP</th>
+          <th class="text-nowrap fw-normal">Dealer Name</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Status</th>
+
+        </tr>
+      </thead>
+
+      <tbody style="font-size: 14px;">
+
+        <tr *ngFor="let item of stockList; let i = index" style="cursor:pointer">
+
+          <td>{{ ((currentPage - 1) * itemsPerPage) + i + 1 }}</td>
+
+          <td class="text-center">
+            <button type="button"
+                    class="btn btn-sm btn-primary action-btn"
+                    (click)="openForm(item)">
+              {{ item.PDIMasterId == null ? 'Fill PDI' : 'Update PDI' }}
+            </button>
+          </td>
+
+          <td class="text-nowrap">{{ item.TractorSrNumber || '-' }}</td>
+          <td class="text-nowrap">{{ item.chasisno || '-' }}</td>
+          <td class="text-nowrap">{{ item.DriveType || '-' }}</td>
+          <td class="text-nowrap">{{ item.Colour || '-' }}</td>
+          <td class="text-nowrap">{{ item.DealerCode || '-' }}</td>
+          <td class="text-nowrap">{{ item.DealershipName || '-' }}</td>
+
+          <td class="text-nowrap">
+            <span class="status-badge"
+                  [class.status-done]="item.Status === 'Done'"
+                  [class.status-pending]="item.Status !== 'Done'">
+              {{ item.Status || 'Pending' }}
+            </span>
+          </td>
+
+        </tr>
+
+        <!-- No Data -->
+        <tr *ngIf="!stockList || stockList.length === 0">
+          <td colspan="9" class="text-center py-4">
+
+            <div class="mb-2 d-flex justify-content-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:48px;height:48px;background:linear-gradient(135deg,#4e73df,#1cc88a);color:white;">
+                <i class="fa-solid fa-hand-point-right fs-5"></i>
+              </div>
+            </div>
+
+            <h6 class="fw-normal mb-1" style="font-size:15px;color:#2c3e50;">No Tractors Found</h6>
+
+            <p class="mb-0 text-muted" style="font-size:13px;">
+              There is currently no stock data available.
+              Try adjusting your search.
+            </p>
+
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>
+
+<!-- ══════════════ FORM VIEW ══════════════ -->
+<div *ngIf="view === 'form'" class="pdi-wrap">
+  <div class="form-header">
+    <button class="back-btn" (click)="backToList()">← Back</button>
+    <h3>PDI Form</h3>
+  </div>
+
+  <div class="info-card">
+    <div class="info-cell">
+      <span>DealerCode</span>
+      <b>{{ selectedItem?.DealerCode || '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Model Code</span>
+      <b>{{ selectedItem?.TractorSrNumber || '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Chassis No</span>
+      <b>{{ selectedItem?.chasisno || '—' }}</b>
+    </div>
+    <!--<div class="info-cell">
+      <span>Engine No</span>
+      <b>{{ '—' }}</b>
+    </div>
+    <div class="info-cell">
+      <span>Plant Code</span>
+      <b>{{ '—' }}</b>
+    </div>-->
+  </div>
+
+  <div class="field-box d-flex justify-content-start">
+    <div>
+      <label>Running Hours<span class="req-star">*</span></label>
+      <input type="number" [(ngModel)]="runningHrs" [disabled]="isDone" />
+      <span class="err" *ngIf="errors['runningHrs']">{{ errors['runningHrs'] }}</span>
+    </div>
+    <div style="padding-left:20px;">
+      <label>PDI Done By<span class="req-star">*</span></label>
+      <input type="text" [(ngModel)]="pdiDoneBy" [disabled]="isDone" />
+      <span class="err" *ngIf="errors['pdiDoneBy']">{{ errors['pdiDoneBy'] }}</span>
+    </div>
+    <div style="padding-left:20px;">
+      <label>Engine No<span class="req-star">*</span></label>
+      <input type="text" [(ngModel)]="engineNo" [disabled]="isDone" />
+      <span class="err" *ngIf="errors['engineNo']">{{ errors['engineNo'] }}</span>
+    </div>
+  </div>
+
+  <!-- OK ONLY SECTIONS (with photos on Not OK) -->
+  <ng-container *ngFor="let sec of okOnlySectionsGrouped | keyvalue">
+    <div class="section-header-sm">{{ sec.key }}</div>
+
+    <div class="row-flex" *ngFor="let field of sec.value">
+      <div class="row-flex-label" [class.row-label-err]="errors[field.key + '_status']">
+        {{ field.label }} <span class="req-star">*</span>
+      </div>
+
+      <div class="row-flex-status">
+        <select class="ok-select" [ngModel]="okStatus[field.key]" (ngModelChange)="setStatus(field.key, $event)">
+          <option value="" disabled>Select</option>
+          <option *ngFor="let opt of okOptions" [value]="opt">{{ opt }}</option>
+        </select>
+        <span class="err" *ngIf="errors[field.key + '_status']">{{ errors[field.key + '_status'] }}</span>
+      </div>
+
+      <div class="row-flex-remark" *ngIf="okStatus[field.key] === 'Not OK'">
+        <textarea placeholder="Remark" [(ngModel)]="remarks[field.key]"></textarea>
+        <span class="err" *ngIf="errors[field.key + '_remark']">{{ errors[field.key + '_remark'] }}</span>
+      </div>
+
+      <div class="row-flex-photos" *ngIf="okStatus[field.key] === 'Not OK' && isPhotoField(field.key)">
+        <div class="photo-slot-sm">
+          <ng-container *ngIf="photos1[field.key].previewUrl; else empty1">
+            <img [src]="photos1[field.key].previewUrl" (error)="onImageBroken(field.key, 1)"/>
+            <div class="upl-overlay-sm" *ngIf="photos1[field.key].uploading">…</div>
+            <span class="remove-btn-sm" *ngIf="!photos1[field.key].uploading" (click)="removePhoto(field.key,1)">✕</span>
+          </ng-container>
+          <ng-template #empty1>
+            <label class="empty-photo-sm">
+              📷 P1
+              <input type="file" accept="image/*" hidden (change)="onPhotoSelected($event, field.key, 1)" />
+            </label>
+          </ng-template>
+        </div>
+        <div class="photo-slot-sm">
+          <ng-container *ngIf="photos2[field.key].previewUrl; else empty2">
+            <img [src]="photos2[field.key].previewUrl" (error)="onImageBroken(field.key, 2)"/>
+            <div class="upl-overlay-sm" *ngIf="photos2[field.key].uploading">…</div>
+            <span class="remove-btn-sm" *ngIf="!photos2[field.key].uploading" (click)="removePhoto(field.key,2)">✕</span>
+          </ng-container>
+          <ng-template #empty2>
+            <label class="empty-photo-sm">
+              📷 P2
+              <input type="file" accept="image/*" hidden (change)="onPhotoSelected($event, field.key, 2)" />
+            </label>
+          </ng-template>
+        </div>
+        <span class="err full-width-err" *ngIf="errors[field.key + '_photo']">{{ errors[field.key + '_photo'] }}</span>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- OTHER -->
+  <!--<div class="section-header-sm">Other</div>
+  <div class="field-box">
+    <label>Other Remarks</label>
+    <textarea placeholder="Enter remarks (optional)" [(ngModel)]="otherText" [disabled]="isDone"></textarea>
+  </div>-->
+
+  <button *ngIf="!isDone && !selectedItem?.PDIMasterId" class="btn custom-btn px-3" (click)="onSubmit()">
+    Submit
+  </button>
+
+  <button *ngIf="!isDone && selectedItem?.PDIMasterId" class="btn custom-btn px-3" (click)="updatePDI()">
+    Update
+  </button>
+
+  <div *ngIf="isDone" class="done-banner">✓ PDI Completed</div>
+</div>

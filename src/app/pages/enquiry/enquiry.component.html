@@ -1,0 +1,447 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row align-items-center">
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="reportFilter" class="form-label fw-medium mb-0">Duration</label>
+        <select class="form-select" [(ngModel)]="selectedFilter" (ngModelChange)="datefilterchange($event)">
+          <option value="Month">This Month</option>
+          <option value="Quarter">This Quarter</option>
+          <option value="Financial Year">This Financial Year</option>
+          <option value="Custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+        <label for="startDate" class="form-label fw-medium mb-0">Start Date</label>
+        <input type="date" id="startDate" class="form-control" [(ngModel)]="startdate_val">
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+        <label for="endDate" class="form-label fw-medium mb-0">End Date</label>
+        <input type="date" id="endDate" class="form-control" [(ngModel)]="enddate_val">
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="enquiry" class="form-label fw-medium mb-0">Enquiry</label>
+        <select class="form-select" [(ngModel)]="enquiryStatus">
+          <option value="Open">Open</option>
+          <option value="Booking">Booking</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="enquiry" class="form-label fw-medium mb-0">Source</label>
+        <select class="form-select" [(ngModel)]="selectSource" (change)="onSourceChange()">
+          <option value="">All</option>
+          <option *ngFor="let source of sourceList" [value]="source">
+            {{ source }}
+          </option>
+        </select>
+      </div>
+      <!--sub Source-->
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Sub Source</label>
+        <select class="form-select"
+                [(ngModel)]="selectSubSource">
+          <option value="">All</option>
+          <option *ngFor="let sub of subSourceList" [value]="sub">
+            {{ sub }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showSH">
+        <label for="am" class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showAM">
+        <label for="am" class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showTM">
+        <label for="tm" class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showStatename">
+        <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
+        <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
+          <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showLocation">
+        <label for="location" class="form-label fw-medium mb-0">Location</label>
+        <select class="form-select" [(ngModel)]="selectedLocation">
+          <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end">
+        <div class="d-flex gap-2">
+          <button class="btn custom-btn flex-fill py-2"
+                  (click)="onShowReport()">
+            <i class="bi bi-clipboard-data me-1"></i> Show Report
+          </button>
+
+          <button class="btn text-white export-btn" style="background-color: #4796BD; padding: 2px 14px;font-size:14px"
+                  (click)="exportToExcel()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="enquiryStatus !== 'Closed'">
+      <div class="row mt-2" *ngFor="let i of leadData">
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Opening')">
+          <div class="card text-white border-0 shadow-sm"
+               [ngClass]="{'active-opening': activeLead === 'Opening'}"
+               style="border-radius: 14px; border: 1px solid #3a6796 !important; cursor: pointer">
+            <div class="card-body d-flex align-items-center justify-content-between py-2">
+              <div>
+                <p class="mb-0" style="font-size: 14px; color: #3a6796 ">Opening Leads</p>
+                <p class="text-dark mb-0" style="font-size:13px">{{ i.OpeningCount ?? 0 }}</p>
+              </div>
+              <div style="background: white; border-radius: 50%; padding: 6px;">
+                <img src="assets/images/period.png" alt="ticket" class="menu-icon" width="30" height="30" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('')">
+          <div class="card text-white border-0 shadow-sm"
+               [ngClass]="{'active-total': activeLead === ''}"
+               style="border-radius: 14px; border: 1px solid #4D963A !important;cursor:pointer">
+            <div class="card-body d-flex align-items-center justify-content-between py-2">
+              <div>
+                <p class="mb-0" style="font-size: 14px; color: #4D963A">Total Leads</p>
+                <p class="text-dark mb-0" style="font-size:13px">{{ i.TotalLeads ?? 0 }}</p>
+              </div>
+              <div style="background: white; border-radius: 50%; padding: 6px;">
+                <img src="assets/images/totalleeds.png" alt="ticket" class="menu-icon" width="30" height="30" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Hot')">
+          <div class="card text-white border-0 shadow-sm"
+               [ngClass]="{'active-hot': activeLead === 'Hot'}"
+               style="border-radius: 14px; border: 1px solid #E45E2E !important; cursor: pointer">
+            <div class="card-body d-flex align-items-center justify-content-between py-2">
+              <div>
+                <p class="mb-0" style="font-size: 14px; color: #E45E2E">Hot Leads</p>
+                <p class="text-dark mb-0" style="font-size:13px">{{i.TotalHot ?? 0 }}</p>
+              </div>
+              <div style="background: white; border-radius: 50%; padding: 6px;">
+                <img src="assets/images/HotLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Warm')">
+          <div class="card text-white border-0 shadow-sm"
+               [ngClass]="{'active-warm': activeLead === 'Warm'}"
+               style="border-radius: 14px; border: 1px solid #D59D3E !important; cursor: pointer">
+            <div class="card-body d-flex align-items-center justify-content-between py-2">
+              <div>
+                <p class="mb-0" style="font-size: 14px; color: #D59D3E">Warm Leads</p>
+                <p class="text-dark mb-0" style="font-size:13px">{{i.TotalWarm ?? 0 }}</p>
+              </div>
+              <div style="background: white; border-radius: 50%; padding: 6px;">
+                <img src="assets/images/ColdLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('Cold')">
+          <div class="card text-white border-0 shadow-sm"
+               [ngClass]="{'active-cold': activeLead === 'Cold'}"
+               style="border-radius: 14px; border: 1px solid #2E8FC4 !important; cursor: pointer">
+            <div class="card-body d-flex align-items-center justify-content-between py-2">
+              <div>
+                <p class="mb-0" style="font-size: 14px; color: #2E8FC4">Cold Leads</p>
+                <p class="text-dark mb-0" style="font-size:13px">{{i.TotalCold ?? 0 }}</p>
+              </div>
+              <div style="background: white; border-radius: 50%; padding: 6px;">
+                <img src="assets/images/WarmLeads.png" alt="ticket" class="menu-icon" width="30" height="30" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="search-wrapper mt-4">
+    <div class="input-group custom-search-group">
+      <span class="input-group-text bg-white border-0">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      </span>
+      <input #mobileInput type="text" class="form-control border-0 shadow-none" placeholder="Search mobile no..." aria-label="Search">
+      <button class="btn search-btn text-white" type="button" (click)="searchValue(mobileInput)">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1800px; border-collapse: separate; border-spacing: 0;">
+      <thead>
+        <!-- ==================== ROW 1: GROUP HEADERS ==================== -->
+        <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 13px; text-align: center;">
+
+          <!-- Fixed columns (no group) -->
+          <th class="text-nowrap py-2 fw-normal" rowspan="2" style="border-top-left-radius: 8px; vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">S.No.</th>
+          <th *ngIf="showSH" class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">SH Name</th>
+          <th *ngIf="showAM" class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">AM Name</th>
+          <th *ngIf="showTM" class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">TM Name</th>
+          <th class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">SAP</th>
+          <th class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">Dlr Name</th>
+          <th class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">Dlr Loc</th>
+
+          <!-- Enquiry Group -->
+          <th colspan="6" class="text-nowrap py-2 fw-normal text-center"
+              style="background-color: #215378; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Enquiry Details
+          </th>
+          <!-- Prospect Group -->
+          <th colspan="6" class="text-nowrap py-2 fw-normal text-center"
+              style="background-color: #215378; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Prospect Details
+          </th>
+
+          <!-- Salesman Group -->
+          <th colspan="2" class="text-nowrap py-2 fw-normal text-center"
+              style="background-color: #215378; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Salesman
+          </th>
+
+          <th colspan="2" class="text-nowrap py-2 fw-normal text-center" *ngIf="enquiryStatus === 'Booking'"
+              style="background-color: #215378;
+                 box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Booking Details
+          </th>
+
+          <!-- Follow-up Group -->
+          <th colspan="3" class="text-nowrap py-2 fw-normal text-center"
+              style="background-color: #215378; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus !== 'Closed'">
+            Follow-up
+          </th>
+
+          <!--Delivery-->
+          <th colspan="2" class="text-nowrap py-2 fw-normal text-center" *ngIf="enquiryStatus === 'Closed'"
+              style="background-color: #215378;box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Delivery Details
+          </th>
+
+          <!-- Exchange Group -->
+          <th colspan="6" class="text-nowrap py-2 fw-normal text-center" *ngIf="enquiryStatus === 'Closed'"
+              style="background-color: #215378;
+                 box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Exchange Details
+          </th>
+
+          <!-- Finance Group -->
+          <th colspan="8" class="text-nowrap py-2 fw-normal text-center" *ngIf="enquiryStatus === 'Closed'"
+              style="background-color: #215378;
+                 box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Payment Details
+          </th>
+
+          <th class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Sale Lost Reason</th>
+
+          <th class="text-nowrap py-2 fw-normal" rowspan="2" style="vertical-align: middle; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Dropped Reason</th>
+
+          <!-- Retail Group -->
+          <th colspan="2" class="text-nowrap py-2 fw-normal text-center"
+              style="background-color: #215378; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">
+            Retail Details
+          </th>
+
+          <!-- Interest Group -->
+          <th colspan="2" class="text-nowrap py-2 fw-normal text-center"
+              style="background-color: #215378; border-top-right-radius: 8px; box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;">
+            Interest
+          </th>
+        </tr>
+
+        <!-- ==================== ROW 2: SUB HEADERS ==================== -->
+        <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 13px;">
+          <!-- Enquiry Sub-headers -->
+          <!--<th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Number</th>-->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Generated By</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Source</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Sub-Source</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Type</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Date</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Status</th>
+
+          <!-- Prospect Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Name</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Mobile</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">State</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">District</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Tehsil</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Village</th>
+
+          <!-- Salesman Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Name</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Mobile</th>
+
+          <!-- Booking Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Booking'">Date</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Booking'">Amount</th>
+
+          <!-- Follow-up Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus !== 'Closed'">Next Followup Date</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus !== 'Closed'">Call Status</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus !== 'Closed'">Remarks</th>
+
+
+          <!-- Delivery Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Date</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Prospect Type</th>
+
+          <!-- Exchange Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Make</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Model</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Mfg Year</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Customer Ask-Exc Tr</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Mkt Value-Exc Tr</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Dealer Price Exc Tr</th>
+
+          <!-- Finance Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Financer Name</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Finance Status</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Type</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">SP (On-Road)</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">DP Amt</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Due Amt</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Loan Amt</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Loan Type</th>
+
+          <!-- Retail Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Date</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;" *ngIf="enquiryStatus === 'Closed'">Status</th>
+
+
+          <!-- Interest Sub-headers -->
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Model</th>
+          <th class="text-nowrap py-2 fw-normal" style="box-shadow: inset 0 -1px 0 #1a4a65;">Chassis Number</th>
+
+        </tr>
+      </thead>
+
+      <tbody style="font-size: 13px;">
+        <tr *ngFor="let item of paginatedEnquiryList; let i = index;">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td *ngIf="showSH" class="text-nowrap">{{ item.StateHead ? item.StateHead : 'VACANT' }}</td>
+          <td *ngIf="showAM" class="text-nowrap">{{ item.Am ? item.Am : 'VACANT' }}</td>
+          <td *ngIf="showTM" class="text-nowrap">{{ item.Tm ? item.Tm : 'VACANT' }}</td>
+
+          <!-- Dealer -->
+          <td class="text-nowrap">{{ item.DealerCode ? item.DealerCode : 'VACANT'  }}</td>
+          <td class="text-nowrap">{{ item.DealerName ? item.DealerName : 'VACANT'  }}</td>
+          <td class="text-nowrap">{{ item.City ? item.City : 'VACANT'  }}</td>
+
+          <!-- Enquiry -->
+          <!--<td class="text-nowrap">{{ item.EnquiryNumber }}</td>-->
+          <td class="text-nowrap">{{ item.EnquiryGeneratedBy }}</td>
+          <td class="text-nowrap">{{ item.EnquirySource }}</td>
+          <td class="text-nowrap">{{ item.EnquirySubSource }}</td>
+          <td class="text-nowrap">{{ item.EnquiryStatus }}</td>
+          <td class="text-nowrap">{{ item.EnquiryDateV1 | date:'dd-MMM-yyyy' }}</td>
+          <td class="text-nowrap">{{ item.EnquiryCurrentStatus }}</td>
+
+          <!-- Prospect -->
+          <td class="text-nowrap">{{ item.ProspectName }}</td>
+          <td class="text-nowrap">{{ item.ProspectMobile }}</td>
+          <td class="text-nowrap">{{ item.StateName }}</td>
+          <td class="text-nowrap">{{ item.ProspectDistrict }}</td>
+          <td class="text-nowrap">{{ item.ProspectTehsil }}</td>
+          <td class="text-nowrap">{{ item.ProspectVillage }}</td>
+
+          <!-- Salesman -->
+          <td class="text-nowrap">{{ item.SalesmanName ? item.SalesmanName : 'VACANT' }}</td>
+          <td class="text-nowrap">{{ item.SalesmanNumber ? item.SalesmanNumber : 'VACANT' }}</td>
+
+          <!--Booking-->
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Booking'">
+            <span>
+              {{ item.bookingDate | date:'dd-MMM-yyyy' }}
+            </span>
+          </td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Booking'">
+            <span>
+              {{ item.bookingAmount? item.bookingAmount : '' }}
+            </span>
+          </td>
+
+          <!-- Follow-up -->
+          <td class="text-nowrap" *ngIf="enquiryStatus !== 'Closed'">{{ item.NextFollowupDatev1 | date:'dd-MMM-yyyy' }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus !== 'Closed'">{{ item.CalledStatus }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus !== 'Closed'">{{ item.Remark }}</td>
+
+          <!-- Delivery -->
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.DateOfSale | date:'dd-MMM-yyyy' }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.ProspectType }}</td>
+
+          <!-- Exchange -->
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.ExchangeMake ? item.ExchangeMake : '-'  }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.ExchangeModel ? item.ExchangeModel : '-'  }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.ExchangeMfgYear ? item.ExchangeMfgYear : '-'  }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.CustomerAskExchTracAmt }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.MktExchTracAmt  }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.Deal_ExchTracAmt }}</td>
+
+          <!-- Finance -->
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.FinancerName ? item.FinancerName : '-' }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.FinanceStatus ? item.FinanceStatus : '-' }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.PaymentType }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.FinalSellingPrice }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.DPAmount }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.dueAmount }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.LoanAmount }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.LoanType ? item.LoanType : '-' }}</td>
+
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.saleLostReason }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.closedDroppedStatus }}</td>
+
+          <!-- Retail -->
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">{{ item.RetailedDate  | date:'dd-MMM-yyyy' }}</td>
+          <td class="text-nowrap" *ngIf="enquiryStatus === 'Closed'">
+            {{ item.RetailStatus }}
+          </td>
+
+
+          <!-- Interest -->
+          <td class="text-nowrap">{{ item.InterestedModel }}</td>
+          <td class="text-nowrap">{{ item.ChassisNumber }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>

@@ -1,0 +1,147 @@
+
+.form-control, .form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+}
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+.btn-custom {
+  background-color: #2d89c8;
+  color: #fff;
+  border-radius: 50px;
+  padding: 10px 25px;
+  border: none;
+}
+
+  .btn-custom:hover {
+    background-color: #236fa1;
+  }
+
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+  .step-indicator span {
+    width: 30px;
+    height: 30px;
+    background: #2d89c8;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+  }
+
+  .btn-additional:hover {
+    background-color: #2d89c8;
+  }
+
+.form-floating-custom {
+  position: relative;
+  margin-bottom: 1.8rem;
+}
+
+  .form-floating-custom input {
+    height: 40px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .form-floating-custom label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0 4px;
+    font-size: 14px;
+    color: #212529bf;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+
+  .form-floating-custom input:focus + label,
+  .form-floating-custom input:not(:placeholder-shown) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.form-control:focus, .form-select:focus{
+  box-shadow: none !important;
+}
+
+.form-floating-custom select {
+  height: 40px;
+  padding: 10px 14px;
+  font-size: 14px;
+  appearance: none;
+}
+
+  .form-floating-custom select:focus + label,
+  .form-floating-custom select:not([value=""]) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+
+
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 80px;
+}
+
+.step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
+  border: 1px solid #BABABA
+}
+
+  .step.active {
+    background: #4796BD;
+    color: #fff;
+    font-weight:400;
+    border: 1px solid #4796BD
+  }
+
+.line {
+  flex: 1;
+  height: 2px;
+  background: #e0e0e0;
+  position: relative;
+}
+
+  .line::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    background: #4796BD;
+    transition: width 0.4s ease;
+  }
+
+  .line.fill::before {
+    width: 100%;
+  }

@@ -1,0 +1,830 @@
+<div class="container-fluid px-0">
+  <div class="d-flex flex-wrap gap-3">
+    <div class="w-auto" (click)="onCardClick('Enquiry')">
+      <div class="card shadow-sm px-3"
+           [ngClass]="{'active': activeCard === 'Enquiry'}"
+           style="cursor:pointer;">
+        <div class="card-body text-center" style="padding:12px 4px">
+          <h6 class="mb-0" style="font-size:14px">Update FollowUp/Enquiry</h6>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-auto" (click)="onCardClick('FollowUp History')">
+      <div class="card shadow-sm px-3"
+           [ngClass]="{'active': activeCard === 'FollowUp History'}"
+           style="cursor:pointer">
+        <div class="card-body text-center" style="padding:12px 4px">
+          <h6 class="mb-0" style="font-size:14px">FollowUp History</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="mt-4" />
+  <div class="card px-4 border-0 py-4" style="border-radius: 12px;
+       box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);margin-top:24px">
+    <div class="row" *ngIf="enquiryBox">
+
+      <!-- Mobile -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="mobileNo">
+          <input type="text" class="form-control" placeholder="mobileNo" [(ngModel)]="mobileNo" />
+          <label>Prospect Mobile</label>
+        </div>
+      </div>
+
+      <!-- Dealer -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedDealer">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="selectedDealer" [disabled]="true" />
+          <label>Dealer</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="enquiryCurrentStatus !== 'Closed'">
+        <div class="form-floating-custom">
+          <select class="form-select" [(ngModel)]="callStatus">
+            <option value="" disabled selected hidden></option>
+            <option value="Connected">Connected</option>
+            <option value="Missed">Missed</option>
+            <option value="Not Reachable">Not Reachable</option>
+          </select>
+          <label>Call Status</label>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="enquiryCurrentStatus !== 'Closed'">
+        <div class="form-floating-custom">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="folloUpRemark" />
+          <label>FollowUp Remark</label>
+        </div>
+      </div>
+      <!-- Enquiry Source -->
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6">
+    <div class="form-floating-custom" [class.has-value]="selectedSource">
+      <select class="form-select" [(ngModel)]="selectedSource" (change)="onSourceChange()" [disabled]="true">
+        <option value="" disabled selected hidden></option>
+        <option *ngFor="let src of enquirySource" [value]="src">{{ src }}</option>
+      </select>
+      <label>Enquiry Source</label>
+    </div>
+  </div>-->
+
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="selectedSource" [disabled]="true" />
+          <label>Enquiry Source</label>
+        </div>
+      </div>
+
+      <!-- Enquiry Sub-Source -->
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6">
+    <div class="form-floating-custom" [class.has-value]="selectedSubSource">
+      <select class="form-select" [(ngModel)]="selectedSubSource" [disabled]="true">
+        <option value="" disabled selected hidden></option>
+        <option *ngFor="let sub of subSourceOptions" [value]="sub">{{ sub }}</option>
+      </select>
+      <label>Enquiry Sub-Source</label>
+    </div>
+  </div>-->
+
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="selectedSubSource" [disabled]="true" />
+          <label>Enquiry Sub-Source</label>
+        </div>
+      </div>
+
+      <!-- Prospect Name -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="customerName">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="customerName" [disabled]="true" />
+          <label>Prospect Name</label>
+        </div>
+      </div>
+
+      <!-- Prospect District -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedDistrict">
+          <select class="form-select" [(ngModel)]="selectedDistrict" (change)="onDistrictChange(selectedDistrict)">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let i of districtList" [ngValue]="i">{{ i.DistrictName }}</option>
+          </select>
+          <label>Prospect District</label>
+        </div>
+      </div>
+
+      <!-- Prospect Tehsil -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedTehsil">
+          <select class="form-select" [(ngModel)]="selectedTehsil" (change)="onTehsilChange(selectedTehsil)">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let i of tehsilList" [ngValue]="i">{{ i.TehsilName }}</option>
+          </select>
+          <label>Prospect Tehsil</label>
+        </div>
+      </div>
+
+      <!-- Prospect Village -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedVillage">
+          <select class="form-select" [(ngModel)]="selectedVillage">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let i of villageList" [ngValue]="i">{{ i.VillageName }}</option>
+            <option [ngValue]="'Other'">Other</option>
+          </select>
+          <label>Prospect Village</label>
+        </div>
+      </div>
+
+      <!-- Other Village Name -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="selectedVillage === 'Other'">
+        <div class="form-floating-custom" [class.has-value]="otherVillageName">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="otherVillageName" />
+          <label>Other Village Name</label>
+        </div>
+      </div>
+
+      <!-- Prospect PIN Code -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="prospectPin">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="prospectPin" maxlength="6"
+                 pattern="[0-9]*" inputmode="numeric" (keypress)="allowNumbersOnly($event)" />
+          <label>Prospect PIN Code</label>
+        </div>
+      </div>
+
+      <!-- Salesman Name -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="salesmanName">
+          <select class="form-select" [(ngModel)]="salesmanName" (change)="onSalesmanChange(salesmanName)">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let i of salesmanList" [value]="i.SalesmanName">{{ i.SalesmanName }}</option>
+            <option *ngIf="positionId === 'Territory Manager' || misstatus?.toLowerCase() === 'yes'" [value]="'__add__'">
+              + Add Salesman
+            </option>
+          </select>
+          <label>Salesman Name</label>
+        </div>
+      </div>
+
+      <!-- Salesman Number (readonly) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="salesmanNumber">
+          <input type="text" class="form-control" [(ngModel)]="salesmanNumber" readonly />
+          <label>Salesman Number</label>
+        </div>
+      </div>
+
+      <!-- Interested HP Category -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="interestedHP">
+          <select class="form-select" [(ngModel)]="interestedHP" (change)="onHpChange()" [disabled]="true">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let range of uniqueHpCategories" [value]="range">{{ range }}</option>
+          </select>
+          <label>Interested HP Category</label>
+        </div>
+      </div>
+
+      <!-- Interested Drive Type -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="interestedDrive">
+          <select class="form-select" [(ngModel)]="interestedDrive" (change)="onDriveChange()" [disabled]="true">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let drive of driveTypesForSelectedHP" [value]="drive">{{ drive }}</option>
+          </select>
+          <label>Interested Drive Type</label>
+        </div>
+      </div>
+
+      <!-- Interested Model -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="interestedModel">
+          <select class="form-select" [(ngModel)]="interestedModel" (change)="onModelChange()" [disabled]="true">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let model of modelsForSelectedDrive" [value]="model.ModelName">{{ model.ModelName }}</option>
+          </select>
+          <label>Interested Model</label>
+        </div>
+      </div>
+
+      <!-- Variant / BOM Code (readonly) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="variantCode">
+          <input type="text" class="form-control" [(ngModel)]="variantCode" [disabled]="true" />
+          <label>Variant / BOM Code</label>
+        </div>
+      </div>
+
+      <!-- Conversion Challenge -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="conversionChallenge">
+          <select class="form-select" [(ngModel)]="conversionChallenge" (change)="onConversionChallengeChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="Low Brand Recall">Low Brand Recall</option>
+            <option value="Low Coverage">Low Coverage</option>
+            <option value="Price Gap Issue">Price Gap Issue</option>
+            <option value="Not Listed in Subsidy">Not Listed in Subsidy</option>
+            <option value="Waiting for Mahurat">Waiting for Mahurat</option>
+            <option value="Low LTV">Low LTV</option>
+            <option value="Negative Area">Negative Area</option>
+            <option value="Exchange Demand">Exchange Demand</option>
+            <option value="Model Availability Issue">Model Availability Issue</option>
+            <option value="Other">Other</option>
+          </select>
+          <label>Conversion Challenge</label>
+        </div>
+      </div>
+
+      <!-- Action Planned -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="actionPlanned">
+          <select class="form-select" [(ngModel)]="actionPlanned" (change)="onActionPlannedChange()">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let action of actionPlannedOptions" [value]="action">{{ action }}</option>
+          </select>
+          <label>Action Planned</label>
+        </div>
+      </div>
+
+      <!-- Other Action Remark -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showOtherActionRemark">
+        <div class="form-floating-custom" [class.has-value]="otherActionRemark">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="otherActionRemark" />
+          <label>Other Action Remark</label>
+        </div>
+      </div>
+
+      <!-- Next Followup Date -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="nextFollowupDate">
+          <input type="date" class="form-control" style="font-size:14px"
+                 [min]="todayDate" [(ngModel)]="nextFollowupDate"
+                 (change)="onFollowupChange($event)" />
+          <label>Next Followup Date</label>
+          <small class="text-danger"
+                 *ngIf="followupError"
+                 style="font-size: 0.7rem !important; line-height: 14px !important; display:block;">
+            {{ followupError }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Expected Delivery Date -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="expectedDeliveryDate">
+          <input type="date" class="form-control" style="font-size:14px"
+                 [min]="nextFollowupDate || todayDate"
+                 [(ngModel)]="expectedDeliveryDate"
+                 (change)="onDeliveryChange($event)" />
+          <label>Expected Delivery Date</label>
+          <small class="text-danger"
+                 *ngIf="deliveryError"
+                 style="font-size: 0.7rem !important; line-height: 14px !important; display:block;">
+            {{ deliveryError }}
+          </small>
+        </div>
+      </div>
+
+
+
+      <!-- Enquiry Type (readonly auto calc) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="enquiryType">
+          <input type="text" class="form-control" [(ngModel)]="enquiryType" readonly />
+          <label>Enquiry Type</label>
+        </div>
+      </div>
+
+      <!-- ENQUIRY CURRENT STATUS -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="enquiryCurrentStatus">
+          <select class="form-select" [(ngModel)]="enquiryCurrentStatus" (change)="onEnquiryCurrentStatusChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="Open">Open</option>
+            <option value="Booking">Booking</option>
+            <option value="Closed">Closed</option>
+          </select>
+          <label>Enquiry Current Status</label>
+        </div>
+      </div>
+
+      <!-- BOOKING -->
+      <div class="col-xl-3 col-lg-4 col-sm-6"
+           *ngIf="showBookingFields && enquiryCurrentStatus !== 'Closed'">
+        <div class="form-floating-custom" [class.has-value]="bookingDate">
+          <input type="date" class="form-control" style="font-size:14px"
+                 [min]="minDate" [max]="maxDate" [(ngModel)]="bookingDate"
+                 (blur)="onBookingDateChange($event)" />
+          <label>Booking Date</label>
+          <small class="text-danger"
+                 *ngIf="BookingError"
+                 style="font-size: 0.7rem !important; line-height: 14px !important; display:block;">
+            {{ BookingError }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Booking Amount -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showBookingFields">
+        <div class="form-floating-custom" [class.has-value]="bookingAmount">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="bookingAmount" pattern="[0-9]*" inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 maxlength="6"
+                 [readonly]="enquiryCurrentStatus === 'Closed'" />
+          <label>Booking Amount</label>
+        </div>
+      </div>
+
+      <!-- CLOSED -> sub-status dropdown -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showClosedFields">
+        <div class="form-floating-custom" [class.has-value]="enquiryClosedStatus">
+          <select class="form-select" [(ngModel)]="enquiryClosedStatus" (change)="onEnquiryClosedStatusChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="Sale Lost">Sale Lost</option>
+            <option value="Dropped">Dropped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Purchased Used Tractor">Purchased Used Tractor</option>
+          </select>
+          <label>Enquiry Status</label>
+        </div>
+      </div>
+
+      <!-- SALE LOST -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSaleLostFields">
+        <div class="form-floating-custom" [class.has-value]="saleLostReason">
+          <select class="form-select" [(ngModel)]="saleLostReason" (change)="onSaleLostReasonChange()">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let reason of saleLostReasons" [value]="reason">{{ reason }}</option>
+          </select>
+          <label>Sale Lost Reason</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSaleLostOtherRemark">
+        <div class="form-floating-custom" [class.has-value]="saleLostOtherRemark">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="saleLostOtherRemark" />
+          <label>Sale Lost Other Remark</label>
+        </div>
+      </div>
+
+      <!-- DROPPED -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDroppedFields">
+        <div class="form-floating-custom" [class.has-value]="droppedReason">
+          <select class="form-select" [(ngModel)]="droppedReason">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let reason of droppedReasons" [value]="reason">{{ reason }}</option>
+          </select>
+          <label>Dropped Reason</label>
+        </div>
+      </div>
+
+      <!-- DELIVERED -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="deliveryDate">
+          <input type="date" class="form-control" style="font-size:14px"
+                 [min]="minDate" [max]="maxDate" [(ngModel)]="deliveryDate"
+                 (blur)="onActulDeliveryDateChange($event)" />
+          <label>Delivery Date</label>
+          <small class="text-danger"
+                 *ngIf="actualDeliveryError"
+                 style="font-size: 0.7rem !important; line-height: 14px !important; display:block;">
+            {{ actualDeliveryError }}
+          </small>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="expectedRetailDate">
+          <input type="date" class="form-control" style="font-size:14px"
+                 [min]="todayDate" [(ngModel)]="expectedRetailDate" (blur)="expeRetailChange($event)" />
+          <label>Expected Retail Date</label>
+          <small class="text-danger"
+                 *ngIf="expectedRetailError"
+                 style="font-size: 0.7rem !important; line-height: 14px !important; display:block;">
+            {{ expectedRetailError }}
+          </small>
+        </div>
+      </div>
+      <!-- Salesman Name -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="salesmanName">
+          <select class="form-select" [(ngModel)]="salesmanName" (change)="onSalesmanChange(salesmanName)">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let i of salesmanList" [value]="i.SalesmanName">{{ i.SalesmanName }}</option>
+            <!--<option *ngIf="positionId === 'Territory Manager' || misstatus?.toLowerCase() === 'yes'" [value]="'__add__'">
+          + Add Salesman
+        </option>-->
+          </select>
+          <label>Salesman Name</label>
+        </div>
+      </div>
+      <!--Salesman Number (readonly)-->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="salesmanNumber">
+          <input type="text" class="form-control" [(ngModel)]="salesmanNumber" readonly />
+          <label>Salesman Number</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="chassisNumber">
+          <select class="form-select" [(ngModel)]="chassisNumber">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let ch of chassisOptions" [value]="ch">{{ ch }}</option>
+          </select>
+          <label>Chassis Number</label>
+        </div>
+      </div>
+
+      <!-- Prospect Type: 4 options. Exchange fields ONLY on "Exchange" -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="prospectType">
+          <select class="form-select" [(ngModel)]="prospectType" (change)="onProspectTypeChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="1st Time Tractor Buyer">1st Time Tractor Buyer</option>
+            <option value="Exchange">Exchange</option>
+            <option value="Multi Tractor Owner">Multi Tractor Owner</option>
+            <option value="Existing Gromax Customer">Existing Gromax Customer</option>
+          </select>
+          <label>Prospect Type</label>
+        </div>
+      </div>
+
+      <!-- EXCHANGE TRACTOR (only when prospectType === 'Exchange') -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="exchangeMake">
+          <select class="form-select" [(ngModel)]="exchangeMake" (change)="onExchangeMakeChange()">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let make of makeList" [value]="make">{{ make }}</option>
+          </select>
+          <label>Make</label>
+        </div>
+      </div>
+
+      <!-- Other Make Input -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields && showExchangeMakeOtherInput">
+        <div class="form-floating-custom" [class.has-value]="exchangeMakeOther">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="exchangeMakeOther" />
+          <label>Enter Make Name</label>
+        </div>
+      </div>
+
+      <!-- HP -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="exchangeHpCategorie">
+          <select class="form-select" [(ngModel)]="exchangeHpCategorie" (change)="onExchHpChange()">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let hp of exchangeHpCategories" [value]="hp">{{ hp }}</option>
+          </select>
+          <label>Exc HP Category</label>
+        </div>
+      </div>
+      <!-- Model -->
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields && showExcModelInput">
+        <div class="form-floating-custom" [class.has-value]="exchangeModel">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="exchangeModel" />
+          <label>Model</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields && showExcModelDrop">
+        <div class="form-floating-custom" [class.has-value]="exchangeModel">
+          <select class="form-select" [(ngModel)]="exchangeModel">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let model of exchangeModels" [value]="model">{{ model }}</option>
+          </select>
+          <label>Model</label>
+        </div>
+      </div>
+
+      <!-- Model -->
+      <!-- Exchange Mfg Year -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="exchangeMfgYear">
+          <select class="form-select" [(ngModel)]="exchangeMfgYear">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let year of mfgYearOptions" [value]="year">{{ year }}</option>
+            <option value="<2000">&lt; 2000</option>
+          </select>
+          <label>Mfg Year</label>
+        </div>
+      </div>
+
+      <!--Exchange Photo-->
+      <div class="col-lg-3 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom">
+          <input type="file" name="excFile"
+                 class="form-control" (change)="onFileChange($event, 'excFile')" />
+          <label>Exchange Tractor Img</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="mktValueExchangeTractor">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="mktValueExchangeTractor" maxlength="6"
+                 inputmode="numeric"
+                 (input)="onExchangeAmtInput($event, 'mktValueExchangeTractor')" />
+          <label>Mkt Value Exc Tr.</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="finalPriceExchangeTractor">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="finalPriceExchangeTractor" maxlength="6"
+                 inputmode="numeric"
+                 (input)="onExchangeAmtInput($event, 'finalPriceExchangeTractor')" />
+          <label>Deal Price of Exc Tr.</label>
+        </div>
+      </div>
+
+      <!-- GAP ERROR MESSAGE -->
+      <div class="col-12 px-3 mb-4" *ngIf="showExchangeFields && mktValueExchangeTractor && finalPriceExchangeTractor && checkExchangeGap()">
+        <div style="display: inline-flex; align-items: center; gap: 3px; background: #fff2f2; border: 1px solid #f5c6cb; border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #842029; max-width: 100%; flex-wrap: wrap; word-break: break-word;">
+          ⚠️ Difference between <strong>Mkt Value Exc Tr.</strong> & <strong>Deal Price of Exc Tr.</strong> can't exceed <strong>₹ 1,00,000</strong>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="customerAskExcTractor">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="customerAskExcTractor" maxlength="6"
+                 inputmode="numeric"
+                 (input)="onExchangeAmtInput($event, 'customerAskExcTractor')" />
+          <label>Customer Ask-Exc Tr.</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields">
+        <div class="form-floating-custom" [class.has-value]="exchangeStockEntryType">
+          <select class="form-select" [(ngModel)]="exchangeStockEntryType" (change)="onExchangeStockEntryTypeChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="Serial No">Serial No</option>
+            <option value="Registration No">Registration No</option>
+            <option value="Other">Other</option>
+          </select>
+          <label>Exchange Stock Entry</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showExchangeFields && exchangeStockEntryType">
+        <div class="form-floating-custom" [class.has-value]="exchangeStockEntryValue">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="exchangeStockEntryValue" />
+          <label>
+            {{
+ exchangeStockEntryType === 'Serial No' ? 'Enter Serial No'
+                 : exchangeStockEntryType === 'Registration No' ? 'Enter Registration No'
+                 : 'Enter Other Details'
+            }}
+          </label>
+        </div>
+      </div>
+
+      <!-- FINAL SALE PRICE (all prospect types when Delivered) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="finalSalePrice">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="finalSalePrice" maxlength="6"
+                 inputmode="numeric"
+                 (input)="onFinalSalePriceInput($event)" />
+          <label>Final Sale Price (on-road)</label>
+        </div>
+      </div>
+
+      <!-- PAYMENT TYPE -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDeliveredFields">
+        <div class="form-floating-custom" [class.has-value]="paymentType">
+          <select class="form-select" [(ngModel)]="paymentType" (change)="onPaymentTypeChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="Cash">Cash</option>
+            <option value="Loan">Loan</option>
+          </select>
+          <label>Payment Type</label>
+        </div>
+      </div>
+
+      <!-- CASH -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showCashFields">
+        <div class="form-floating-custom" [class.has-value]="cashDpAmount">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="cashDpAmount" maxlength="6"
+                 (keypress)="allowDpInput($event)"
+                 (input)="onDpInput($event, 'cashDpAmount')" />
+          <label>DP Amount</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showCashFields">
+        <div class="form-floating-custom" [class.has-value]="cashDueAmount">
+          <input type="text" class="form-control" [(ngModel)]="cashDueAmount" readonly />
+          <label>Due Amount (Auto)</label>
+        </div>
+      </div>
+
+      <!-- LOAN -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="loanDpAmount">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="loanDpAmount" maxlength="6"
+                 (keypress)="allowDpInput($event)"
+                 (input)="onDpInput($event, 'loanDpAmount')" />
+          <label>DP Amount</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="loanRequired">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="loanRequired" maxlength="6"
+                 inputmode="numeric" (keypress)="allowNumbersOnly($event)"
+                 (input)="onLoanRequiredInput($event)" />
+          <label>Loan Required</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="customerDues">
+          <input type="text" class="form-control" [(ngModel)]="customerDues" readonly />
+          <label>Customer Dues (Auto)</label>
+        </div>
+      </div>
+
+      <!-- ADDITIONAL PAYMENT -->
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showCashFields || showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="additionalCash">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="additionalCash" maxlength="8" pattern="[0-9]*"
+                 inputmode="numeric" (keypress)="allowNumbersOnly($event)"
+                 (input)="onAdditionalCashChange()" />
+          <label>Additional Payment</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="financerName">
+          <select class="form-select" [(ngModel)]="financerName" (change)="onFinancerNameChange()">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let fin of financerOptions" [value]="fin">{{ fin }}</option>
+          </select>
+          <label>Financer Name</label>
+        </div>
+      </div>
+
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showFinancerOtherInput">
+    <div class="form-floating-custom" [class.has-value]="financerNameOther">
+      <input type="text" class="form-control" placeholder="" [(ngModel)]="financerNameOther" />
+      <label>Enter Financer Name</label>
+    </div>
+  </div>-->
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="loanType">
+          <select class="form-select" [(ngModel)]="loanType">
+            <option value="" disabled selected hidden></option>
+            <option value="KYC">KYC</option>
+            <option value="Normal">Normal</option>
+          </select>
+          <label>Loan Type</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLoanFields">
+        <div class="form-floating-custom" [class.has-value]="financeStatus">
+          <select class="form-select" [(ngModel)]="financeStatus" (change)="onFinanceStatusChange()">
+            <option value="" disabled selected hidden></option>
+            <option value="In-Process">In-Process</option>
+            <option value="Approved">Approved</option>
+            <option value="Not Approved">Not Approved</option>
+            <option value="Disbursed">Disbursed</option>
+          </select>
+          <label>Finance Status</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showFinanceSubStatus">
+        <div class="form-floating-custom" [class.has-value]="financeSubStatus">
+          <select class="form-select" [(ngModel)]="financeSubStatus">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let sub of financeSubStatusOptions" [value]="sub">{{ sub }}</option>
+          </select>
+          <label>Finance Sub Status</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDisbursedAmount">
+        <div class="form-floating-custom" [class.has-value]="disbursedAmount">
+          <input type="text" class="form-control" placeholder=""
+                 [(ngModel)]="disbursedAmount" maxlength="6"
+                 inputmode="numeric" (keypress)="allowNumbersOnly($event)"
+                 (input)="onDisbursedInput($event)" />
+          <label>Disbursed Amount</label>
+        </div>
+      </div>
+      <!-- Submit Button -->
+      <div class="col-12 text-center">
+        <button type="button"
+                class="btn px-4 text-white"
+                style="background-color: #4796BD; border-radius: 8px"
+                (click)="onSubmitEnquiry()"
+                [disabled]="!isFormValid()">
+          Update Enquiry
+        </button>
+      </div>
+    </div>
+
+    <div class="row pt-1" *ngIf="followUpBox">
+      <div *ngIf="followUpReport">
+        <div style="overflow-x: auto; width: 100%;">
+          <table id="enquiryTable" class="table table-bordered table-striped mt-3" style="min-width: 1200px;">
+            <thead>
+              <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+                <th class="text-nowrap py-3 fw-normal">Date Time</th>
+                <th class="text-nowrap py-3 fw-normal">Call Status</th>
+                <th class="text-nowrap py-3 fw-normal">Enquiry Status</th>
+                <th class="text-nowrap py-3 fw-normal">Call Leeds</th>
+                <th class="text-nowrap py-3 fw-normal" style="border-top-right-radius: 6px;">Remark</th>
+              </tr>
+            </thead>
+            <tbody style="font-size: 14px;">
+              <tr *ngFor="let item of followUpList; let i = index">
+                <td>{{ item.create_date | date:'dd-MM-yyyy' }}</td>
+                <td>{{ item.CallStatus }}</td>
+                <td>{{ item.followenquiryStatus }}</td>
+                <td>{{ item.CallLeads }}</td>
+                <td>{{ item.Remark }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Salesman Modal -->
+<div class="modal fade" id="addSalesmanModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Salesman</h5>
+        <button type="button" class="btn-close" (click)="closeSalesman()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Territory Manager -->
+        <div class="col-12 mb-3" *ngIf="showTM">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+              <option value="">Select Territory Manager</option>
+              <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+            </select>
+            <label>Territory Manager</label>
+          </div>
+        </div>
+
+        <!-- Dealer -->
+        <div class="col-12 mb-3" *ngIf="showDealer">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedSaleDealer">
+              <option value="">Select Dealer</option>
+              <option *ngFor="let dealer of dealersList" [value]="dealer.Name">
+                {{ dealer.DealerName }} ({{ dealer.Name }})
+              </option>
+            </select>
+            <label>Dealer</label>
+          </div>
+        </div>
+
+        <!-- Salesman Name -->
+        <div class="col-12 mb-3">
+          <div class="form-floating-custom">
+            <input type="text" class="form-control" [(ngModel)]="newSalesmanName" placeholder="" />
+            <label>Salesman Name</label>
+          </div>
+        </div>
+
+        <!-- Mobile Number -->
+        <div class="col-12">
+          <div class="form-floating-custom">
+            <input type="text" class="form-control" [(ngModel)]="newSalesmanMobile" maxlength="10"
+                   pattern="[0-9]{0,10}" (keypress)="allowNumbersOnly($event)" />
+            <label>Mobile Number</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn text-white px-3" (click)="onSubmitSalesman()"
+                style="background-color: #4796BD;font-size:14px">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

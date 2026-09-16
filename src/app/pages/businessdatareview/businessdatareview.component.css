@@ -1,0 +1,589 @@
+:host {
+  display: block;
+}
+
+.empty-icon-wrap {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: #EEF6FB;
+  border: 1.5px solid #c7dff0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4796BD;
+  font-size: 26px;
+}
+
+.empty-title {
+  font-size: 15px;
+  color: #2c3e50;
+}
+
+.empty-state-card {
+  border-radius: 12px;
+  background: #fff;
+}
+
+.filter-card {
+  background: #ffffff;
+}
+
+.filter-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #444;
+}
+
+.filter-select {
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #cce0ef;
+  color: #333;
+  background-color: #f9fcfe;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+  .filter-select:focus {
+    border-color: #4796BD;
+    box-shadow: 0 0 0 3px rgba(71, 150, 189, 0.15);
+    outline: none;
+  }
+
+.is-invalid-field {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8 !important;
+}
+
+.inline-error {
+  font-size: 11px;
+  color: #dc3545;
+  margin-top: 3px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  line-height: 1.3;
+}
+
+/* Filter Button */
+.btn-filter {
+  background-color: #4796BD;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 9px;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  letter-spacing: 0.2px;
+}
+
+  .btn-filter:hover:not(:disabled) {
+    background-color: #3a7fa3;
+    color: #fff;
+  }
+
+  .btn-filter:disabled {
+    background-color: #a0c9de;
+    cursor: not-allowed;
+  }
+
+.table-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c3e50;
+  letter-spacing: 0.2px;
+}
+
+.month-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #4796BD;
+  background: #EEF6FB;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #c7dff0;
+}
+
+.edit-mode-badge {
+  font-size: 12px;
+  font-weight: 500;
+  color: #7a4f00;
+  background: #fff8e1;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #ffe082;
+}
+
+.dirty-indicator {
+  color: #e65100;
+}
+
+.bdrc-table-outer {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px 6px 0 0;
+}
+
+/* =============================================
+   TABLE WRAPPER — fixed height + both scrolls
+   Header rows stay sticky via thead th
+============================================= */
+.bdrc-table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 100%;
+  max-height: 420px;
+  border-radius: 6px 6px 0 0;
+}
+
+.bdrc-table {
+  font-size: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  white-space: nowrap;
+  width: max-content;
+  table-layout: auto;
+}
+
+  /* ---- Sticky Header ---- */
+  .bdrc-table thead th {
+    position: sticky;
+    z-index: 3;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 500;
+    padding: 4px 6px;
+    border: 1px solid #cce0ef;
+    box-sizing: border-box;
+    height: 28px;
+  }
+
+/* Each row sticks at correct offset (3 rows × 28px) */
+.thead-row1 th {
+  top: 0;
+}
+
+.thead-row2 th {
+  top: 28px;
+}
+
+.thead-row3 th {
+  top: 56px;
+}
+
+/* rowspan=3 cells span all 3 rows — must sit at top:0 with high z-index */
+.th-fixed {
+  top: 0 !important;
+  z-index: 4 !important;
+  height: 84px !important; /* 3 × 28px */
+  background-color: #4796BD;
+  color: #fff;
+}
+
+.thead-row1 th {
+  background-color: #4796BD;
+  color: #fff;
+  font-size: 11.5px;
+}
+
+.thead-row2 th {
+  background-color: #4796BD;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 5px;
+}
+
+.thead-row3 th {
+  background-color: #fff200c7;
+  color: #333;
+  font-size: 11px;
+  padding: 4px 5px;
+}
+
+.th-section {
+  background-color: #4796BD !important;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.th-ttl {
+  background-color: #fffff2cc !important;
+  color: #6b5900 !important;
+}
+
+.th-w5-disabled {
+  background-color: #b0d4e8 !important;
+  color: #e0eff7 !important;
+}
+
+.th-action-total {
+  background-color: #fff200c7;
+  min-width: 70px;
+  max-width: 70px;
+  width: 70px;
+}
+
+/* Workflow header */
+.th-workflow {
+  background-color: #4796BD !important;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  min-width: 110px;
+  width: 115px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.th-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: #fff;
+  display: block;
+}
+
+/* ---- Fixed / locked column styles ---- */
+.td-locked {
+  background-color: #F2F2F2;
+  color: #333;
+}
+
+.th-state, .td-state {
+  width: 80px;
+  min-width: 80px;
+}
+
+.th-dealer, .td-dealer {
+  width: 170px;
+  min-width: 150px;
+  text-align: left !important;
+}
+
+.th-loc, .td-loc {
+  width: 100px;
+  min-width: 90px;
+}
+
+.th-sap, .td-sap {
+  width: 75px;
+  min-width: 70px;
+}
+
+.th-status, .td-status {
+  width: 70px;
+  min-width: 65px;
+}
+
+.th-action, .td-action {
+  width: 70px;
+  min-width: 70px;
+  text-align: center !important;
+}
+
+/* Week cells */
+.bdrc-table th:not(.th-fixed):not(.th-section):not(.th-action):not(.th-action-total),
+.bdrc-table td:not(.td-locked):not(.td-action) {
+  width: 52px;
+  min-width: 48px;
+}
+
+.th-ttl, .td-ttl {
+  width: 58px;
+  min-width: 55px;
+}
+
+/* ---- Table Body ---- */
+.bdrc-table tbody td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 4px 5px;
+  border: 1px solid #ddeef7;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.td-locked {
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.td-dealer {
+  text-align: left !important;
+  padding-left: 8px !important;
+}
+
+.td-readonly {
+  background-color: #fff;
+  color: #333;
+}
+
+.td-editable {
+  background-color: #fffbe6;
+  padding: 2px 3px !important;
+}
+
+.td-ttl {
+  background-color: #fffff2cc;
+  color: #5a4800;
+  font-weight: 500;
+}
+
+.td-disabled {
+  background-color: #4796BD;
+  color: #fff;
+}
+
+.td-workflow {
+  font-size: 11.5px;
+  color: #2c3e50;
+  text-align: center;
+  min-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.td-pending {
+  background-color: #fffaf4 !important;
+  color: #7a4200;
+  font-weight: 500;
+}
+
+/* ---- Edit Input ---- */
+.edit-input {
+  width: 46px;
+  border: 1px solid #4796BD;
+  border-radius: 5px;
+  padding: 2px 3px;
+  font-size: 11.5px;
+  text-align: center;
+  background-color: #fff;
+  color: #1a3a4f;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+  .edit-input:focus {
+    box-shadow: 0 0 0 2px rgba(71, 150, 189, 0.35);
+    border-color: #2e7aad;
+  }
+
+  .edit-input::-webkit-inner-spin-button,
+  .edit-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .edit-input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+/* ---- Row States ---- */
+.row-editing td {
+  background-color: #fffde8 !important;
+}
+
+.row-editing {
+  outline: 2px solid #4796BD;
+  outline-offset: -1px;
+}
+
+.row-dirty .td-editable {
+  background-color: #fff8e1 !important;
+}
+
+/* ---- Status Badges ---- */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.status-active {
+  background-color: #d1f5e4;
+  color: #1a7342;
+}
+
+.status-inactive {
+  background-color: #fde8e8;
+  color: #a01818;
+}
+
+.approved-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #1a7342;
+  background: #d1f5e4;
+  border: 1px solid #b0e8cd;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.rejected-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #8b1a1a;
+  background: #fde8e8;
+  border: 1px solid #f5c0c0;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.lock-icon {
+  color: #6e6e6e;
+  font-size: 11px;
+}
+
+/* ---- Action Buttons ---- */
+.btn-xs {
+  padding: 3px 7px;
+  font-size: 11px;
+  border-radius: 5px;
+  border: none;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+}
+
+.btn-edit {
+  background-color: #EEF6FB;
+  color: #4796BD;
+  border: 1px solid #c7dff0;
+}
+
+  .btn-edit:hover {
+    background-color: #4796BD;
+    color: #fff;
+    transform: scale(1.05);
+  }
+
+.btn-cancel-edit {
+  background-color: #fde8e8;
+  color: #a01818;
+  border: 1px solid #f5c2c2;
+}
+
+  .btn-cancel-edit:hover {
+    background-color: #dc3545;
+    color: #fff;
+  }
+
+/* ---- Save All Footer Bar ---- */
+.save-all-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e3a4f;
+  color: #e0edf5;
+  padding: 10px 20px;
+  font-size: 13px;
+  border-top: 2px solid #4796BD;
+  border-radius: 0 0 12px 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.save-all-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.save-all-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cancel-all {
+  background-color: transparent;
+  color: #e0edf5;
+  border: 1px solid #4e718a;
+  font-size: 12px;
+  border-radius: 7px;
+  padding: 5px 14px;
+  transition: background-color 0.15s ease;
+}
+
+  .btn-cancel-all:hover:not(:disabled) {
+    background-color: #2a4f68;
+    color: #fff;
+  }
+
+  .btn-cancel-all:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+.btn-save-all {
+  background-color: #4796BD;
+  color: #fff;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 7px;
+  padding: 5px 18px;
+  letter-spacing: 0.2px;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+  .btn-save-all:hover:not(:disabled) {
+    background-color: #357fa3;
+    transform: translateY(-1px);
+  }
+
+  .btn-save-all:disabled {
+    background-color: #3a6a85;
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+/* ---- Scrollbar ---- */
+.bdrc-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.bdrc-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.bdrc-table-wrapper::-webkit-scrollbar-thumb {
+  background: #a0c4d8;
+  border-radius: 10px;
+}
+
+  .bdrc-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #4796BD;
+  }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .filter-card {
+    padding: 12px !important;
+  }
+
+  .save-all-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

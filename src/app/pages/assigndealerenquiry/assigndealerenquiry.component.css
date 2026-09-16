@@ -1,0 +1,97 @@
+.card h6 {
+  font-size: 1rem;
+}
+
+.card h4 {
+  font-size: 1.5rem;
+}
+
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+  .custom-btn:hover {
+    background-color: #3a7fa6 !important;
+    transform: translateY(-1px);
+  }
+
+  .custom-btn:active {
+    transform: translateY(0);
+  }
+
+::ng-deep .error-snackbar {
+  background: linear-gradient(135deg, #214557, #4796BD);
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+  min-height: unset !important;
+  line-height: 20px !important;
+}
+
+.active-total {
+  background-color: #4D963A;
+  transition: 0.3s;
+}
+
+  .active-total p {
+    color: white !important;
+  }
+
+.active-hot {
+  background-color: #E45E2E;
+  transition: 0.3s;
+}
+
+  .active-hot p {
+    color: white !important;
+  }
+
+.active-warm {
+  background-color: #D59D3E;
+  transition: 0.3s;
+}
+
+  .active-warm p {
+    color: white !important;
+  }
+
+.active-cold {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+  .active-cold p {
+    color: white !important;
+  }
+
+.enquiry-table-wrapper {
+  max-height: unset;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 12px 8px;
+}
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 8px;
+}

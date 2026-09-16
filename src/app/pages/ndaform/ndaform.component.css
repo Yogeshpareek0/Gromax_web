@@ -1,0 +1,570 @@
+.form-control, .form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+.btn-custom {
+  background-color: #2d89c8;
+  color: #fff;
+  border-radius: 50px;
+  padding: 10px 25px;
+  border: none;
+}
+
+  .btn-custom:hover {
+    background-color: #236fa1;
+  }
+
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+  .step-indicator span {
+    width: 30px;
+    height: 30px;
+    background: #2d89c8;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+  }
+
+.btn-additional:hover {
+  background-color: #2d89c8;
+}
+
+.form-floating-custom {
+  position: relative;
+  margin-bottom: 1.8rem;
+}
+
+  .form-floating-custom input,
+  .form-floating-custom select {
+    height: 38px;
+    padding: 8px 20px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+    .form-floating-custom select option {
+      font-size: 14px;
+    }
+
+  .form-floating-custom select {
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 35px;
+  }
+
+  .form-floating-custom label {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 8px;
+    font-size: 14px;
+    color: #6c757d;
+    z-index: 1;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+  }
+
+  .form-floating-custom input:focus ~ label,
+  .form-floating-custom input:not(:placeholder-shown) ~ label,
+  .form-floating-custom select:focus ~ label,
+  .form-floating-custom select:not([value=""]):not([value=null]) ~ label,
+  .form-floating-custom.has-value label {
+    top: 0;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #4796BD;
+    font-weight: 500;
+    background: #fff;
+    padding: 1px;
+  }
+
+.form-control:focus,
+.form-select:focus {
+  box-shadow: none !important;
+  border-color: #4796BD;
+  outline: none;
+}
+
+.form-control::placeholder {
+  opacity: 0;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 80px;
+}
+
+.step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
+  border: 1px solid #BABABA;
+}
+
+  .step.active {
+    background: #4796BD;
+    color: #fff;
+    font-weight: 400;
+    border: 1px solid #4796BD;
+  }
+
+.line {
+  flex: 1;
+  height: 2px;
+  background: #e0e0e0;
+  position: relative;
+}
+
+  .line::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    background: #4796BD;
+    transition: width 0.4s ease;
+  }
+
+  .line.fill::before {
+    width: 100%;
+  }
+
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #4796BD;
+  border-color: #4796BD;
+  border-radius: 50px;
+}
+
+  .btn-primary:hover {
+    background-color: #3a7a9a;
+    border-color: #3a7a9a;
+  }
+
+  .btn-primary:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+
+.btn-secondary {
+  border-radius: 50px;
+}
+
+.btn-success {
+  border-radius: 50px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.form-control:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.form-select:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.enquiry-table-wrapper {
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 12px 8px;
+}
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 8px;
+}
+
+/* ============ ADD BUTTON ============ */
+/* ============ NDA ACTION BUTTON ============ */
+
+.nda-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 38px;
+  padding: 8px 16px;
+  margin: 0;
+  background: linear-gradient(135deg, #4796BD 0%, #215378 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+  .nda-add-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #55a8d1 0%, #2a6491 100%);
+  }
+
+  .nda-add-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(71, 150, 189, 0.3);
+  }
+
+
+/* Button icon */
+
+.nda-add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.nda-add-btn:hover .nda-add-icon {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* ============ FORM HEADER ============ */
+.nda-form-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 5px 4px 10px 4px;
+}
+
+.nda-header-spacer {
+  flex: 1;
+}
+
+/* ============ BACK BUTTON ============ */
+.nda-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px 7px 10px;
+  background: #fff;
+  color: #215378;
+  border: 1.5px solid #c8dde9;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+  .nda-back-btn:hover {
+    background: #eef6fb;
+    border-color: #4796BD;
+    color: #4796BD;
+    transform: translateX(-2px);
+  }
+
+.nda-back-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #e8f4fb, #d0e9f5);
+  border-radius: 50%;
+  font-size: 11px;
+  color: #215378;
+  transition: all 0.2s;
+}
+
+.nda-back-btn:hover .nda-back-arrow {
+  background: linear-gradient(135deg, #4796BD, #215378);
+  color: #fff;
+}
+
+.multi-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.multi-dropdown-label {
+  position: absolute;
+  top: -9px;
+  left: 12px;
+  font-size: 12px;
+  color: #4796BD;
+  background: #fff;
+  padding: 0 4px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.multi-dropdown-toggle {
+  min-height: 38px;
+  border: 1px solid #4796BD;
+  border-radius: 50px;
+  padding: 6px 36px 6px 16px;
+  cursor: pointer;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  position: relative;
+  font-size: 14px;
+  color: #333;
+}
+
+  .multi-dropdown-toggle:hover {
+    border-color: #215378;
+  }
+
+.multi-dropdown-placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+.multi-dropdown-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4796BD;
+  font-size: 13px;
+  transition: transform 0.2s;
+}
+
+  .multi-dropdown-arrow.rotated {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+.multi-tag {
+  background-color: #E8F4FB;
+  color: #215378;
+  border: 1px solid #4796BD;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+  .multi-tag i {
+    cursor: pointer;
+    font-size: 10px;
+    color: #4796BD;
+  }
+
+    .multi-tag i:hover {
+      color: #c0392b;
+    }
+
+.multi-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 12px;
+  z-index: 1050;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.multi-dropdown-item {
+  padding: 2px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+  .multi-dropdown-item:hover {
+    background-color: #EBF5FB;
+  }
+
+  .multi-dropdown-item.selected {
+    background-color: #D6EAF8;
+    color: #215378;
+    font-weight: 500;
+  }
+
+  .multi-dropdown-item .check-icon {
+    font-size: 11px;
+    color: #4796BD;
+    opacity: 0;
+    width: 12px;
+  }
+
+  .multi-dropdown-item.selected .check-icon {
+    opacity: 1;
+  }
+
+#enquiryTable tbody td .btn-sm {
+  font-size: 12px;
+}
+
+#enquiryTable tbody td .badge {
+  font-size: 12px;
+}
+
+.nda-tab-btn {
+  padding: 8px 20px;
+  font-size: 13px;
+  border: 1px solid #4796BD;
+  background-color: #fff;
+  color: #4796BD;
+  cursor: pointer;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  margin-right: 4px;
+  transition: background 0.2s;
+}
+
+  .nda-tab-btn.nda-tab-active {
+    background-color: #215378;
+    color: #fff;
+    border-color: #215378;
+    font-weight: 500;
+  }
+
+  .nda-tab-btn:hover:not(.nda-tab-active) {
+    background-color: #EBF5FB;
+  }
+
+.modal.show {
+  display: block !important;
+}
+
+.modal-dialog-top {
+  margin-top: 3rem;
+}
+
+.modal-content {
+  border-radius: 12px;
+  border: 0;
+}
+
+/* ============ NDA TOOLBAR ============ */
+
+.nda-toolbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+  /* Left buttons */
+
+  .nda-toolbar > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+
+  /* Right buttons */
+
+  .nda-toolbar > .d-flex {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
+
+/* ============ EXPORT BUTTON ============ */
+
+.nda-export-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  background-color: #4796BD;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+  .nda-export-btn:hover {
+    background-color: #3a7a9a;
+    transform: translateY(-2px);
+  }
+
+  .nda-export-btn:active {
+    transform: translateY(0);
+  }

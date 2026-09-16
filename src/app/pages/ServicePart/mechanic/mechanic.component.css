@@ -1,0 +1,490 @@
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+  padding: 8px 20px;
+}
+
+.btn-outline {
+  color: #4796BD;
+  border-radius: 8px;
+  border: 1px solid #4796BD;
+}
+
+.form-control, .form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+}
+
+  /* Disabled fields — light grey bg, muted text, no pointer */
+  .form-control:disabled,
+  .form-select:disabled,
+  .form-control[disabled],
+  .form-select[disabled] {
+    background-color: #f4f6f8 !important;
+    color: #888 !important;
+    cursor: not-allowed !important;
+    border-color: #d0d8e0 !important;
+    opacity: 1 !important;
+  }
+
+.form-floating-custom {
+  position: relative;
+  margin-bottom: 0rem;
+}
+
+  .form-floating-custom input {
+    height: 40px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .form-floating-custom label {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0 4px;
+    font-size: 14px;
+    color: #212529bf;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+
+  .form-floating-custom input:focus + label,
+  .form-floating-custom input:not(:placeholder-shown) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.form-control:focus, .form-select:focus {
+  box-shadow: none !important;
+}
+
+.form-floating-custom select {
+  height: 40px;
+  padding: 10px 14px;
+  font-size: 14px;
+  appearance: none;
+}
+
+  .form-floating-custom select:focus + label,
+  .form-floating-custom select:not([value=""]) + label {
+    top: -1px;
+    font-size: 14px;
+    color: #4796BD;
+  }
+
+.enquiry-table-wrapper {
+  height: calc(100vh - 156px);
+  max-height: unset;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+  #mechanicTable thead th,
+  .enquiry-table-wrapper table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 13px;
+    padding: 12px 10px;
+  }
+
+  #mechanicTable tbody td,
+  .enquiry-table-wrapper table tbody td {
+    font-size: 12px;
+    padding: 10px 10px;
+    vertical-align: middle;
+  }
+
+  .enquiry-table-wrapper table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+    .enquiry-table-wrapper table tbody tr:hover {
+      background-color: #f0f7fc !important;
+    }
+
+.card-body {
+  padding: 24px 20px 0 20px;
+}
+
+/* ── KYC / Status Badges ── */
+.kyc-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-approved {
+  background-color: #D1E7DD;
+  color: #0A4D2A;
+}
+
+.badge-pending {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+
+.badge-rejected {
+  background-color: #F8D7DA;
+  color: #721c24;
+}
+
+/* ── KYC Action Buttons ── */
+.kyc-approve-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #198754;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+  .kyc-approve-btn:hover {
+    background-color: #146c43;
+  }
+
+.kyc-reject-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #dc3545;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+  .kyc-reject-btn:hover {
+    background-color: #b02a37;
+  }
+
+/* ── Reject Remark Modal ── */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1040;
+}
+
+.reject-modal-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 16px;
+}
+
+.reject-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 32px rgba(33, 83, 120, 0.18);
+  overflow: hidden;
+  animation: modalIn 0.18s ease;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.reject-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1d0d3;
+  background: #fff5f5;
+}
+
+.reject-icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #F8D7DA;
+  color: #721c24;
+  font-size: 13px;
+}
+
+.reject-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #721c24;
+}
+
+.reject-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  font-size: 15px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+  .reject-close-btn:hover {
+    background: #f1d0d3;
+    color: #721c24;
+  }
+
+.reject-modal-body {
+  padding: 20px 20px 8px;
+}
+
+.reject-salesman-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #215378;
+  margin-bottom: 14px;
+  background: #E8F1F8;
+  padding: 7px 12px;
+  border-radius: 8px;
+}
+
+.reject-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.remark-counter {
+  font-size: 11px;
+  font-weight: 400;
+  color: #888;
+}
+
+  .remark-counter.remark-counter-warn {
+    color: #dc3545;
+    font-weight: 500;
+  }
+
+.reject-textarea {
+  width: 100%;
+  border: 1px solid #4ba3e3;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+  color: #212529;
+}
+
+  .reject-textarea:focus {
+    border-color: #215378;
+    box-shadow: none;
+  }
+
+  .reject-textarea.reject-textarea-error {
+    border-color: #dc3545;
+  }
+
+.reject-error-msg {
+  font-size: 11px;
+  color: #dc3545;
+  margin-top: 4px;
+  display: block;
+}
+
+.reject-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.reject-cancel-btn {
+  padding: 7px 20px;
+  border-radius: 8px;
+  border: 1px solid #4796BD;
+  background: transparent;
+  color: #4796BD;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+  .reject-cancel-btn:hover {
+    background: #E8F1F8;
+  }
+
+.reject-confirm-btn {
+  padding: 7px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #dc3545;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+  .reject-confirm-btn:hover {
+    background: #b02a37;
+  }
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.form-control:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.form-select:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Cursor pointer for interactive elements */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Tab button styling */
+.tab-btn {
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+  .tab-btn:hover {
+    transform: translateY(-1px);
+  }
+
+/* Card styling */
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(33, 83, 120, 0.1);
+}
+
+/* Form validation styles */
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: none !important;
+}
+
+/* Utility spacing */
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.pb-4 {
+  padding-bottom: 1.5rem;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-end {
+  align-items: flex-end;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.fw-normal {
+  font-weight: 400;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+.py-3 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+.filter-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

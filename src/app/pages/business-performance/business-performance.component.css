@@ -1,0 +1,73 @@
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+.active-hot {
+  background-color: #E45E2E;
+  transition: 0.3s;
+}
+
+  .active-hot p {
+    color: white !important;
+  }
+
+.active-warm {
+  background-color: #D59D3E;
+  transition: 0.3s;
+}
+
+  .active-warm p {
+    color: white !important;
+  }
+
+.active-box {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+  .active-box p, .active-box h6, .active-box div {
+    color: white !important;
+  }
+
+.enquiry-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+
+#enquiryTable {
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+
+  #enquiryTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  #enquiryTable tbody td {
+    border: 1px solid #dee2e6;
+  }
+
+  #enquiryTable thead tr:first-child th {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    box-shadow: inset 0 1px 0 #1a4a65, inset 0 -1px 0 #1a4a65;
+  }
+
+  #enquiryTable thead tr:nth-child(2) th {
+    position: sticky;
+    top: 36px;
+    z-index: 10;
+    box-shadow: inset 0 -1px 0 #1a4a65;
+  }

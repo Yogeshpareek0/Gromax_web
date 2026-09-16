@@ -1,0 +1,741 @@
+<div class="container-fluid px-0">
+  <div class="dashboard-container">
+    <!--Loading State-->
+    <div *ngIf="isLoading" class="loading-spinner">
+      <div class="spinner-border"></div>
+      <p class="mt-1">Loading dashboard...</p>
+    </div>
+
+    <!--Dashboard Sections-->
+
+    <div *ngIf="!isLoading && currentDashboard" class="row">
+      <div *ngFor="let section of currentDashboard.sections" [ngClass]="getColumnClass(section.columnWidth)" class="mb-4">
+        <div class="section-container" [id]="'section-' + section.id">
+          <!--Section Header-->
+          <div class="section-header">
+            <div class="section-header-left"></div>
+
+            <div class="section-actions" [id]="'actions-' + section.id">
+              <!--Refresh Button-->
+              <button class="refresh-btn"
+                      (click)="refreshSection(section.id)"
+                      *ngIf="currentSectionReports[section.id]">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+
+              <!--Export Dropdown-->
+              <div class="export-dropdown"
+                   *ngIf="currentSectionReports[section.id]?.config?.ViewConfig?.ExportOptions as exportOpts">
+                <button class="export-btn"
+                        (click)="toggleExportMenu(section.id)"
+                        *ngIf="exportOpts.AllowExcelExport || exportOpts.AllowPDFExport || exportOpts.AllowCSVExport || exportOpts.AllowCopyToClipboard">
+                  <i class="fas fa-download"></i> Export
+                </button>
+
+                <div class="export-menu"
+                     [class.show]="exportMenuOpen[section.id]"
+                     (click)="$event.stopPropagation()">
+                  <div *ngIf="exportOpts.AllowExcelExport"
+                       class="export-menu-item"
+                       (click)="exportSectionToExcel(section.id)">
+                    <i class="fas fa-file-excel" style="color: #28a745;"></i> Export to Excel
+                  </div>
+
+                  <div *ngIf="exportOpts.AllowCSVExport"
+                       class="export-menu-item"
+                       (click)="exportSectionToCSV(section.id)">
+                    <i class="fas fa-file-csv" style="color: #007bff;"></i> Export to CSV
+                  </div>
+
+                  <div *ngIf="exportOpts.AllowCopyToClipboard"
+                       class="export-menu-item"
+                       (click)="copySectionToClipboard(section.id)">
+                    <i class="fas fa-copy" style="color: #6c757d;"></i> Copy to Clipboard
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--Parameters Panel-->
+          <ng-container *ngIf="currentSectionReports[section.id]?.config?.Parameters as params">
+            <!--<div class="parameters-panel" *ngIf="params.length > 0">-->
+            <div class="parameters-panel" *ngIf="getVisibleParameters(params).length > 0">
+              <!-- Collapsible Header -->
+              <div class="filter-header" (click)="toggleFilterPanel(section.id)" style="cursor: pointer;display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #f8f9fa;border-radius: 6px; user-select: none;">
+                <h5 style="margin: 0; font-size: 15px; font-weight: 600; color: #495057;">
+                  <i class="fas fa-filter" style="margin-right: 4px; color: #007bff;"></i>
+                  Filters
+                  <span style="font-size: 12px; font-weight: 400; color: #6c757d; margin-left: 8px;">
+                    ({{ getVisibleParameters(params).length }} filter{{ getVisibleParameters(params).length > 1 ? 's' : '' }})
+                  </span>
+                </h5>
+                <i class="fas"
+                   [ngClass]="filterPanelOpen[section.id] ? 'fa-chevron-up' : 'fa-chevron-down'"
+                   style="color: #6c757d; transition: transform 0.3s ease;"></i>
+              </div>
+
+              <!-- Collapsible Content -->
+              <div *ngIf="filterPanelOpen[section.id]">
+                <form [id]="'param-form-' + section.id" class="p-3">
+                  <div class="row">
+                    <!-- ADD FINANCIAL YEAR DROPDOWN -->
+                    <div *ngIf="isComparativeBDCReport(section.id)"
+                         [ngClass]="getParamColClass(getVisibleParameters(params).length + 1, section.columnWidth)">
+                      <div class="parameter-group">
+                        <label class="mb-0">
+                          Financial Year
+                          <span class="required">*</span>
+                        </label>
+                        <select class="form-control param-input"
+                                [(ngModel)]="currentSectionParams[section.id]['FinancialYear']"
+                                (ngModelChange)="onDropdownChange(section.id, 'FinancialYear', $event)"
+                                name="FinancialYear">
+                          <option *ngFor="let fy of financialYearOptions" [ngValue]="fy.value">
+                            {{ fy.label }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div *ngFor="let param of getVisibleParameters(params)"
+                         [ngClass]="getParamColClass(getVisibleParameters(params).length, section.columnWidth)">
+                      <div class="parameter-group">
+                        <label class="mb-0">
+                          {{ param.DisplayName || param.Name }}
+                          <span *ngIf="param.IsRequired" class="required">*</span>
+                        </label>
+
+                        <!-- Text Input -->
+                        <input *ngIf="param.DataType === 'Text'"
+                               type="text"
+                               class="form-control param-input"
+                               [(ngModel)]="currentSectionParams[section.id][param.Name]"
+                               [name]="param.Name">
+
+                        <!-- Number Input -->
+                        <input *ngIf="param.DataType === 'Number'"
+                               type="number"
+                               class="form-control param-input"
+                               [(ngModel)]="currentSectionParams[section.id][param.Name]"
+                               [name]="param.Name">
+
+                        <!-- Date Input -->
+                        <input *ngIf="param.DataType === 'Date' || param.DataType === 'DateTime'"
+                               type="date"
+                               class="form-control param-input"
+                               [(ngModel)]="currentSectionParams[section.id][param.Name]"
+                               [name]="param.Name">
+
+                        <!-- Dropdown Input -->
+                        <select *ngIf="param.DataType === 'Dropdown'"
+                                class="form-control param-input"
+                                [(ngModel)]="currentSectionParams[section.id][param.Name]"
+                                (ngModelChange)="onDropdownChange(section.id, param.Name, $event)"
+                                [name]="param.Name">
+                          <option value="">-- Select {{ param.DisplayName || param.Name }} --</option>
+                          <option *ngFor="let opt of getDropdownOptionsForParam(section.id, param.Name)"
+                                  [ngValue]="opt.value">
+                            {{ opt.label }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                    <!-- ✅ CUSTOM DATE RANGE FIELDS (Inline in same row) -->
+                    <ng-container *ngIf="showCustomDateRange[section.id]">
+
+                      <!-- Start Month -->
+                      <div [ngClass]="getParamColClass(4, section.columnWidth)">
+                        <div class="parameter-group">
+                          <label class="mb-0">
+                            Start Month
+                            <span class="required">*</span>
+                          </label>
+                          <select class="form-control param-input"
+                                  [(ngModel)]="currentSectionParams[section.id]['StartMonth']"
+                                  name="StartMonth">
+                            <option value="">Select Month</option>
+                            <option *ngFor="let month of monthOptions" [ngValue]="month.value">
+                              {{ month.label }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Start Year -->
+                      <div [ngClass]="getParamColClass(4, section.columnWidth)">
+                        <div class="parameter-group">
+                          <label class="mb-0">
+                            Start Year
+                            <span class="required">*</span>
+                          </label>
+                          <select class="form-control param-input"
+                                  [(ngModel)]="currentSectionParams[section.id]['StartYear']"
+                                  name="StartYear">
+                            <option value="">Select Year</option>
+                            <option *ngFor="let year of yearOptions" [ngValue]="year">
+                              {{ year }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- End Month -->
+                      <div [ngClass]="getParamColClass(4, section.columnWidth)">
+                        <div class="parameter-group">
+                          <label class="mb-0">
+                            End Month
+                            <span class="required">*</span>
+                          </label>
+                          <select class="form-control param-input"
+                                  [(ngModel)]="currentSectionParams[section.id]['EndMonth']"
+                                  name="EndMonth">
+                            <option value="">Select Month</option>
+                            <option *ngFor="let month of monthOptions" [ngValue]="month.value">
+                              {{ month.label }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- End Year -->
+                      <div [ngClass]="getParamColClass(4, section.columnWidth)">
+                        <div class="parameter-group">
+                          <label class="mb-0">
+                            End Year
+                            <span class="required">*</span>
+                          </label>
+                          <select class="form-control param-input"
+                                  [(ngModel)]="currentSectionParams[section.id]['EndYear']"
+                                  name="EndYear">
+                            <option value="">Select Year</option>
+                            <option *ngFor="let year of yearOptions" [ngValue]="year">
+                              {{ year }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                    </ng-container>
+                  </div>
+
+                  <!-- Apply Filters Button -->
+                  <div class="row mt-3">
+                    <div class="col-12">
+                      <button type="button"
+                              class="apply-filters-btn"
+                              (click)="applyFilters(section.id)">
+                        <i class="fas fa-search"></i> Apply Filters
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </ng-container>
+
+          <!--Section Body-->
+          <div class="section-body print-area" [id]="'body-' + section.id">
+
+            <!--Report Views-->
+            <ng-container *ngIf="currentSectionData[section.id] as data; else loadingSection">
+              <!--Table View-->
+              <div *ngIf="currentSectionReports[section.id]?.config?.ViewConfig?.ViewType === 'Table'"
+                   [style.background-color]="currentSectionReports[section.id].config.ViewConfig.BackgroundColor"
+                   [style.color]="currentSectionReports[section.id].config.ViewConfig.TextColor"
+                   class="report-view-container">
+
+                <div class="table-toolbar mb-2" *ngIf="data?.rows?.length">
+
+                  <!-- LEFT SIDE -->
+                  <div class="toolbar-left">
+                    <!-- ✅ ONLY SHOW GROUP BY IF NOT BUSINESS MASTER -->
+                    <select class="form-select form-select-sm group-select"
+                            *ngIf="shouldShowGroupBy(section.id)"
+                            [(ngModel)]="groupByColumn[section.id]"
+                            (change)="onGroupByChange(section.id)">
+                      <option [ngValue]="null">All Records (No Group)</option>
+
+                      <ng-container *ngFor="let col of data.columns">
+                        <option *ngIf="isTextColumn(section.id, col) && columnVisibility[section.id][col]"
+                                [ngValue]="col">
+                          {{ col }}
+                        </option>
+                      </ng-container>
+                    </select>
+                  </div>
+
+                  <!-- RIGHT SIDE -->
+                  <div class="toolbar-right">
+                    <button class="btn btn-sm btn-warning customize-btn"
+                            (click)="toggleFreezeManager(section.id)">
+                      <i class="fas fa-thumbtack"></i> Freeze Columns
+                    </button>
+
+                    <button class="btn btn-sm btn-secondary customize-btn"
+                            (click)="toggleColumnManager(section.id)">
+                      <i class="fas fa-cog"></i> Customize Columns
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Freeze column manager -->
+                <div class="column-managers card shadow-sm"
+                     *ngIf="freezeManagerOpen === section.id">
+                  <div class="card-header py-2 px-3">
+                    <i class="fas fa-thumbtack me-1"></i> Freeze Columns
+                  </div>
+
+                  <div class="card-body p-2 column-list">
+                    <ng-container *ngFor="let col of data.columns">
+                      <label class="column-item" *ngIf="columnVisibility[section.id][col] && isInFirstFourVisible(section.id, col)">
+                        <input type="checkbox"
+                               [checked]="isFrozen(section.id, col)"
+                               (change)="onFreezeCheckboxChange(section.id, col, $event)">
+                        <span>{{ col }}</span>
+                      </label>
+                    </ng-container>
+                  </div>
+                </div>
+
+                <!-- Column show / hide -->
+                <div class="column-manager card shadow-sm" *ngIf="columnManagerOpen === section.id">
+                  <div class="card-header py-2 px-3">
+                    <i class="fas fa-eye me-1"></i> Show/Hide Columns
+                  </div>
+                  <div class="card-body p-2 column-list">
+
+                    <!-- SELECT ALL -->
+                    <label class="column-item fw-normal border-bottom pb-1 mb-1"
+                           style="background:#f1f3f5; border-radius:4px; padding: 4px 6px;">
+                      <input type="checkbox"
+                             [checked]="isAllColumnsVisible(section.id, data.columns)"
+                             [indeterminate]="isSomeColumnsVisible(section.id, data.columns)"
+                             (change)="toggleAllColumns(section.id, data.columns, $event)" />
+                      <span style="color:#215378;">Select All</span>
+                    </label>
+
+                    <!-- Individual Columns -->
+                    <label class="column-item" *ngFor="let col of data.columns">
+                      <input type="checkbox"
+                             [(ngModel)]="columnVisibility[section.id][col]"
+                             (change)="onColumnVisibilityChange(section.id, col)" />
+                      <span>{{ col }}</span>
+                    </label>
+
+                  </div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- COMPLETE TABLE CODE WITH DISPLAY NAMES -->
+                <!-- Replace your entire table section with this -->
+                <!-- ============================================ -->
+
+                <div class="table-scroll-wrapper" *ngIf="data.rows && data.rows.length > 0; else noData">
+                  <table class="table table-striped report-table table-bordered"
+                         [class.has-grouped-headers]="hasColumnGrouping(section.id)">
+                    <thead>
+
+                      <!-- ============================================ -->
+                      <!-- FIRST ROW: ONLY SHOW IF GROUPING EXISTS -->
+                      <!-- ============================================ -->
+                      <tr *ngIf="hasColumnGrouping(section.id)">
+                        <ng-container *ngFor="let col of data.columns">
+                          <ng-container *ngIf="columnVisibility[section.id][col]">
+
+                            <!-- Grouped column - show group header -->
+                            <ng-container *ngIf="isColumnInGroup(section.id, col)">
+                              <ng-container *ngIf="shouldShowGroupHeader(section.id, col)">
+                                <ng-container *ngIf="getColumnGroupInfo(section.id, col) as groupInfo">
+                                  <th [attr.colspan]="getGroupColspan(section.id, groupInfo.groupIndex)"
+                                      class="text-center group-header"
+                                      [style.background]="groupInfo.group.color || '#1a4d6d'"
+                                      [style.border-right]="'2px solid #fff'"
+                                      style="color:#fff;font-weight:bold;padding:12px 8px;">
+                                    {{ groupInfo.group.groupName }}
+                                  </th>
+                                </ng-container>
+                              </ng-container>
+                            </ng-container>
+
+                            <!-- Non-grouped column - rowspan=2 -->
+                            <th *ngIf="!isColumnInGroup(section.id, col)"
+                                [attr.rowspan]="2"
+                                class="position-relative"
+                                [class.freeze-col]="isFrozen(section.id, col)"
+                                [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                                [style.width.px]="columnWidths[section.id][col]"
+                                [style.min-width.px]="columnWidths[section.id][col]"
+                                [style.max-width.px]="columnWidths[section.id][col]"
+                                style="background:#215378;color:#fff;vertical-align:middle;">
+                              <span class="filter-icon"
+                                    (click)="toggleColumnFilter(section.id, col, $event)"
+                                    style="cursor:pointer">
+                                ▼
+                              </span>
+                              <span>{{ col }}</span>
+
+                              <!-- Filter dropdown -->
+                              <div class="column-filter-dropdown"
+                                   *ngIf="activeFilterCol?.sectionId === section.id && activeFilterCol?.col === col">
+                                <input type="text"
+                                       class="form-control form-control-sm filter-search"
+                                       placeholder="Search..."
+                                       [(ngModel)]="columnSearchText[section.id][col]"
+                                       (click)="$event.stopPropagation()" />
+
+                                <label class="filter-item fw-bold border-bottom pb-1 mb-1">
+                                  <input type="checkbox"
+                                         [checked]="isAllSelected(section.id, col)"
+                                         (change)="toggleSelectAll(section.id, col, $event)">
+                                  <span>Select All</span>
+                                </label>
+
+                                <div class="filter-list">
+                                  <label class="filter-item"
+                                         *ngFor="let val of getFilteredColumnValues(section.id, col)">
+                                    <input type="checkbox"
+                                           [checked]="columnFilters[section.id][col].includes(val)"
+                                           (change)="onColumnFilterChange(section.id, col, val, $event)">
+                                    <span>{{ val === '__BLANK__' ? '(Blank)' : val }}</span>
+                                  </label>
+                                </div>
+
+                                <div class="filter-footer">
+                                  <button class="btn btn-sm btn-link text-danger p-0"
+                                          (click)="clearColumnFilter(section.id, col, $event)">
+                                    Clear
+                                  </button>
+                                </div>
+                              </div>
+                            </th>
+
+                          </ng-container>
+                        </ng-container>
+                      </tr>
+
+                      <!-- ============================================ -->
+                      <!-- SECOND ROW: GROUPED SUB-HEADERS OR SIMPLE HEADERS -->
+                      <!-- ============================================ -->
+                      <tr>
+                        <ng-container *ngFor="let col of data.columns">
+
+                          <!-- FOR GROUPED REPORTS: Show sub-headers -->
+                          <th *ngIf="hasColumnGrouping(section.id) && isColumnInGroup(section.id, col) && columnVisibility[section.id][col]"
+                              class="position-relative"
+                              [class.freeze-col]="isFrozen(section.id, col)"
+                              [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                              [style.width.px]="columnWidths[section.id][col]"
+                              [style.min-width.px]="columnWidths[section.id][col]"
+                              [style.max-width.px]="columnWidths[section.id][col]"
+                              [style.background]="getColumnGroupInfo(section.id, col)?.group?.subHeaderColor || '#215378'"
+                              style="color:#fff">
+                            <span class="filter-icon"
+                                  (click)="toggleColumnFilter(section.id, col, $event)"
+                                  style="cursor:pointer">
+                              ▼
+                            </span>
+                            <span>{{ getColumnDisplayName(section.id, col) }}</span>
+
+                            <!-- Filter dropdown -->
+                            <div class="column-filter-dropdown"
+                                 *ngIf="activeFilterCol?.sectionId === section.id && activeFilterCol?.col === col">
+                              <input type="text"
+                                     class="form-control form-control-sm filter-search"
+                                     placeholder="Search..."
+                                     [(ngModel)]="columnSearchText[section.id][col]"
+                                     (click)="$event.stopPropagation()" />
+
+                              <label class="filter-item fw-bold border-bottom pb-1 mb-1">
+                                <input type="checkbox"
+                                       [checked]="isAllSelected(section.id, col)"
+                                       (change)="toggleSelectAll(section.id, col, $event)">
+                                <span>Select All</span>
+                              </label>
+
+                              <div class="filter-list">
+                                <label class="filter-item"
+                                       *ngFor="let val of getFilteredColumnValues(section.id, col)">
+                                  <input type="checkbox"
+                                         [checked]="columnFilters[section.id][col].includes(val)"
+                                         (change)="onColumnFilterChange(section.id, col, val, $event)">
+                                  <span>{{ val === '__BLANK__' ? '(Blank)' : val }}</span>
+                                </label>
+                              </div>
+
+                              <div class="filter-footer">
+                                <button class="btn btn-sm btn-link text-danger p-0"
+                                        (click)="clearColumnFilter(section.id, col, $event)">
+                                  Clear
+                                </button>
+                              </div>
+                            </div>
+                          </th>
+
+                          <!-- FOR NON-GROUPED REPORTS: Simple single header -->
+                          <th *ngIf="!hasColumnGrouping(section.id) && columnVisibility[section.id][col]"
+                              class="position-relative"
+                              [class.freeze-col]="isFrozen(section.id, col)"
+                              [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                              [style.width.px]="columnWidths[section.id][col]"
+                              [style.min-width.px]="columnWidths[section.id][col]"
+                              [style.max-width.px]="columnWidths[section.id][col]"
+                              style="background:#215378;color:#fff">
+                            <span class="filter-icon"
+                                  (click)="toggleColumnFilter(section.id, col, $event)"
+                                  style="cursor:pointer">
+                              ▼
+                            </span>
+                            <span>{{ col }}</span>
+
+                            <!-- Filter dropdown -->
+                            <div class="column-filter-dropdown"
+                                 *ngIf="activeFilterCol?.sectionId === section.id && activeFilterCol?.col === col">
+                              <input type="text"
+                                     class="form-control form-control-sm filter-search"
+                                     placeholder="Search..."
+                                     [(ngModel)]="columnSearchText[section.id][col]"
+                                     (click)="$event.stopPropagation()" />
+
+                              <label class="filter-item fw-bold border-bottom pb-1 mb-1">
+                                <input type="checkbox"
+                                       [checked]="isAllSelected(section.id, col)"
+                                       (change)="toggleSelectAll(section.id, col, $event)">
+                                <span>Select All</span>
+                              </label>
+
+                              <div class="filter-list">
+                                <label class="filter-item"
+                                       *ngFor="let val of getFilteredColumnValues(section.id, col)">
+                                  <input type="checkbox"
+                                         [checked]="columnFilters[section.id][col].includes(val)"
+                                         (change)="onColumnFilterChange(section.id, col, val, $event)">
+                                  <span>{{ val === '__BLANK__' ? '(Blank)' : val }}</span>
+                                </label>
+                              </div>
+
+                              <div class="filter-footer">
+                                <button class="btn btn-sm btn-link text-danger p-0"
+                                        (click)="clearColumnFilter(section.id, col, $event)">
+                                  Clear
+                                </button>
+                              </div>
+                            </div>
+                          </th>
+
+                        </ng-container>
+                      </tr>
+                    </thead>
+
+                    <!-- ============================================ -->
+                    <!-- TABLE BODY - REMAINS SAME -->
+                    <!-- ============================================ -->
+                    <tbody>
+                      <!-- Total Row -->
+                      <tr class="bg-light"
+                          *ngIf="(!currentSectionReports[section.id]?.name?.toLowerCase()?.includes('industry') || currentSectionReports[section.id]?.name?.toLowerCase()?.includes('taluka')) && !currentSectionReports[section.id]?.name?.toLowerCase()?.includes('price position')">
+                        <ng-container *ngFor="let col of data.columns">
+                          <td *ngIf="columnVisibility[section.id][col]"
+                              [class.freeze-col]="isFrozen(section.id, col)"
+                              [class.negative-cell]="isNegativeValue(getColumnTotal(section.id, col), section.id, col, {})"
+                              [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                              [style.width.px]="columnWidths[section.id][col]"
+                              [style.min-width.px]="columnWidths[section.id][col]"
+                              [style.max-width.px]="columnWidths[section.id][col]"
+                              [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
+                            {{ formatDecimal(getColumnTotal(section.id, col)) }}
+                          </td>
+                        </ng-container>
+                      </tr>
+
+                      <!-- Grouped Rows -->
+                      <ng-container *ngIf="groupByColumn[section.id]">
+                        <ng-container *ngFor="let g of getGroupedDataWithSum(section.id)">
+                          <!-- Grouped summary row -->
+                          <tr class="group-row fw-bold">
+                            <ng-container *ngFor="let col of data.columns">
+                              <td *ngIf="columnVisibility[section.id][col]"
+                                  [class.freeze-col]="isFrozen(section.id, col)"
+                                  [class.negative-cell]="col !== groupByColumn[section.id] && isNegativeValue(g.sums[col])"
+                                  [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                                  [style.width.px]="columnWidths[section.id][col]"
+                                  [style.min-width.px]="columnWidths[section.id][col]"
+                                  [style.max-width.px]="columnWidths[section.id][col]"
+                                  [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
+
+                                <ng-container *ngIf="col === groupByColumn[section.id]">
+                                  <span style="cursor:pointer" (click)="toggleGroupRow(section.id, g.mapKey)">
+                                    <i class="fas"
+                                       [ngClass]="expandedGroups[section.id][g.mapKey] ? 'fa-minus-circle text-danger' : 'fa-plus-circle text-success'">
+                                    </i>
+                                  </span>
+                                  {{ g.key }}
+                                </ng-container>
+
+                                <ng-container *ngIf="col !== groupByColumn[section.id] && (!currentSectionReports[section.id]?.name?.toLowerCase()?.includes('industry') || currentSectionReports[section.id]?.name?.toLowerCase()?.includes('taluka'))">
+                                  {{ formatDecimal(g.sums[col]) }}
+                                </ng-container>
+                              </td>
+                            </ng-container>
+                          </tr>
+
+                          <!-- Grouped Rows - Detail rows -->
+                          <ng-container *ngIf="expandedGroups[section.id][g.mapKey]">
+                            <tr *ngFor="let r of g.rows">
+                              <ng-container *ngFor="let col of data.columns">
+                                <td *ngIf="columnVisibility[section.id][col]"
+                                    [style.text-align]="isUrlColumn(col) ? 'center' : null"
+                                    [style.vertical-align]="isUrlColumn(col) ? 'middle' : null"
+                                    [class.freeze-col]="isFrozen(section.id, col)"
+                                    [class.negative-cell]="isNegativeValue(r[col], section.id, col, r)"
+                                    [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                                    [style.width.px]="columnWidths[section.id][col]"
+                                    [style.min-width.px]="columnWidths[section.id][col]"
+                                    [style.max-width.px]="columnWidths[section.id][col]"
+                                    [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
+
+                                  <ng-container *ngIf="isUrlColumn(col); else normalCellG">
+                                    <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer"
+                                       title="View"
+                                       style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
+                                      View Image
+                                    </a>
+                                    <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+                                  </ng-container>
+                                  <ng-template #normalCellG>
+                                    {{ r[col] }}
+                                  </ng-template>
+
+                                </td>
+                              </ng-container>
+                            </tr>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+
+                      <!-- Regular Rows -->
+                      <ng-container *ngIf="!groupByColumn[section.id]">
+                        <tr *ngFor="let r of getFilteredRows(section.id)">
+                          <ng-container *ngFor="let col of data.columns">
+                            <td *ngIf="columnVisibility[section.id][col]"
+                                [style.text-align]="isUrlColumn(col) ? 'center' : null"
+                                [style.vertical-align]="isUrlColumn(col) ? 'middle' : null"
+                                [class.freeze-col]="isFrozen(section.id, col)"
+                                [class.negative-cell]="isNegativeValue(r[col], section.id, col, r)"
+                                [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                                [style.width.px]="columnWidths[section.id][col]"
+                                [style.min-width.px]="columnWidths[section.id][col]"
+                                [style.max-width.px]="columnWidths[section.id][col]"
+                                [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
+
+                              <ng-container *ngIf="isUrlColumn(col); else normalCell">
+                                <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer"
+                                   title="View"
+                                   style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
+                                  View Image
+                                </a>
+                                <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+                              </ng-container>
+                              <ng-template #normalCell>
+                                {{ r[col] }}
+                              </ng-template>
+
+                            </td>
+                          </ng-container>
+                        </tr>
+                      </ng-container>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="text-right mt-2 totalCount" style="font-size: 0.9em;">
+                  Total Records: {{ data.rows.length }}
+                </div>
+              </div>
+
+              <!--Summary View-->
+              <div *ngIf="currentSectionReports[section.id]?.config?.ViewConfig?.ViewType === 'Summary'"
+                   [style.background-color]="currentSectionReports[section.id].config.ViewConfig.BackgroundColor"
+                   [style.color]="currentSectionReports[section.id].config.ViewConfig.TextColor"
+                   class="report-view-container">
+
+                <div class="row" *ngIf="data.rows && data.rows.length > 0; else noData">
+                  <div *ngFor="let box of currentSectionReports[section.id].config.ViewConfig.SummaryBoxes"
+                       class="col-md-6 col-lg-4 mb-3">
+                    <div class="summary-box"
+                         [style.background]="box.Color || currentSectionReports[section.id].config.ViewConfig.PrimaryColor">
+                      <i *ngIf="box.Icon" [class]="'fas ' + box.Icon"></i>
+                      <h3>{{ formatNumber(calculateSummaryValue(data, box)) }}</h3>
+                      <p>{{ box.Title || 'Summary' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!--Details View-->
+              <div *ngIf="currentSectionReports[section.id]?.config?.ViewConfig?.ViewType === 'Details'"
+                   [style.background-color]="currentSectionReports[section.id].config.ViewConfig.BackgroundColor"
+                   [style.color]="currentSectionReports[section.id].config.ViewConfig.TextColor"
+                   class="report-view-container">
+
+                <ng-container *ngIf="data.rows && data.rows.length > 0; else noData">
+                  <div *ngFor="let row of data.rows.slice(0, 10); let i = index"
+                       class="details-card"
+                       [style.border-left-color]="currentSectionReports[section.id].config.ViewConfig.PrimaryColor">
+                    <h5 [style.color]="currentSectionReports[section.id].config.ViewConfig.PrimaryColor">
+                      Record {{ i + 1 }}
+                    </h5>
+                    <p *ngFor="let col of data.columns">
+                      <strong>{{ col }}:</strong> {{ row[col] || 'N/A' }}
+                    </p>
+                  </div>
+
+                  <p *ngIf="data.rows.length > 10" class="text-center mt-3">
+                    Showing 10 of {{ data.rows.length }} records
+                  </p>
+                </ng-container>
+              </div>
+
+              <!--Chart View-->
+              <div *ngIf="currentSectionReports[section.id]?.config?.ViewConfig?.ViewType === 'Chart'"
+                   [style.background-color]="currentSectionReports[section.id].config.ViewConfig.BackgroundColor"
+                   class="report-view-container">
+
+                <ng-container *ngIf="data.rows && data.rows.length > 0; else noData">
+                  <div class="chart-container">
+                    <canvas [id]="'chart-' + section.id"></canvas>
+
+                    <!--PRINT IMAGE-->
+                    <img [id]="'chart-img-' + section.id"
+                         style="display:none; width:150%;" />
+                  </div>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Section Template -->
+  <ng-template #loadingSection>
+    <div class="loading-spinner" style="padding: 40px 20px;">
+      <div class="spinner-border"></div>
+      <p class="mt-1">Loading report...</p>
+    </div>
+  </ng-template>
+
+
+  <!-- No Data Template -->
+  <ng-template #noData>
+    <div class="no-data-message">
+      <i class="fas fa-database"></i>
+      <h5 class="mb-0">No Data Found</h5>
+      <p>
+        There is no data available for the selected filters.<br /> Try adjusting filters or refresh the report.
+      </p>
+    </div>
+  </ng-template>
+</div>

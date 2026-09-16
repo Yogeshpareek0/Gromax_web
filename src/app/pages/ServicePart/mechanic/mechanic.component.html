@@ -1,0 +1,508 @@
+<div class="container-fluid px-0">
+  <!-- Tab Navigation -->
+  <div class="d-flex mb-4">
+    <!-- List Tab - Sab ko dikhega -->
+    <button class="btn tab-btn me-2 px-3 py-2"
+            [ngClass]="{ 'custom-btn': activeTab === 'list', 'btn-outline': activeTab !== 'list' }"
+            (click)="showList()" style="font-size:14px">
+      <i class="fa-solid fa-list me-2"></i>Mechanic List
+    </button>
+
+    <!-- Add Mechanic Tab - Sirf Dealer ko -->
+    <button class="btn tab-btn me-2 px-3 py-2"
+            *ngIf="positionId === 'Dealer'"
+            [ngClass]="{ 'custom-btn': activeTab === 'create'||activeTab === 'update', 'btn-outline': activeTab !== 'create' && activeTab !== 'update' }"
+            (click)="showCreate()" style="font-size:14px">
+      {{ activeTab === 'update' ? 'Update Mechanic' : 'Add Mechanic' }}
+    </button>
+
+    <!-- Approval Tab - Sab ko dikhega -->
+    <button class="btn tab-btn px-3 py-2"
+            [ngClass]="{ 'custom-btn': activeTab === 'approval', 'btn-outline': activeTab !== 'approval' }"
+            (click)="showApproval()" style="font-size:14px">
+      <i class="fa-solid fa-check-circle me-2"></i>Approval
+    </button>
+
+    <!-- Export Button -->
+    <button class="text-white border-0 rounded me-2"
+            [ngClass]="{ 'custom-btn': activeTab === 'approval', 'btn-outline': activeTab !== 'approval' }"
+            style="background-color:#4796BD;padding:6px 16px;font-size:14px;margin-left:10px;"
+            (click)="exportToExcel()">
+      <i class="fas fa-download"></i>
+    </button>
+  </div>
+
+  <!-- Add / Update Mechanic Form -->
+  <div *ngIf="(activeTab === 'create' || activeTab === 'update')" class="card shadow-sm rounded-3">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Mechanic Name -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="mechanicName" name="mechanicName" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !mechanicName}"
+                   [disabled]="activeTab==='update'">
+            <label>Mechanic Name</label>
+          </div>
+        </div>
+
+        <!-- Contact Number -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="contactNo" name="contactNo" maxlength="10"
+                   class="form-control" pattern="[0-9]{0,10}"
+                   (keypress)="allowNumbersOnly($event)"
+                   [ngClass]="{'is-invalid': submitClicked && (!contactNo || !isPhoneValid(contactNo))}"
+                   [disabled]="activeTab==='update'">
+            <label>Contact No.</label>
+          </div>
+        </div>
+
+        <!-- Aadhar Card Number -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="aadharNo" name="aadharNo" maxlength="12"
+                   class="form-control" pattern="[0-9]{0,12}"
+                   (keypress)="allowNumbersOnly($event)"
+                   [ngClass]="{'is-invalid': submitClicked && !aadharNo}"
+                   [disabled]="activeTab==='update'">
+            <label>Aadhar Card No.</label>
+          </div>
+        </div>
+
+        <!-- Type of Mechanic -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="typeOfMechanic" name="typeOfMechanic" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !typeOfMechanic}"
+                    [disabled]="activeTab==='update'">
+              <option value="" disabled selected hidden></option>
+              <option value="Contract">Contract</option>
+              <option value="Dealer">Dealer</option>
+            </select>
+            <label>Type of Mechanic</label>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="education" name="education" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !education}"
+                   [disabled]="activeTab==='update'">
+            <label>Education</label>
+          </div>
+        </div>
+
+        <!-- Experience in Dealership -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="number" [(ngModel)]="experienceInDealership" name="experienceInDealership" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !experienceInDealership}"
+                   min="0"
+                   [disabled]="activeTab==='update'">
+            <label>Experience in Dealership [Years]</label>
+          </div>
+        </div>
+
+        <!-- Prior Experience in Tractor -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="text" [(ngModel)]="priorExperience" name="priorExperience" class="form-control"
+                   [disabled]="activeTab==='update'">
+            <label>Prior Experience in Tractor</label>
+          </div>
+        </div>
+
+        <!-- Prior Experience Years -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="number" [(ngModel)]="priorExperienceYears" name="priorExperienceYears" class="form-control"
+                   min="0" [disabled]="activeTab==='update'">
+            <label>No. of years</label>
+          </div>
+        </div>
+
+        <!-- Total Experience -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="number" [(ngModel)]="totalExperience" name="totalExperience" class="form-control"
+                   min="0" [disabled]="activeTab==='update'">
+            <label>Total Experience [Years]</label>
+          </div>
+        </div>
+
+        <!-- Physical Training Count -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="number" [(ngModel)]="physicalTraining" name="physicalTraining" class="form-control"
+                   min="0" [disabled]="activeTab==='update'">
+            <label>No. of Trainings (Physical)</label>
+          </div>
+        </div>
+
+        <!-- Virtual Training Count -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="number" [(ngModel)]="virtualTraining" name="virtualTraining" class="form-control"
+                   min="0" [disabled]="activeTab==='update'">
+            <label>No. of Trainings (Virtual)</label>
+          </div>
+        </div>
+
+        <!-- Installation Attendance -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="installationAttendance" name="installationAttendance" class="form-select">
+              <option value="" disabled selected hidden></option>
+              <option value="Attend">Attend</option>
+              <option value="Not Attend">Not Attend</option>
+            </select>
+            <label>Installation</label>
+          </div>
+        </div>
+
+        <!-- Hydraulic Attendance -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="hydraulicAttendance" name="hydraulicAttendance" class="form-select">
+              <option value="" disabled selected hidden></option>
+              <option value="Attend">Attend</option>
+              <option value="Not Attend">Not Attend</option>
+            </select>
+            <label>Hydraulic</label>
+          </div>
+        </div>
+
+        <!-- Engine Attendance -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="engineAttendance" name="engineAttendance" class="form-select">
+              <option value="" disabled selected hidden></option>
+              <option value="Attend">Attend</option>
+              <option value="Not Attend">Not Attend</option>
+            </select>
+            <label>Engine</label>
+          </div>
+        </div>
+
+        <!-- Complete Tractor Training -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="completeTraining" name="completeTraining" class="form-select">
+              <option value="" disabled selected hidden></option>
+              <option value="Completed">Completed</option>
+              <option value="Not Completed">Not Completed</option>
+            </select>
+            <label>Complete Tractor Training</label>
+          </div>
+        </div>
+
+        <!-- System and Process -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="systemProcess" name="systemProcess" class="form-select">
+              <option value="" disabled selected hidden></option>
+              <option value="Completed">Completed</option>
+              <option value="Not Completed">Not Completed</option>
+            </select>
+            <label>System and Process</label>
+          </div>
+        </div>
+
+        <!-- Current Status -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="currentStatus" name="currentStatus" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !currentStatus}">
+              <option value="" disabled selected hidden></option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <label>Current Status</label>
+          </div>
+        </div>
+
+        <!-- Date of Inactive (sirf jab Inactive ho) -->
+        <div class="col-lg-3 col-sm-6" *ngIf="currentStatus === 'Inactive'">
+          <div class="form-floating-custom">
+            <input type="date" [(ngModel)]="inactiveDate" name="inactiveDate" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && currentStatus === 'Inactive' && !inactiveDate}">
+            <label>Date of Inactive</label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-auto pb-4">
+          <button class="btn custom-btn px-4 py-2" (click)="onSubmitMechanic()">
+            {{ activeTab === 'create' ? 'Submit' : 'Update' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mechanic List Section -->
+  <div *ngIf="activeTab === 'list'">
+    <div class="filter-box">
+
+      <div class="row g-3">
+
+        <!-- Start Date -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="date"
+                   [(ngModel)]="filterStartDate"
+                   name="filterStartDate"
+                   class="form-control">
+            <label>Start Date</label>
+          </div>
+        </div>
+
+        <!-- End Date -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <input type="date"
+                   [(ngModel)]="filterEndDate"
+                   name="filterEndDate"
+                   class="form-control"
+                   [max]="getLastDateOfCurrentMonth()">
+            <label>End Date</label>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="filterApprovalStatus"
+                    name="filterApprovalStatus"
+                    class="form-select">
+              <option value="" disabled hidden></option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <label>Status</label>
+          </div>
+        </div>
+
+        <div class="col-auto pb-4">
+          <button class="btn custom-btn px-4 py-2" (click)="loadMechanicList()">
+            Filter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper">
+      <table id="mechanicTable" class="table table-bordered table-striped" style="min-width: 1600px;">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px; width:10px">S.No.</th>
+            <th class="text-nowrap fw-normal" style="width:10px;" *ngIf="positionId === 'Service CCM'">Action</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">State Name</th>
+            <th class="text-nowrap fw-normal">Location</th>
+
+            <th class="text-nowrap fw-normal">Mechanic Name</th>
+            <th class="text-nowrap fw-normal">Contact No.</th>
+            <th class="text-nowrap fw-normal">Aadhar Card No.</th>
+            <th class="text-nowrap fw-normal">Type</th>
+            <th class="text-nowrap fw-normal">Education</th>
+            <th class="text-nowrap fw-normal">Exp. in Dealership</th>
+            <th class="text-nowrap fw-normal">Prior Exp.</th>
+            <th class="text-nowrap fw-normal">Total Exp.</th>
+            <th class="text-nowrap fw-normal">Physical</th>
+            <th class="text-nowrap fw-normal">Virtual</th>
+            <th class="text-nowrap fw-normal">Installation</th>
+            <th class="text-nowrap fw-normal">Hydraulic</th>
+            <th class="text-nowrap fw-normal">Engine</th>
+            <th class="text-nowrap fw-normal">Training</th>
+            <th class="text-nowrap fw-normal">System</th>
+
+            <th class="text-nowrap fw-normal">Approval Status</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Remark</th>
+
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr *ngFor="let item of mechanicList; let i = index;">
+            <td>{{ i + 1 }}</td>
+            <td *ngIf="positionId === 'Service CCM'" class="text-center">
+              <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+                 style="font-size:14px" title="Update Mechanic" (click)="onRowClick(item)"></i>
+            </td>
+            <td class="text-nowrap">{{item.dealerCode}}</td>
+
+            <td class="text-nowrap">{{item.dealerName}}</td>
+            <td class="text-nowrap">{{item.stateName}}</td>
+            <td class="text-nowrap">{{item.location}}</td>
+            <td class="text-nowrap">{{ item.mechanicName }}</td>
+            <td class="text-nowrap">{{ item.contactNo }}</td>
+            <td class="text-nowrap">{{ item.aadharCardNo }}</td>
+            <td class="text-nowrap">{{ item.typeOfMechanic }}</td>
+            <td class="text-nowrap">{{ item.education }}</td>
+            <td class="text-nowrap">{{ item.experienceInGromax }}</td>
+            <td class="text-nowrap">{{ item.priorExperience }}</td>
+            <td class="text-nowrap">{{ item.totalExperience }}</td>
+            <td class="text-nowrap">{{ item.physicalTrainingCount }}</td>
+            <td class="text-nowrap">{{ item.virtualTrainingCount }}</td>
+            <td class="text-nowrap">{{ item.installationAttendance }}</td>
+            <td class="text-nowrap">{{ item.hydraulicAttendance }}</td>
+            <td class="text-nowrap">{{ item.engineAttendance }}</td>
+            <td class="text-nowrap">{{ item.completeTractorTraining }}</td>
+            <td class="text-nowrap">{{ item.systemAndProcess }}</td>
+            <td class="text-nowrap">
+              <span class="kyc-badge"
+                    [ngClass]="{
+      'badge-approved': item.approvalStatus === 'Approved',
+      'badge-pending': item.approvalStatus === 'Pending',
+      'badge-rejected': item.approvalStatus === 'Rejected'
+    }">
+                {{ item.approvalStatus }}
+              </span>
+            </td>
+            <td class="text-nowrap">{{ item.rejectedRemark??'-'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Approval Section -->
+  <div *ngIf="activeTab === 'approval'">
+
+    <div class="enquiry-table-wrapper">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th class="text-nowrap fw-normal" style="width:10px; border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">State Name</th>
+            <th class="text-nowrap fw-normal">Location</th>
+            <th class="text-nowrap fw-normal">Mechanic Name</th>
+            <th class="text-nowrap fw-normal">Contact No.</th>
+            <th class="text-nowrap fw-normal">Type</th>
+            <th class="text-nowrap fw-normal">Education</th>
+            <th class="text-nowrap fw-normal">Total Experience</th>
+            <th class="text-nowrap fw-normal">Status</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Action</th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <ng-container *ngIf="approvalList.length > 0; else noApprovalData">
+            <tr *ngFor="let item of approvalList; let i = index;">
+              <td>{{ i + 1 }}</td>
+              <td class="text-nowrap">{{item.dealerCode}}</td>
+
+              <td class="text-nowrap">{{item.dealerName}}</td>
+              <td class="text-nowrap">{{item.stateName}}</td>
+              <td class="text-nowrap">{{item.location}}</td>  
+              <td class="text-nowrap">{{ item.mechanicName }}</td>
+              <td class="text-nowrap">{{ item.contactNo }}</td>
+              <td class="text-nowrap">{{ item.typeOfMechanic }}</td>
+              <td class="text-nowrap">{{ item.education }}</td>
+              <td class="text-nowrap">{{ item.totalExperience }}</td>
+              <td class="text-nowrap">
+                <span class="kyc-badge"
+                      [ngClass]="{
+                    'badge-approved': item.approvalStatus === 'Approved',
+                    'badge-pending': item.approvalStatus === 'Pending',
+                    'badge-rejected': item.approvalStatus === 'Rejected'
+                  }">
+                  {{ item.approvalStatus }}
+                </span>
+              </td>
+
+              <td class="text-nowrap">
+                <!-- Approve button sirf CCM ko -->
+                <button class="kyc-approve-btn me-1"
+                        *ngIf="positionId === 'Service CCM' && item.approvalStatus === 'Pending'"
+                        title="Approve"
+                        (click)="onApproveAction(item)">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <!-- Reject button sirf CCM ko -->
+                <button class="kyc-reject-btn"
+                        *ngIf="positionId === 'Service CCM' && item.approvalStatus === 'Pending'"
+                        title="Reject"
+                        (click)="openRejectModal(item)">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+                <!-- Agar CCM nahi hai -->
+                <span *ngIf="positionId !== 'Service CCM'">-</span>
+              </td>
+            </tr>
+          </ng-container>
+          <ng-template #noApprovalData>
+            <tr>
+              <td colspan="12" class="text-center text-muted py-3" style="font-size:13px;">
+                No approval records found.
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Reject Remark Modal -->
+<div class="modal-backdrop-custom" *ngIf="showRejectModal" (click)="closeRejectModal()"></div>
+
+<div class="reject-modal-wrap" *ngIf="showRejectModal">
+  <div class="reject-modal" (click)="$event.stopPropagation()">
+
+    <div class="reject-modal-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="reject-icon-circle">
+          <i class="fa-solid fa-xmark"></i>
+        </span>
+        <span class="reject-modal-title">Reject Mechanic</span>
+      </div>
+      <button class="reject-close-btn" (click)="closeRejectModal()" title="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="reject-modal-body">
+      <p class="reject-salesman-name">
+        <i class="fa-solid fa-user me-1" style="color:#215378"></i>
+        {{ rejectTargetItem?.mechanicName }}
+      </p>
+
+      <label class="reject-label">
+        Remark <span style="color:#dc3545">*</span>
+
+        <span class="remark-counter"
+              [ngClass]="{'remark-counter-warn': remarkWordCount > 90}">
+          {{ remarkWordCount }} / 100 characters
+        </span>
+      </label>
+
+      <textarea class="reject-textarea"
+                [(ngModel)]="rejectRemark"
+                (input)="onRemarkInput()"
+                placeholder="Enter reason for rejection... (Max 100 characters)"
+                rows="4"
+                maxlength="100"
+                [ngClass]="{'reject-textarea-error': rejectSubmitClicked && !remarkHasContent}">
+</textarea>
+
+      <span class="reject-error-msg"
+            *ngIf="rejectSubmitClicked && !remarkHasContent">
+        Remark is required.
+      </span>
+    </div>
+
+    <div class="reject-modal-footer">
+      <button class="reject-cancel-btn" (click)="closeRejectModal()">Cancel</button>
+      <button class="reject-confirm-btn" (click)="confirmReject()">
+        <i class="fa-solid fa-xmark me-1"></i> Confirm Reject
+      </button>
+    </div>
+
+  </div>
+</div>

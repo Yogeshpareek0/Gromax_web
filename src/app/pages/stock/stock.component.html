@@ -1,0 +1,136 @@
+<div class="container-fluid px-0">
+
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row">
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label for="reportFilter" class="form-label fw-medium mb-0">Report Filters</label>
+        <select class="form-select" [(ngModel)]="selectedFilter" (ngModelChange)="datefilterchange($event)">
+          <option selected value="">All</option>
+          <option value="Month">Month</option>
+          <option value="Quarter">Quarter</option>
+          <option value="Financial Year">Financial Year</option>
+          <option value="Custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+        <label for="startDate" class="form-label fw-medium mb-0">Start Date</label>
+        <input type="date" id="startDate" class="form-control" [(ngModel)]="startdate_val">
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="displayDateInputs">
+        <label for="endDate" class="form-label fw-medium mb-0">End Date</label>
+        <input type="date" id="endDate" class="form-control" [(ngModel)]="enddate_val">
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showSH">
+        <label for="am" class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showAM">
+        <label for="am" class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showTM">
+        <label for="tm" class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showDealer">
+        <label for="dealer" class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select" [(ngModel)]="selectedDealer">
+          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end">
+        <button class="btn w-100 custom-btn" (click)="onShowReport()">
+          <i class="bi bi-clipboard-data"></i> Show Report
+        </button>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end">
+        <button class="btn w-100 custom-btn" (click)="exportToExcel()">
+          <i class="fas fa-download pe-2"></i> Download
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="input-group mt-4" style="max-width: 430px;">
+    <span class="input-group-text">
+      <i class="fa fa-search"></i>
+    </span>
+    <input #mobileInput type="text" class="form-control" placeholder="Search chassis no..." aria-label="Search">
+    <button class="btn text-white" type="button"
+            style="font-size: 15px; background-color: #4796BD" (click)="searchValue(mobileInput)">
+      Search
+    </button>
+  </div>
+
+  <div class="mt-3" style="overflow-x: auto; width: 100%;">
+    <table id="enquiryTable" class="table table-bordered table-striped mt-3" style="min-width: 1200px;">
+      <thead>
+        <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap py-3 fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th *ngIf="showSH" class="text-nowrap py-3 fw-normal">State Head Name</th>
+          <th *ngIf="showAM" class="text-nowrap py-3 fw-normal">AM Name</th>
+          <th *ngIf="showTM" class="text-nowrap py-3 fw-normal">TM Name</th>
+          <th class="text-nowrap py-3 fw-normal">Dealer Code</th>
+          <th class="text-nowrap py-3 fw-normal">Dealer Name</th>
+          <th class="text-nowrap py-3 fw-normal">Billing Date</th>
+          <th class="text-nowrap py-3 fw-normal">Chasis No</th>
+          <th class="text-nowrap py-3 fw-normal">Tractor Sr.Number</th>
+          <th class="text-nowrap py-3 fw-normal">Model</th>
+          <th class="text-nowrap py-3 fw-normal">Drive Type</th>
+          <th class="text-nowrap py-3 fw-normal">Colour</th>
+          <th class="text-nowrap py-3 fw-normal">Product Details</th>
+          <th class="text-nowrap py-3 fw-normal">Stock Aging</th>
+          <!--<th class="text-nowrap py-3 fw-normal">Transfer By</th>
+          <th class="text-nowrap py-3 fw-normal">Customer Id</th>
+          <th class="text-nowrap py-3 fw-normal">Sale Date</th>
+          <th class="text-nowrap py-3 fw-normal">Sold By</th>-->
+          <th class="text-nowrap py-3 fw-normal" style="border-top-right-radius: 8px;">Status</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of paginatedInventryData; let i = index">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td *ngIf="showSH" class="text-nowrap py-3">{{ item.StateHead }}</td>
+          <td *ngIf="showAM" class="text-nowrap py-3">{{ item.Am }}</td>
+          <td *ngIf="showTM" class="text-nowrap py-3">{{ item.Tm }}</td>
+          <td class="text-nowrap py-3">{{ item.DealerCode }}</td>
+          <td class="text-nowrap py-3">{{ item.DealerName }}</td>
+          <td class="text-nowrap py-3">{{ item.BillingDate | date:'dd-MM-yyyy' }}</td>
+          <td class="text-nowrap py-3">{{ item.chasisno }}</td>
+          <td class="text-nowrap py-3">{{ item.TractorSrNumber }}</td>
+          <td class="text-nowrap py-3">{{ item.Model }}</td>
+          <td class="text-nowrap py-3">{{ item.DriveType }}</td>
+          <td class="text-nowrap py-3">{{ item.Colour }}</td>
+          <td class="text-nowrap py-3">{{ item.ProductDetails }}</td>
+          <td class="text-nowrap py-3">{{ getAgeing(item.BillingDate) }} days</td>
+          <!--<td class="text-nowrap py-3">{{ item.TransferBy }}</td>
+          <td>{{ item.EntryTime | date:'dd-MM-yyyy HH:mm' }}</td>
+          <td class="text-nowrap py-3">{{ item.CustomerId }}</td>
+          <td class="text-nowrap py-3">{{ item.SaleDate  | date:'dd-MM-yyyy'}}</td>
+          <td class="text-nowrap py-3">{{ item.SoldBy }}</td>-->
+          <td class="text-nowrap py-3">{{ item.Status }}</td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>

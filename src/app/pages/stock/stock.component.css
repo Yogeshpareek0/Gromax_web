@@ -1,0 +1,23 @@
+.menu-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+.active-box {
+  background-color: #4796BD;
+  transition: 0.3s;
+}
+
+  .active-box h5, .active-box h6 {
+    color: white !important;
+  }

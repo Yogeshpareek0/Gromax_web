@@ -1,0 +1,143 @@
+<div class="container-fluid px-0">
+  <!-- Filter Section -->
+
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row g-3 align-items-end mb-3">
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-group-custom">
+          <label class="form-label-custom">Chassis No.</label>
+          <input type="text" class="form-control form-control-custom" [ngClass]="{'border-danger': searchError}" placeholder="Enter Chassis Number" [(ngModel)]="searchValue" (input)="searchError = false" />
+          <small *ngIf="searchError" class="text-danger">
+            Please enter Chassis Number
+          </small>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6" [ngClass]="searchError ? 'align-self-center' : 'align-self-end'">
+        <button class="btn custom-btn" (click)="onShowReport()">
+          <i class="bi bi-clipboard-data"></i>
+          <span>Filter</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive mt-4" *ngIf="rcStatusList.length > 0">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">Customer Name</th>
+          <th class="text-nowrap fw-normal">Model Name</th>
+          <th class="text-nowrap fw-normal">Model Code</th>
+          <th class="text-nowrap fw-normal">Drive Type</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Chassis Number</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of rcStatusList; let i = index;" style="cursor:pointer">
+          <td class="text-nowrap">{{ i + 1 }}</td>
+          <td class="text-center">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+               title="Update RC Status"
+               (click)="onRowClick(item)">
+            </i>
+          </td>
+          <td class="text-nowrap">{{ item.CustomerName }}</td>
+          <td class="text-nowrap">{{ item.ModelName }}</td>
+          <td class="text-nowrap">{{ item.Modelcode }}</td>
+          <td class="text-nowrap">{{ item.DriveType }}</td>
+          <td class="text-nowrap">{{ item.ChassisNumber }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="viewMoreModal" tabindex="-1" aria-labelledby="viewMoreLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0" id="viewMoreLabel">
+            <i class="bi bi-pencil-square me-2"></i>Update RC Status
+          </h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="closeModal()">
+        </button>
+      </div>
+      <div class="modal-body p-4">
+        <div *ngIf="selectedItem">
+          <div class="customer-details-card mb-4">
+            <div class="card-header-custom mb-2">
+              <i class="bi bi-person-circle me-2"></i>Customer Details
+            </div>
+            <div class="details-grid">
+              <div class="detail-item">
+                <div class="detail-label">Customer Name</div>
+                <div class="detail-value">{{ selectedItem.CustomerName }}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Chassis Number</div>
+                <div class="detail-value">{{ selectedItem.ChassisNumber }}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Model Name</div>
+                <div class="detail-value">{{ selectedItem.ModelName }}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Model Code</div>
+                <div class="detail-value">{{ selectedItem.Modelcode }}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Drive Type</div>
+                <div class="detail-value">{{ selectedItem.DriveType }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="update-form-card">
+            <div class="row g-3">
+              <!-- RC Status -->
+              <div class="col-md-6">
+                <label class="form-label-modern">
+                  RC Status <span class="text-danger">*</span>
+                </label>
+                <select class="form-select-modern" [ngClass]="{'border-danger': rcStatusError}" [(ngModel)]="selectedRcStatus" (change)="onRcStatusChange(); rcStatusError = false">
+                  <option value="">Select Status</option>
+                  <option value="Not Done">Not Done</option>
+                  <option value="Done">Done</option>
+                </select>
+                <div style="min-height:20px">
+                  <small *ngIf="rcStatusError" class="text-danger">
+                    Please select RC Status
+                  </small>
+                </div>
+              </div>
+
+              <!-- Registration Number -->
+              <div class="col-md-6" *ngIf="selectedRcStatus === 'Done'">
+                <label class="form-label-modern">
+                  Registration Number <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control-modern" [(ngModel)]="registrationNumber"
+                       (input)="registrationError = false" placeholder="e.g., DL01AB1234" maxlength="13" autocomplete="off">
+                <div style="min-height:20px">
+                  <small *ngIf="registrationError" class="text-danger">
+                    Please enter Registration Number
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal Footer -->
+      <div class="modal-footer p-3 d-flex justify-content-center">
+        <button type="button" class="btn btn-submit" (click)="onSubmit()">
+          <i class="bi bi-check-circle me-1"></i> Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

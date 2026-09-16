@@ -1,0 +1,545 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm border-0 px-4 py-3 mt-2" style="border-radius:16px;">
+
+    <div class="row">
+
+      <!-- DEALER CODE -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 placeholder=""
+                 [(ngModel)]="dealerCode"
+                 (blur)="getbillingreqdata()"
+                 name="dealerCode">
+          <label>Dealer Code</label>
+        </div>
+      </div>
+
+      <!-- DEALER -->
+      <div class="col-xl-6 col-lg-8 col-md-12">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.Dealer"
+                 name="Dealer"
+                 readonly>
+          <label>Dealer Name</label>
+        </div>
+      </div>
+
+      <!-- D.O.A -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="date"
+                 class="form-control"
+                 [ngModel]="billingReqData.DateOfAppointment | date:'yyyy-MM-dd'"
+                 name="DateOfAppointment"
+                 readonly>
+          <label>D.O.A.</label>
+        </div>
+      </div>
+
+      <!-- TENURE -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.Tenure"
+                 name="Tenure"
+                 readonly>
+          <label>Tenure</label>
+        </div>
+      </div>
+
+      <!-- OP JUL 23 -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.opOSasOn1stJul23"
+                 name="opOSasOn1stJul23"
+                 readonly>
+          <label>OP Jul'23</label>
+        </div>
+      </div>
+
+      <!-- OP APR 24 -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.opOSasOn1stApr24"
+                 name="opOSasOn1stApr24"
+                 readonly>
+          <label>OP Apr'24</label>
+        </div>
+      </div>
+
+      <!-- OP APR 25 -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.opOSasOn1stApr25"
+                 name="opOSasOn1stApr25"
+                 readonly>
+          <label>OP Apr'25</label>
+        </div>
+      </div>
+
+      <!-- OP APR 26 -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.opOSasOn1stApr26"
+                 name="opOSasOn1stApr26"
+                 readonly>
+          <label>OP Apr'26</label>
+        </div>
+      </div>
+
+      <!-- OPENING OS -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.opOSCurrentMonth"
+                 name="opOSCurrentMonth"
+                 readonly>
+          <label>Opening OS</label>
+        </div>
+      </div>
+
+      <!-- BILLING TILL DATE -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.BillingTillDate"
+                 name="BillingTillDate"
+                 readonly>
+          <label>Billing Till Date</label>
+        </div>
+      </div>
+
+      <!-- COLLECTION TILL DATE -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.CollTillDate"
+                 name="CollTillDate"
+                 readonly>
+          <label>Collection Till Date</label>
+        </div>
+      </div>
+
+      <!-- CURRENT OS -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control fw-bold"
+                 [(ngModel)]="billingReqData.OSasOnDate"
+                 name="OSasOnDate"
+                 readonly>
+          <label>Current OS</label>
+        </div>
+      </div>
+
+      <!-- AGING -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData._0To30os"
+                 name="_0To30os"
+                 readonly>
+          <label>0-30 Days</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData._31To60os"
+                 name="_31To60os"
+                 readonly>
+          <label>31-60 Days</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData._61To90os"
+                 name="_61To90os"
+                 readonly>
+          <label>61-90 Days</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData._91To120os"
+                 name="_91To120os"
+                 readonly>
+          <label>91-120 Days</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData._121To150os"
+                 name="_121To150os"
+                 readonly>
+          <label>121-150 Days</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData._151To180os"
+                 name="_151To180os"
+                 readonly>
+          <label>151-180 Days</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.Above180os"
+                 name="Above180os"
+                 readonly>
+          <label>>180 Days</label>
+        </div>
+      </div>
+
+      <!-- PDD -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.PDD"
+                 name="PDD" readonly>
+          <label>PDD likely - {{currentMonth}}</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.PDD_YTD"
+                 name="PDD_YTD" readonly>
+          <label>PDD YTD - {{currentFY}}</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.PDD_CLosingLastYear"
+                 name="PDD_CLosingLastYear" readonly>
+          <label>PDD - {{currentFY}}</label>
+        </div>
+      </div>
+
+      <!-- REQ BILLING -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="reqBilling"
+                 (input)="calculateAll()"
+                 name="reqBilling">
+          <label>Req Billing Value (L)</label>
+        </div>
+      </div>
+
+      <!-- TODAY COLLECTION -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="todayCollection"
+                 (input)="calculateAll()"
+                 name="todayCollection">
+          <label>Today Coll (L)</label>
+        </div>
+      </div>
+
+      <!-- OS AFTER BILLING -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control fw-bold"
+                 [(ngModel)]="osAfterBilling"
+                 name="osAfterBilling"
+                 readonly>
+          <label>OS After Billing</label>
+        </div>
+      </div>
+
+      <!-- OP STOCK -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OPStock"
+                 name="OPStock"
+                 readonly>
+          <label>OP Stock</label>
+        </div>
+      </div>
+
+      <!-- OP ADV -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OPAdvance"
+                 name="OPAdvance"
+                 readonly>
+          <label>OP Adv</label>
+        </div>
+      </div>
+
+      <!-- STOCK > 60 -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OPStockMoreThan60"
+                 name="OPStockMoreThan60"
+                 readonly>
+          <label>Stock >60</label>
+        </div>
+      </div>
+
+      <!-- ADV > 60 -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OPAdvanceMoreThan60"
+                 name="OPAdvanceMoreThan60"
+                 readonly>
+          <label>Adv >60</label>
+        </div>
+      </div>
+
+      <!-- FURTHER COLLECTION -->
+      <!--<div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="form-floating-custom">
+      <input type="number"
+             class="form-control"
+             [(ngModel)]="furtherCollection"
+             (input)="calculateAll()"
+             name="furtherCollection">
+      <label>Further Coll (L)</label>
+    </div>
+  </div>-->
+      <!-- FURTHER COLLECTION PLAN -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="furtherCollectionPlan"
+                 (input)="calculateAll()"
+                 name="furtherCollectionPlan">
+          <label>Further Coll Plan (L)</label>
+        </div>
+      </div>
+
+      <!-- CLOSING OS -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control fw-bold"
+                 [(ngModel)]="closingOS"
+                 name="closingOS"
+                 readonly>
+          <label>Closing OS</label>
+        </div>
+      </div>
+
+      <!-- BG -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.BG"
+                 name="BG"
+                 readonly>
+          <label>BG Value</label>
+        </div>
+      </div>
+
+      <!-- UNSECURED OS -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control fw-bold text-danger"
+                 [(ngModel)]="unsecuredOS"
+                 name="unsecuredOS"
+                 readonly>
+          <label>Unsecured OS</label>
+        </div>
+      </div>
+
+      <!-- PFS -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OP_Pfs1stApr24"
+                 name="OP_Pfs1stApr24"
+                 readonly>
+          <label>PFS Apr'24</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OP_Pfs1stApr26"
+                 name="OP_Pfs1stApr26"
+                 readonly>
+          <label>PFS Apr'26</label>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.OP_PfsCurrentMonth"
+                 name="OP_PfsCurrentMonth"
+                 readonly>
+          <label>Current Month OP PFS</label>
+        </div>
+      </div>
+
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="PfsImprovPlan"
+                 name="PfsImprovPlan">
+          <label>PFS Improv Plan (Current Month)</label>
+        </div>
+      </div>
+      <!-- PENDING CN -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="text"
+                 class="form-control"
+                 [(ngModel)]="billingReqData.PendingCNHold"
+                 name="PendingCNHold"
+                 readonly>
+          <label>Pending CN</label>
+        </div>
+      </div>
+
+      <!-- NEW BG -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="newBG"
+                 name="newBG"
+                 (input)="calculateAll()">
+          <label>New BG (Current Month)</label>
+        </div>
+      </div>
+
+      <!-- FURTHER BILLING -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="furtherBilling"
+                 (input)="calculateAll()"
+                 name="furtherBilling">
+          <label>Further Billing (L)</label>
+        </div>
+      </div>
+      <!-- FINAL CL OS -->
+
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control fw-bold"
+                 [(ngModel)]="finalClosingOS"
+                 name="finalClosingOS"
+                 readonly>
+          <label>Final CL OS</label>
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control fw-bold text-success"
+                 [(ngModel)]="closingUnseOs"
+                 name="closingUnseOs"
+                 readonly>
+          <label>Closing Unsecured Os</label>
+        </div>
+      </div>
+      <!-- CLOSING NET SECURITY -->
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="form-floating-custom">
+          <input type="number"
+                 class="form-control fw-bold text-success"
+                 [(ngModel)]="closingNetSecurity"
+                 name="closingNetSecurity"
+                 readonly>
+          <label>Closing Net Security</label>
+        </div>
+      </div>
+
+
+
+
+      <!-- BUTTON -->
+
+      <div class="col-12 text-center mt-4">
+        <button class="btn btn-custom px-5" (click)="downloadExcel()">
+          Download Excel
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

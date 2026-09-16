@@ -1,0 +1,189 @@
+<div class="container-fluid px-0">
+
+  <!-- Card - Single Row Layout -->
+  <div class="card shadow-sm border-0 px-3 py-2" style="border-radius: 14px;">
+    <div class="d-flex align-items-end gap-3">
+
+      <!-- File Input -->
+      <div class="d-flex flex-column gap-1" style="max-width: 350px;">
+        <label for="uploadExcel" class="mb-0" style="font-size: 14px;">
+          Upload Excel
+          <small class="text-danger">(Only .xlsx files are allowed)</small>
+        </label>
+        <input type="file"
+               id="uploadExcel"
+               class="form-control-file form-control form-control-sm"
+               accept=".xlsx"
+               (change)="onFileChange($event)"
+               #fileInput />
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex align-items-center gap-2 pb-1">
+        <button class="btn btn-outline-success btn-sm text-nowrap" (click)="downloadExcel()">
+          <i class="fas fa-download me-1"></i> Download Excel Format
+        </button>
+        <button class="btn btn-sm text-white text-nowrap"
+                style="background-color: #4796BD; font-size: 14px;"
+                (click)="submitExcel()">
+          <i class="fas fa-check-circle me-2"></i> Upload Stock Transfer
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="search-wrapper mt-4">
+    <div class="input-group custom-search-group">
+      <span class="input-group-text bg-white border-0">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      </span>
+      <input type="text" class="form-control border-0 shadow-none" placeholder="Search by sap & chassis" [(ngModel)]="globalFilter">
+      <button class="btn search-btn text-white" type="button" (click)="searchFilter()">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Table - Same as before -->
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">Bill Dealer Code</th>
+          <th class="text-nowrap fw-normal">Current Dealer Code</th>
+          <th class="text-nowrap fw-normal">Current Dealer Name</th>
+          <th class="text-nowrap fw-normal">Current Dealer State</th>
+          <th class="text-nowrap fw-normal">Chassis No</th>
+          <th class="text-nowrap fw-normal">Model Code</th>
+          <th class="text-nowrap fw-normal">Model Name</th>
+          <th class="text-nowrap fw-normal">Drive Type</th>
+          <th class="text-nowrap fw-normal">Hp Category</th>
+          <th class="text-nowrap fw-normal">Colour</th>
+          <th class="text-nowrap fw-normal">Billing Date</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Invoice No</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let record of stockrecord; let i = index">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-center" (click)="onAction(record)">
+            <i class="fa-solid fa-arrow-up-right-from-square text-primary cursor-pointer"></i>
+          </td>
+          <td>{{ record.BillingDealerCode }}</td>
+          <td>{{ record.currentDealercode }}</td>
+          <td>{{ record.currenyDealerName }}</td>
+          <td>{{ record.currentDealerState }}</td>
+          <td>{{ record.chasisno }}</td>
+          <td>{{ record.modelcode }}</td>
+          <td>{{ record.model }}</td>
+          <td>{{ record.DriveType }}</td>
+          <td>{{ record.HpCategory }}</td>
+          <td>{{ record.Colour }}</td>
+          <td>{{ record.BillDate }}</td>
+          <td>{{ record.InvoiceNo }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+ 
+
+
+</div>
+
+
+<div class="modal fade" id="viewMoreModal" tabindex="-1" aria-labelledby="viewMoreLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-header p-3 border-0" style="background-color: #215378">
+        <div class="text-white">
+          <h6 class="modal-title mb-0" id="viewMoreLabel">
+            Stock Details
+          </h6>
+        </div>
+        <button type="button" class="btn-close" style="filter: invert(1);" data-bs-dismiss="modal" (click)="onCancel()" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body px-3 pb-3 pt-4">
+        <div class="row">
+          <input type="hidden" [(ngModel)]="stockId" />
+
+          <div class="col-sm-6">
+            <div class="form-floating-custom mb-4">
+              <input type="text" [(ngModel)]="dealercode" class="form-control" readonly>
+              <label>Dealer Code</label>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="form-floating-custom mb-4">
+              <input type="text" [(ngModel)]="chassisno" class="form-control" readonly>
+              <label>Chassis No</label>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="form-floating-custom mb-4">
+              <input type="text" [(ngModel)]="modelcode" class="form-control" readonly>
+              <label>Model Code</label>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="form-floating-custom mb-4">
+              <input type="text" [(ngModel)]="billdate" class="form-control" readonly>
+              <label>Bill Date</label>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="form-floating-custom mb-3">
+              <input type="date" [(ngModel)]="returnDate"
+                     [min]="minDate"
+                     [max]="maxDate" class="form-control" (blur)="onReturnDateBlur()">
+              <label>Return Date</label>
+            </div>
+            <div *ngIf="errorMessage" class="text-danger fw-normal" style="font-size:12px;">
+              <i class="fa-solid fa-triangle-exclamation me-1" style="font-size:14px;"></i>
+              {{ errorMessage }}
+            </div>
+          </div>
+
+
+          <!--<div class="col-sm-6">
+    <div class="form-floating-custom mb-4">
+      <input type="text" [(ngModel)]="status" class="form-control" readonly>
+      <label>Status</label>
+    </div>
+  </div>-->
+          <!--<div class="col-sm-6" *ngIf="positionId !== 'Dealer'">
+    <div class="form-floating-custom">
+      <input type="text" [(ngModel)]="remark" class="form-control"
+             [readonly]="!showButtons"
+             (ngModelChange)="message = ''">
+      <label>Remark</label>
+    </div>
+    <div *ngIf="message" class="text-danger mt-2" style="font-size: 12px;">
+      <i class="fa-solid fa-circle-exclamation me-1"></i>{{ message }}
+    </div>
+  </div>-->
+
+            <div class="text-center mt-3" *ngIf="formValid">
+              <button class="custom-btn" (click)="submitReturn()">
+                <i class="fa-solid fa-check"></i> Submit
+              </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,662 @@
+.file-upload-wrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Hide actual input */
+.file-upload-input {
+  display: none;
+}
+
+/* Upload Box */
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  border: 2px dashed #667eea;
+  border-radius: 12px;
+  padding: 24px 16px;
+  cursor: pointer;
+  background-color: #f8f9ff;
+  transition: all 0.25s ease-in-out;
+  text-align: center;
+}
+
+  /* Hover */
+  .file-upload-label:hover {
+    background-color: #eef1ff;
+    border-color: #764ba2;
+  }
+
+  /* Upload Icon */
+  .file-upload-label i {
+    font-size: 2.4rem;
+    color: #667eea;
+    margin-bottom: 10px;
+  }
+
+/* Upload Text */
+.file-upload-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+.file-upload-text .main-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 4px;
+}
+
+/* Selected File Name */
+.file-name {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background-color: #e8f5e9;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+  .file-name i {
+    margin-right: 6px;
+    font-size: 1.1rem;
+  }
+
+/* =============================
+   Preview Button
+============================= */
+.btn-preview {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  padding: 10px 22px;
+  font-weight: 500;
+  transition: all 0.25s ease-in-out;
+}
+
+  .btn-preview:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-preview:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+
+@media (max-width: 576px) {
+  .file-upload-label {
+    min-height: 140px;
+    padding: 20px 14px;
+  }
+
+    .file-upload-label i {
+      font-size: 2rem;
+    }
+}
+
+.table-wrapper {
+  max-height: 500px;
+  overflow: auto;
+  border-radius: 8px;
+  position: relative;
+  background: #fff;
+}
+
+.preview-table {
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  border: 1px solid #dee2e6;
+}
+
+.custom-table-head th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #215378;
+  color: #fff;
+  font-weight: 400;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 0 !important;
+}
+
+  .custom-table-head th:first-child {
+    border-top-left-radius: 8px !important;
+  }
+
+  .custom-table-head th:last-child {
+    border-top-right-radius: 8px !important;
+  }
+
+
+.preview-table td {
+  font-size: 13px;
+  padding: 8px 16px;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-top: none;
+  border-bottom: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+}
+
+  .preview-table td:first-child,
+  .custom-table-head th:first-child {
+    border-left: 1px solid #dee2e6;
+  }
+
+.preview-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.preview-table tbody tr:hover {
+  background-color: #f5f8fb;
+}
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    max-height: 400px;
+  }
+
+  .custom-table-head th {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .preview-table td {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+
+.enquiry-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 10px 8px
+}
+
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8PX
+}
+
+
+/*price position*/
+/* ===== FORM CONTROLS ===== */
+.form-control,
+.form-select {
+  border-radius: 50px;
+  border: 1px solid #4ba3e3;
+  padding-left: 20px;
+}
+
+  .form-control:focus,
+  .form-select:focus {
+    box-shadow: none !important;
+    border-color: #4796BD;
+    outline: none;
+  }
+
+  .form-control::placeholder {
+    opacity: 0;
+  }
+
+/* ===== FLOATING LABEL ===== */
+.form-floating-custom {
+  position: relative;
+  margin-bottom: 1.8rem;
+}
+
+  .form-floating-custom input,
+  .form-floating-custom select {
+    height: 38px;
+    padding: 8px 20px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .form-floating-custom select {
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 35px;
+  }
+
+  /* Label default position */
+  .form-floating-custom label {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 8px;
+    font-size: 14px;
+    color: #6c757d;
+    z-index: 1;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+  }
+
+  /* Label float up on focus / value */
+  .form-floating-custom input:focus ~ label,
+  .form-floating-custom input:not(:placeholder-shown) ~ label,
+  .form-floating-custom select:focus ~ label,
+  .form-floating-custom select:not([value=""]):not([value=null]) ~ label,
+  .form-floating-custom.has-value label {
+    top: 0;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #4796BD;
+    font-weight: 500;
+    background: #fff;
+    padding: 1px;
+  }
+
+/* ===== READ ONLY ===== */
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+/* ===== DISABLED ===== */
+.form-control:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.form-select:disabled {
+  background-color: transparent !important;
+  background-image: none !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== FILE UPLOAD ===== */
+.file-upload-wrapper {
+  margin-bottom: 1.8rem;
+}
+
+.file-upload-box {
+  position: relative;
+  border: 1px solid #4ba3e3;
+  border-radius: 50px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0 16px;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: hidden;
+}
+
+  .file-upload-box:hover {
+    border-color: #4796BD;
+    background: #f0f8ff;
+  }
+
+  .file-upload-box.has-file {
+    border-color: #28a745;
+    background: #f0fff4;
+  }
+
+/* Floating label for file upload */
+.file-label-top {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #4796BD;
+  font-weight: 500;
+  background: #fff;
+  padding: 1px 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.file-upload-text {
+  font-size: 13px;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 30px);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.file-name-text {
+  color: #155724;
+  font-weight: 500;
+}
+
+.file-remove-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #dc3545;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2;
+  background: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+  .file-remove-btn:hover {
+    background: #dc3545;
+    color: #fff;
+  }
+
+/* ===== BUTTON ===== */
+.btn-primary {
+  background-color: #4796BD;
+  border-color: #4796BD;
+  border-radius: 50px;
+}
+
+  .btn-primary:hover {
+    background-color: #3a7a9a;
+    border-color: #3a7a9a;
+  }
+
+  .btn-primary:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+
+/* ===== CARD ===== */
+.card {
+  border-radius: 12px;
+}
+
+/* ===== AUTOFILL FIX ===== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+/*file input*/
+/* FILE UPLOAD BOX */
+.file-upload-box {
+  position: relative;
+  border: 1.5px dashed #4ba3e3;
+  border-radius: 50px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0 40px 0 18px;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: visible;
+}
+
+  .file-upload-box:hover {
+    border-color: #4796BD;
+    background: #f0f8ff;
+    border-style: solid;
+  }
+
+  .file-upload-box.has-file {
+    border-style: solid;
+    border-color: #28a745;
+    background: #f0fff4;
+  }
+
+/* Floating label — always at top (file fields mein label hamesha upar rahega) */
+.file-label-top {
+  position: absolute;
+  left: 16px;
+  top: -9px;
+  font-size: 11.5px;
+  color: #4796BD;
+  font-weight: 500;
+  background: #fff;
+  padding: 0 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.file-upload-box.has-file .file-label-top {
+  color: #28a745;
+}
+
+/* Inner text */
+.file-upload-text {
+  font-size: 13px;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.file-name-text {
+  color: #155724;
+  font-weight: 500;
+}
+
+/* Remove button */
+.file-remove-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #dc3545;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dc3545;
+  z-index: 2;
+}
+
+  .file-remove-btn:hover {
+    background: #dc3545;
+    color: #fff;
+  }
+
+/* ===== MULTI DROPDOWN WRAPPER ===== */
+.multi-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.8rem; /* same as form-floating-custom */
+}
+
+/* Floating Label - always on top */
+.multi-dropdown-label {
+  position: absolute;
+  top: -9px;
+  left: 16px;
+  font-size: 12px;
+  color: #4796BD;
+  font-weight: 500;
+  background: #fff;
+  padding: 0 4px;
+  z-index: 1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Toggle Box - same as form-control */
+.multi-dropdown-toggle {
+  min-height: 38px;
+  border: 1px solid #4ba3e3; /* same as form-control */
+  border-radius: 50px; /* same as form-control */
+  padding: 4px 36px 4px 16px;
+  cursor: pointer;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  position: relative;
+  font-size: 14px;
+  color: #333;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+  .multi-dropdown-toggle:hover,
+  .multi-dropdown-toggle:focus {
+    border-color: #4796BD;
+    outline: none;
+  }
+
+/* Placeholder */
+.multi-dropdown-placeholder {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Arrow Icon */
+.multi-dropdown-arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4ba3e3;
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+  .multi-dropdown-arrow.rotated {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+/* Selected Tag Chips */
+.multi-tag {
+  background-color: #E8F4FB;
+  color: #215378;
+  border: 1px solid #4796BD;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+  .multi-tag i {
+    cursor: pointer;
+    font-size: 10px;
+    color: #4796BD;
+  }
+
+    .multi-tag i:hover {
+      color: #c0392b;
+    }
+
+/* Dropdown Menu */
+.multi-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #4ba3e3;
+  border-radius: 12px;
+  z-index: 1050;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(71, 150, 189, 0.12);
+}
+
+/* Dropdown Item */
+.multi-dropdown-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  transition: background 0.15s;
+}
+
+  .multi-dropdown-item:hover {
+    background-color: #EBF5FB;
+  }
+
+  .multi-dropdown-item.selected {
+    background-color: #D6EAF8;
+    color: #215378;
+    font-weight: 500;
+  }
+
+  /* Check Icon */
+  .multi-dropdown-item .check-icon {
+    font-size: 11px;
+    color: #4796BD;
+    opacity: 0;
+    width: 12px;
+    flex-shrink: 0;
+  }
+
+  .multi-dropdown-item.selected .check-icon {
+    opacity: 1;
+  }
+
+/* Scrollbar */
+.multi-dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.multi-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #4ba3e3;
+  border-radius: 4px;
+}

@@ -1,0 +1,73 @@
+<div class="container-fluid px-0">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm rounded-3 p-3" style="background-color: #f8f9fa;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-muted mb-1">Total Enquiry</h6>
+            <h6 class="text-center mb-0">{{ totalItems }}</h6>
+          </div>
+          <button class="text-white border-0 rounded"
+                  style="background-color: #4796BD; padding: 6px 16px;font-size:14px"
+                  (click)="exportToExcel()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <!--<th *ngIf="showSH" class="text-nowrap fw-normal">State Head Name</th>
+          <th *ngIf="showAM" class="text-nowrap fw-normal">AM Name</th>
+          <th *ngIf="showTM" class="text-nowrap fw-normal">TM Name</th>-->
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">Dealer Code</th>
+          <th class="text-nowrap fw-normal">Dealer Name</th>
+          <th class="text-nowrap fw-normal">Location</th>
+          <th class="text-nowrap fw-normal">TM</th>
+          <th class="text-nowrap fw-normal">Prospect Name</th>
+          <th class="text-nowrap fw-normal">Prospect Mobile</th>
+          <th class="text-nowrap fw-normal">Enquiry Status</th>
+          <th class="text-nowrap fw-normal">Enquiry Source</th>
+          <th class="text-nowrap fw-normal">Enquiry Date</th>
+          <th class="text-nowrap fw-normal">Varient & BOM Code</th>
+          <th class="text-nowrap fw-normal">Interested Model</th>
+          <th class="text-nowrap fw-normal">Next Followup Date</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Expected Delivery Date</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of paginatedFollowUpList; let i = index;" (click)="onRowClick(item.Id)" style="cursor:pointer">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-center">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
+               title="Go to Enquiry"
+               (click)="onRowClick(item.Id)">
+            </i>
+          </td>
+          <td class="text-nowrap">{{ item.DealerCode }}</td>
+          <td class="text-nowrap">{{ item.DealerName }}</td>
+          <td class="text-nowrap">{{ item.DealerLocation }}</td>
+          <td class="text-nowrap">{{ item.Tm }}</td>
+
+          <td class="text-nowrap">{{ item.ProspectName }}</td>
+          <td class="text-nowrap">{{ item.ProspectMobile }}</td>
+          <td class="text-nowrap">{{ item.EnquiryStatus }}</td>
+          <td class="text-nowrap">{{ item.EnquirySource }}</td>
+          <td class="text-nowrap">{{ item.enquiryDate }}</td>
+          <td class="text-nowrap">{{ item.VarientOrBOMCode }}</td>
+          <td class="text-nowrap">{{ item.InterestedModel }}</td>
+          <td class="text-nowrap">{{ item.NextFollowupDate | date:'dd-MMM-yyyy'  }}</td>
+
+          <td class="text-nowrap">{{ item.ExpectedDeliveryDate | date:'dd-MMM-yyyy'  }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+</div>

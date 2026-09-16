@@ -1,0 +1,692 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     SEARCH MODE - Find eligible job card records
+     ═══════════════════════════════════════════════════════════════ -->
+
+<div class="jc-page" *ngIf="mode === 'search'">
+  <div class="jc-card search-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Search Job Card Eligible Records</span>
+    </div>
+
+    <div class="search-container">
+      <div class="search-controls">
+        <!-- Search By Dropdown -->
+        <div class="form-floating-custom search-by-dropdown">
+          <select [(ngModel)]="searchBy" [ngClass]="{'filled': searchBy}">
+            <option value="Chassis">Chassis No.</option>
+            <option value="Mobile">Mobile No.</option>
+          </select>
+          <label class="select-label">Search by</label>
+        </div>
+
+        <!-- Search Query Input -->
+        <div class="form-floating-custom search-query-input">
+          <input type="text"
+                 placeholder=" "
+                 [(ngModel)]="searchQuery"
+                 [disabled]="searchLoading" />
+          <label>{{ searchBy === 'Chassis' ? 'Chassis No.' : 'Mobile No.' }}</label>
+        </div>
+
+        <!-- Search Button -->
+        <button type="button"
+                class="search-btn"
+                (click)="searchJobCardEligible()"
+                [disabled]="searchLoading || !searchQuery.trim()">
+          <i class="fa fa-search" *ngIf="!searchLoading"></i>
+          <span *ngIf="!searchLoading">Search</span>
+          <span *ngIf="searchLoading">Searching...</span>
+        </button>
+      </div>
+
+      <!-- Search Results Table -->
+      <div class="search-results-container" *ngIf="searchResults.length > 0">
+        <div class="results-header">
+          <span *ngIf="!openJobListTag" class="results-count">{{ searchResults.length }} record(s) found</span>
+          <span *ngIf="openJobListTag" class="results-count">Open Job Card List</span>
+        </div>
+
+        <div class="results-table-wrapper">
+          <div class="enquiry-table-wrapper mt-3">
+            <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+
+              <thead>
+                <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 12px;">
+                  <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+                  <th class="text-nowrap fw-normal text-center">Action</th>
+                  <th class="text-nowrap fw-normal">Status</th>
+                  <th class="text-nowrap fw-normal">Chassis No.</th>
+                  <th class="text-nowrap fw-normal">Mobile No.</th>
+                  <th class="text-nowrap fw-normal">Customer Name</th>
+                  <th class="text-nowrap fw-normal">Dealer Name</th>
+                  <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;">Model</th>
+
+                </tr>
+              </thead>
+
+              <tbody style="font-size: 12px;">
+
+                <tr *ngFor="let result of searchResults; let i = index">
+
+                  <td>{{ i + 1 }}</td>
+                  <td class="text-center">
+
+                    <button type="button"
+                            class="action-btn"
+                            title="Open Job Card"
+                            (click)="selectSearchResult(result)">
+                      {{ result.IsClosed === false ? 'Update' : 'Open' }}
+                    </button>
+                  </td>
+                  <td class="text-nowrap">
+                    {{ result.IsClosed === false ? 'Open' : '-' }}
+                  </td>
+
+                  <td class="text-nowrap">
+                    {{ result.ChassisNo || '-' }}
+                  </td>
+
+                  <td class="text-nowrap">
+                    {{ result.MobileNo || '-' }}
+                  </td>
+
+                  <td class="text-nowrap">
+                    {{ result.CustomerName || '-' }}
+                  </td>
+
+                  <td class="text-nowrap">
+                    {{ result.DealerName || '-' }}
+                  </td>
+
+                  <td class="text-nowrap">
+                    {{ result.Model || '-' }}
+                  </td>
+
+                </tr>
+
+                <tr *ngIf="searchResults?.length == 0">
+                  <td colspan="7" class="text-center py-3">
+                    No Record Found
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Results Message -->
+      <div class="no-results-message" *ngIf="searchResults.length === 0 && dataFound && !searchLoading">
+        <p>No eligible records found for the given search criteria.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JOB CARD FORM MODE - Fill in job card details
+     ═══════════════════════════════════════════════════════════════ -->
+
+<div class="jc-page" *ngIf="mode === 'form'">
+
+  <!-- Back Button / Header -->
+  <div class="jc-back-header">
+    <button type="button" class="back-btn" (click)="backToSearch()">
+      <i class="fa fa-arrow-left"></i> Back to Search
+    </button>
+  </div>
+
+  <!-- Job Card Type + Fuel -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Job card type &amp; fuel</span>
+    </div>
+
+    <div class="jc-card">
+      <div class="jc-section-header">
+        <span class="jc-section-title">Job card type &amp; fuel</span>
+      </div>
+
+      <div class="jc-toprow">
+        <!-- Job Card Type Dropdown -->
+        <div class="form-floating-custom" [class.open]="jobCardTypeDropdownOpen">
+          <input type="text"
+                 placeholder=" "
+                 [value]="jobCardType"
+                 readonly
+                 (click)="toggleJobCardTypeDropdown()"
+                 [class.input-error]="hasFieldError('jobCardType')" />
+          <label>Job Card Type</label>
+          <i class="fa fa-chevron-down chevron"></i>
+          <div class="dropdown-panel" *ngIf="jobCardTypeDropdownOpen">
+            <div class="dropdown-option"
+                 *ngFor="let opt of jobCardTypes"
+                 [class.selected]="opt === jobCardType"
+                 (click)="selectJobCardType(opt)">
+              {{ opt }}
+            </div>
+          </div>
+          <div class="field-error" *ngIf="hasFieldError('jobCardType')">
+            {{ getFieldError('jobCardType') }}
+          </div>
+        </div>
+
+        <!-- Fuel Dropdown ✅ -->
+        <div class="form-floating-custom" [class.open]="fuelDropdownOpen">
+          <input type="text"
+                 placeholder=" "
+                 [value]="fuel"
+                 readonly
+                 (click)="toggleFuelDropdown()"
+                 [class.input-error]="hasFieldError('fuel')" />
+          <label>Fuel</label>
+          <i class="fa fa-chevron-down chevron"></i>
+          <div class="dropdown-panel" *ngIf="fuelDropdownOpen">
+            <div class="dropdown-option"
+                 *ngFor="let fuelOpt of fuelTypes"
+                 [class.selected]="fuelOpt === fuel"
+                 (click)="selectFuel(fuelOpt)">
+              {{ fuelOpt }}
+            </div>
+          </div>
+          <div class="field-error" *ngIf="hasFieldError('fuel')">
+            {{ getFieldError('fuel') }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Card Details -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Job card details</span>
+    </div>
+
+    <div class="jc-grid-4">
+      <div class="form-floating-custom">
+        <input type="date"
+               placeholder=" "
+               [(ngModel)]="dateTime"
+               (ngModelChange)="onDateChange($event)"
+               [class.input-error]="hasFieldError('dateTime')" />
+        <label>Date</label>
+        <div class="field-error" *ngIf="hasFieldError('dateTime')">
+          {{ getFieldError('dateTime') }}
+        </div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " [value]="formatDateDMY(dateOfSale) || '-'" readonly />
+        <label>Date of sale</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dealer / Customer / Tractor -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Dealer, customer &amp; tractor</span>
+    </div>
+
+    <div class="jc-grid-4">
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " [value]="dealerName || '-'" readonly />
+        <label>Dealer's name</label>
+      </div>
+      <div class="form-floating-custom">
+        <input placeholder=" " rows="1" [value]="customerName|| '-'" readonly />
+        <label>Customer's name</label>
+      </div>
+      <div class="form-floating-custom">
+        <input placeholder=" " rows="1" [value]="customerAddress|| '-'" readonly />
+        <label>Customer's Address</label>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " [value]="model || '-'" readonly />
+        <label>Model</label>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " [value]="tractorSlNo || '-'" readonly />
+        <label>Tractor sl. no.</label>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " [value]="regnNo || '-'" readonly />
+        <label>Regn. no.</label>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" "
+               [(ngModel)]="workDoneBy" (ngModelChange)="onWorkDoneByChange($event)"
+               [class.input-error]="hasFieldError('workDoneBy')" />
+        <label>Work done by</label>
+        <div class="field-error" *ngIf="hasFieldError('workDoneBy')">{{ getFieldError('workDoneBy') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " [value]="mobileNo || '-'" readonly />
+        <label>Mobile number</label>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="numeric" maxlength="10"
+               [(ngModel)]="alternateMobileNo" (ngModelChange)="onAlternateMobileNoChange($event)"
+               [class.input-error]="hasFieldError('alternateMobileNo')" />
+        <label>Alternate mobile number</label>
+        <div class="field-error" *ngIf="hasFieldError('alternateMobileNo')">{{ getFieldError('alternateMobileNo') }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tyre Pressure -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Tyre pressure</span>
+    </div>
+
+    <div class="jc-grid-4">
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="frontTyrePressureLeft" (ngModelChange)="onFrontTyrePressureLeftChange($event)"
+               [class.input-error]="hasFieldError('frontTyrePressureLeft')" />
+        <label>Front tyre pressure (left)</label>
+        <div class="field-error" *ngIf="hasFieldError('frontTyrePressureLeft')">{{ getFieldError('frontTyrePressureLeft') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="frontTyrePressureRight" (ngModelChange)="onFrontTyrePressureRightChange($event)"
+               [class.input-error]="hasFieldError('frontTyrePressureRight')" />
+        <label>Front tyre pressure (right)</label>
+        <div class="field-error" *ngIf="hasFieldError('frontTyrePressureRight')">{{ getFieldError('frontTyrePressureRight') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="rearTyrePressureLeft" (ngModelChange)="onRearTyrePressureLeftChange($event)"
+               [class.input-error]="hasFieldError('rearTyrePressureLeft')" />
+        <label>Rear tyre pressure (left)</label>
+        <div class="field-error" *ngIf="hasFieldError('rearTyrePressureLeft')">{{ getFieldError('rearTyrePressureLeft') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="rearTyrePressureRight" (ngModelChange)="onRearTyrePressureRightChange($event)"
+               [class.input-error]="hasFieldError('rearTyrePressureRight')" />
+        <label>Rear tyre pressure (right)</label>
+        <div class="field-error" *ngIf="hasFieldError('rearTyrePressureRight')">{{ getFieldError('rearTyrePressureRight') }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Record -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Service record</span>
+    </div>
+
+    <p class="muted-text" *ngIf="serviceRecordLoading">Loading service record...</p>
+
+    <div class="grid-scroll" *ngIf="!serviceRecordLoading">
+      <table class="service-grid">
+        <thead>
+          <tr>
+            <th class="label-col">Service</th>
+            <th *ngFor="let c of serviceColumns">{{ c }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="label-col">Date</td>
+            <td *ngFor="let c of serviceColumns">{{ formatShortDate(serviceRecord.date[c]) || '-' }}</td>
+          </tr>
+          <tr>
+            <td class="label-col">HMR</td>
+            <td *ngFor="let c of serviceColumns">{{ serviceRecord.hmr[c] || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COMPLAINTS SECTION (REQUIRED) -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Customer's complaints (Required)</span>
+    </div>
+
+    <div class="dynamic-row" *ngFor="let row of complaintRows; let i = index; let isLast = last">
+      <div class="jc-grid-3-with-icons">
+        <div class="form-floating-custom">
+          <textarea placeholder=" " rows="1" [(ngModel)]="row.complaint"></textarea>
+          <label>Customer's complaint</label>
+        </div>
+        <div class="form-floating-custom">
+          <textarea placeholder=" " rows="1" [(ngModel)]="row.actionTaken"></textarea>
+          <label>Action taken / analysis</label>
+        </div>
+        <div class="form-floating-custom">
+          <input type="text" placeholder=" " [(ngModel)]="row.remark" />
+          <label>Remark</label>
+        </div>
+
+        <div class="row-icons">
+          <button type="button" class="link-btn danger" *ngIf="!isLast && complaintRows.length > 1"
+                  (click)="removeComplaintRow(row.id)" title="Remove">
+            <i class="fa fa-trash"></i>
+          </button>
+          <button type="button" class="add-row-btn" *ngIf="isLast"
+                  (click)="addComplaintRow()" title="Add complaint">
+            <i class="fa fa-plus"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSING PARTS SECTION (REQUIRED) -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Details of missing parts / accessories (Required)</span>
+    </div>
+
+    <div class="jc-grid-4">
+      <div class="dynamic-row" *ngFor="let row of missingPartsRows; let i = index; let isLast = last"
+           style="border-top: none; padding-top: 0; margin-top: 0;">
+        <div class="form-floating-custom-with-icons">
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " [(ngModel)]="row.value" />
+            <label>Part / accessory name</label>
+          </div>
+
+          <div class="input-icons">
+            <button type="button" class="link-btn danger" *ngIf="!isLast && missingPartsRows.length > 1"
+                    (click)="removeMissingPartRow(row.id)" title="Remove">
+              <i class="fa fa-trash"></i>
+            </button>
+            <button type="button" class="add-row-btn" *ngIf="isLast"
+                    (click)="addMissingPartRow()" title="Add missing part">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPARE PARTS SECTION (REQUIRED) -->
+  <p class="jc-page-title">Spare part's statement cum estimate</p>
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Spare parts (Required)</span>
+    </div>
+
+    <ng-container *ngFor="let row of sparePartsRows; let i = index; let isLast = last">
+
+      <div class="dynamic-row">
+        <!-- Search Mode: Part Selection -->
+        <ng-container *ngIf="!row.selected">
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " [(ngModel)]="row.query" (ngModelChange)="onSpareSearchChange(row, $event)" />
+            <label>Search part by name or number</label>
+          </div>
+
+          <div class="search-results" *ngIf="row.query.trim().length > 0">
+            <p class="no-results" *ngIf="row.results.length === 0">No matching part found</p>
+            <div class="search-result-item" *ngFor="let p of row.results" (click)="selectSparePart(row, p)">
+              <span class="sri-name">{{ p.partName }}</span>
+              <span class="sri-meta">
+                {{ p.partNumber }} &bull; ₹{{ p.basePrice.toFixed(2) }}
+                <ng-container *ngIf="p.gstRate !== undefined && p.gstRate !== null"> &bull; GST {{ p.gstRate }}% (incl.)</ng-container>
+              </span>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Selected Part: Show Details + Qty -->
+        <ng-container *ngIf="row.selected">
+          <div class="selected-header-row">
+            <div>
+              <p class="sri-name">{{ row.selected.partName }}</p>
+              <p class="sri-meta">
+                {{ row.selected.partNumber }} &bull; MRP ₹{{ row.selected.basePrice.toFixed(2) }} / unit
+                <ng-container *ngIf="row.selected.gstRate !== undefined && row.selected.gstRate !== null"> (incl. GST {{ row.selected.gstRate }}%)</ng-container>
+              </p>
+              <p class="sri-meta" *ngIf="row.selected.gstRate !== undefined && row.selected.gstRate !== null">
+                Excl. GST ₹{{ computeGstBreakup(row.selected.basePrice, row.selected.gstRate).priceExGst.toFixed(2) }}
+                + GST ₹{{ computeGstBreakup(row.selected.basePrice, row.selected.gstRate).gstAmount.toFixed(2) }}
+              </p>
+            </div>
+            <button type="button" class="link-btn" (click)="clearSpareSelection(row)" title="Change part">
+              <i class="fa fa-pencil"></i>
+            </button>
+          </div>
+
+          <div class="jc-grid-4">
+            <div class="form-floating-custom">
+              <input type="text" placeholder=" " inputmode="numeric"
+                     [(ngModel)]="row.qty"
+                     (ngModelChange)="row.qty = validateRowField(row, 'qty', $event, filterInteger.bind(this), fieldCharRules['alternateMobileNo'].pattern, 'Sirf number allowed hai')"
+                     [class.input-error]="hasRowFieldError(row, 'qty')" />
+              <label>Qty.</label>
+              <div class="field-error" *ngIf="hasRowFieldError(row, 'qty')">{{ getRowFieldError(row, 'qty') }}</div>
+            </div>
+            <div class="form-floating-custom">
+              <input type="text" placeholder=" " [(ngModel)]="row.remark" />
+              <label>Remark</label>
+            </div>
+          </div>
+
+          <div class="total-value-row">
+            <span>Total: ₹{{ computeRowTotal(row).toFixed(2) }}</span>
+            <span class="row-icons">
+              <button type="button" class="link-btn danger" *ngIf="!isLast && sparePartsRows.length > 1"
+                      (click)="removeSpareRow(row.id)" title="Remove">
+                <i class="fa fa-trash"></i>
+              </button>
+              <button type="button" class="add-row-btn" *ngIf="isLast"
+                      (click)="addSpareRow()" title="Add spare part">
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </div>
+
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <div class="subtotal-row">
+      <span>Sub total</span>
+      <span>₹{{ spareTotal.toFixed(2) }}</span>
+    </div>
+  </div>
+
+  <!-- LOCAL PARTS SECTION (OPTIONAL) -->
+  <p class="jc-page-title">Local part's statement cum estimate</p>
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Local parts (Optional)</span>
+    </div>
+
+    <!-- ALWAYS show input fields for optional section, never saved cards -->
+    <ng-container *ngFor="let row of localPartsRows; let i = index; let isLast = last">
+      <div class="dynamic-row">
+        <div class="jc-grid-4-with-icons">
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " [(ngModel)]="row.partName" />
+            <label>Part name</label>
+          </div>
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " [(ngModel)]="row.partNumber" />
+            <label>Number / code (optional)</label>
+          </div>
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " inputmode="numeric"
+                   [(ngModel)]="row.qty"
+                   (ngModelChange)="row.qty = validateRowField(row, 'qty', $event, filterInteger.bind(this), fieldCharRules['alternateMobileNo'].pattern, 'Sirf number allowed hai')"
+                   [class.input-error]="hasRowFieldError(row, 'qty')" />
+            <label>Qty.</label>
+            <div class="field-error" *ngIf="hasRowFieldError(row, 'qty')">{{ getRowFieldError(row, 'qty') }}</div>
+          </div>
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " inputmode="decimal" maxlength="8"
+                   [(ngModel)]="row.price"
+                   (ngModelChange)="row.price = validateRowField(row, 'price', $event, filterDecimal.bind(this), fieldCharRules['fuel'].pattern, 'Sirf number allowed hai (0-9 aur ek decimal point)')"
+                   [class.input-error]="hasRowFieldError(row, 'price')" />
+            <label>Price (₹)</label>
+            <div class="field-error" *ngIf="hasRowFieldError(row, 'price')">{{ getRowFieldError(row, 'price') }}</div>
+          </div>
+          <div class="form-floating-custom">
+            <select [(ngModel)]="row.gst" [ngClass]="{'filled': row.gst}">
+              <option *ngFor="let g of gstOptions" [value]="g">{{ g }}</option>
+            </select>
+            <label class="select-label">GST</label>
+          </div>
+          <div class="form-floating-custom">
+            <input type="text" placeholder=" " [(ngModel)]="row.remark" />
+            <label>Remark (optional)</label>
+          </div>
+
+          <div class="row-icons">
+            <button type="button" class="link-btn danger" *ngIf="!isLast && localPartsRows.length > 1"
+                    (click)="removeLocalPartRow(row.id)" title="Remove">
+              <i class="fa fa-trash"></i>
+            </button>
+            <button type="button" class="add-row-btn" *ngIf="isLast"
+                    (click)="addLocalPartRow()" title="Add local part">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="total-value-row">
+          <span>Total (incl. GST): ₹{{ computeLocalRowTotal(row).toFixed(2) }}</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="subtotal-row">
+      <span>Sub total</span>
+      <span>₹{{ localTotal.toFixed(2) }}</span>
+    </div>
+  </div>
+
+  <!-- SUBLET PARTS SECTION (OPTIONAL) -->
+  <p class="jc-page-title">Sublet part's statement cum estimate</p>
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Sublet parts (Optional)</span>
+    </div>
+
+    <!-- ALWAYS show input fields for optional section, never saved cards -->
+    <div class="dynamic-row">
+      <div class="jc-grid-2">
+        <div class="form-floating-custom">
+          <input type="text" placeholder=" " [(ngModel)]="subletRow.descriptionSublet" />
+          <label>Description sublet</label>
+        </div>
+        <div class="form-floating-custom">
+          <input type="text" placeholder=" " inputmode="decimal"
+                 [(ngModel)]="subletRow.costSublet"
+                 (ngModelChange)="subletRow.costSublet = validateRowField(subletRow, 'costSublet', $event, filterDecimal.bind(this), fieldCharRules['fuel'].pattern, 'Sirf number allowed hai (0-9 aur ek decimal point)')"
+                 [class.input-error]="hasRowFieldError(subletRow, 'costSublet')" />
+          <label>Cost sublet (₹)</label>
+          <div class="field-error" *ngIf="hasRowFieldError(subletRow, 'costSublet')">{{ getRowFieldError(subletRow, 'costSublet') }}</div>
+        </div>
+      </div>
+
+      <div class="total-value-row">
+        <span>Cost sublet: ₹{{ computeSubletRowTotal(subletRow).toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <div class="subtotal-row">
+      <span>Sub total</span>
+      <span>₹{{ subletTotal.toFixed(2) }}</span>
+    </div>
+  </div>
+
+  <!-- Cost & Time -->
+  <div class="jc-card">
+    <div class="jc-section-header">
+      <span class="jc-section-title">Cost &amp; time estimated</span>
+    </div>
+
+    <div class="jc-grid-4">
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="hours" (ngModelChange)="onHoursChange($event)"
+               [class.input-error]="hasFieldError('hours')" />
+        <label>Hours</label>
+        <div class="field-error" *ngIf="hasFieldError('hours')">{{ getFieldError('hours') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="timeEstimate" (ngModelChange)="onTimeEstimateChange($event)"
+               [class.input-error]="hasFieldError('timeEstimate')" />
+        <label>Time estimate</label>
+        <div class="field-error" *ngIf="hasFieldError('timeEstimate')">{{ getFieldError('timeEstimate') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="timeActual" (ngModelChange)="onTimeActualChange($event)"
+               [class.input-error]="hasFieldError('timeActual')" />
+        <label>Time actual</label>
+        <div class="field-error" *ngIf="hasFieldError('timeActual')">{{ getFieldError('timeActual') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [(ngModel)]="costEstimate" (ngModelChange)="onCostEstimateChange($event)"
+               [class.input-error]="hasFieldError('costEstimate')" />
+        <label>Cost estimate (₹)</label>
+        <div class="field-error" *ngIf="hasFieldError('costEstimate')">{{ getFieldError('costEstimate') }}</div>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal"
+               [value]="computedCostActual.toFixed(2)"
+               readonly />
+        <label>Cost actual (₹)</label>
+      </div>
+      <div class="form-floating-custom">
+        <input type="text" placeholder=" " inputmode="decimal" maxlength="8"
+               [(ngModel)]="labourCost"
+               (ngModelChange)="onLabourCostChange($event)"
+               [class.input-error]="hasFieldError('labourCost')" />
+        <label>Labour cost (₹)</label>
+        <div class="field-error" *ngIf="hasFieldError('labourCost')">
+          {{ getFieldError('labourCost') }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grand total -->
+  <div class="grand-total-card">
+    <span>Grand total (Spare + Local + Labour + Sublet)</span>
+    <span>₹{{ grandTotal.toFixed(2) }}</span>
+  </div>
+
+  <!-- SUBMIT / UPDATE BUTTON -->
+  <div class="jc-submit-row">
+    <button type="button"
+            class="submit-btn"
+            [disabled]="!allSectionsSaved() || submitting || hasAnyFieldError || hasAnyRowError"
+            (click)="handleSubmitPress()">
+      <i class="fa fa-check" *ngIf="!submitting"></i>
+      {{ submitting ? 'Saving...' : (item.IsClosed === false ? 'Update job card' : 'Submit job card') }}
+    </button>
+    <p class="section-reminder" *ngIf="!allSectionsSaved() || hasAnyFieldError || hasAnyRowError">
+      ⚠ {{ (hasAnyFieldError || hasAnyRowError) ? 'Kuch fields me invalid value hai, unhe theek karo' : 'Please fill all required sections: Complaints, Missing Parts, and Spare Parts' }}
+    </p>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="confirm-overlay" *ngIf="confirmVisible">
+    <div class="confirm-sheet">
+      <p class="confirm-title">Verify before submission</p>
+      <p class="confirm-body">
+        Please confirm all job card details, spare parts, local parts, and totals entered are correct before submitting.
+      </p>
+      <div class="confirm-actions">
+        <button type="button" class="confirm-cancel-btn" (click)="cancelConfirm()">Review again</button>
+        <button type="button" class="confirm-ok-btn" (click)="handleConfirmSubmit()">Confirm &amp; submit</button>
+      </div>
+    </div>
+  </div>
+
+</div>

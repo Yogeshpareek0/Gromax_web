@@ -1,0 +1,694 @@
+<div class="container-fluid px-0">
+  <!-- ==================== UPLOAD FORM ==================== -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;" *ngIf="!isPreviewMode && !isCommitResultMode">
+    <form id="uploadForm" (ngSubmit)="onSubmit()" #uploadForm="ngForm">
+
+      <!-- Upload Type, Month, Year -->
+      <div class="row g-4">
+        <!-- Upload Type -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <label class="form-label fw-medium mb-0">
+            Upload Type<span class="text-danger"> *</span>
+          </label>
+          <select class="form-select"
+                  id="uploadType"
+                  required
+                  [(ngModel)]="selectedUploadId"
+                  (ngModelChange)="onUploadTypeChange()"
+                  name="uploadType">
+            <option [ngValue]="null">-- Select Upload Type --</option>
+            <option *ngFor="let item of filteredUploadReportList" [ngValue]="item.UploadID">
+              {{ item.UploadName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Month -->
+        <div class="col-xl-3 col-lg-4 col-md-6" *ngIf="showMonthYearDropdowns && !priecPositionDiv">
+          <label class="form-label fw-medium mb-0">
+            Month<span class="text-danger"> *</span>
+          </label>
+          <select class="form-select" required [(ngModel)]="selectedMonth" name="month" (change)="onMonthChange()">
+            <option [ngValue]="null">-- Select Month --</option>
+            <option *ngFor="let m of availableMonths" [value]="m.value">{{ m.name }}</option>
+          </select>
+        </div>
+
+        <!-- Year -->
+        <div class="col-xl-3 col-lg-4 col-md-6" *ngIf="showMonthYearDropdowns && !priecPositionDiv">
+          <label class="form-label fw-medium mb-0">
+            Year<span class="text-danger"> *</span>
+          </label>
+          <select class="form-select" required [(ngModel)]="selectedYear" name="year">
+            <option [ngValue]="null">-- Select Year --</option>
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <!-- State (Only for Upload Type 7) -->
+        <div class="col-xl-3 col-lg-4 col-md-6"
+             *ngIf="stateBasedUploadTypes.includes(selectedUploadId!) && !priecPositionDiv">
+          <label class="form-label fw-medium mb-0">
+            Select State<span class="text-danger"> *</span>
+          </label>
+          <select class="form-select"
+                  [(ngModel)]="selectedState"
+                  name="state"
+                  (ngModelChange)="onStateChange()">
+            <option [ngValue]="null">-- Select State --</option>
+            <option *ngFor="let s of stateList" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Download Format Section -->
+      <div class="row mt-4" *ngIf="!priecPositionDiv">
+        <div class="col-12">
+          <div *ngIf="downloadFileUrl && selectedUploadId !== 7" class="mb-3">
+            <a class="btn btn-danger btn-sm" [href]="downloadFileUrl" [download]="downloadFileName">
+              <i class="fas fa-download me-1"></i> Download Format
+            </a>
+          </div>
+
+          <div *ngIf="selectedUploadId === 7 && selectedState">
+            <div *ngIf="dealerData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadDynamicExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ dealerData.length }} Dealers)
+              </button>
+            </div>
+
+            <div *ngIf="dealerData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No dealers found for selected state.
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedUploadId === 4 && selectedState">
+            <div *ngIf="modelData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadForecastExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ modelData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="modelData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No forecast data found for selected state.
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedUploadId === 5 && selectedState">
+            <div *ngIf="industryData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadIndustryExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ industryData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="industryData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No industry data found for selected state.
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedUploadId === 1 && selectedState">
+            <div *ngIf="talukaIndustryData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadTalukaIndustryExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ talukaIndustryData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="talukaIndustryData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No taluka industry data found for selected state.
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedUploadId === 3 && selectedState">
+            <div *ngIf="bdrcData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadBDRCExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ bdrcData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="bdrcData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No BDRC data found for selected state.
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedUploadId === 6">
+            <div *ngIf="spaData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadSPAExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ spaData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="spaData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No SPA Planning data found.
+              </div>
+            </div>
+          </div>
+
+
+          <div *ngIf="selectedUploadId === 10 && selectedMonth && selectedYear">
+            <div *ngIf="outlookFormatData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downlaodOutLookFormat()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ outlookFormatData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="outlookFormatData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No Outlook data found.
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedUploadId === 11 && selectedMonth && selectedYear">
+            <div *ngIf="bdrcData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadRevisedBdrcExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ bdrcData.length }} data for W{{currentWeek}})
+              </button>
+            </div>
+
+            <div *ngIf="bdrcData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No Revised BRDC data found.
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedUploadId === 12">
+            <div *ngIf="pddFormatData.length > 0" class="mb-3">
+              <button type="button"
+                      class="btn btn-danger btn-sm"
+                      (click)="downloadPddExcel()">
+                <i class="fas fa-download me-1"></i>
+                Download Format (Pre-filled with {{ pddFormatData.length }} data)
+              </button>
+            </div>
+
+            <div *ngIf="pddFormatData.length === 0" class="mb-3">
+              <div class="text-danger">
+                <i class="fas fa-info-circle me-1"></i>
+                No Pdd data found.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload -->
+      <div class="row" *ngIf="!priecPositionDiv">
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <label class="form-label fw-medium mb-0">
+            Upload Excel File<span class="text-danger">*</span>
+          </label>
+          <div class="border rounded-3 p-2 text-center file-drop-area">
+            <input type="file"
+                   id="excelFile"
+                   class="form-control d-none"
+                   accept=".xlsx"
+                   (change)="onFileChange($event)"
+                   required />
+
+            <label for="excelFile" class="cursor-pointer">
+              <i class="fas fa-cloud-upload-alt fa-2x text-success mb-2"></i>
+              <p class="mb-0 fw-medium" style="line-height:16px;font-size:14px">Click to upload Excel file</p>
+              <small class="text-muted">Supported: .xlsx</small>
+            </label>
+
+            <div *ngIf="selectedFileName" class="mt-1 text-success fw-medium" style="font-size:14px">
+              <i class="fas fa-file-excel me-1"></i>
+              {{ selectedFileName }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="row" *ngIf="!priecPositionDiv">
+        <div class="col-12 my-3">
+          <button type="submit"
+                  class="btn px-4 text-white"
+                  style="background-color: #4796BD;font-size:14px"
+                  [disabled]="!uploadForm.valid">
+            <i class="fas fa-eye me-2"></i>Preview Upload
+          </button>
+        </div>
+      </div>
+
+
+
+    </form>
+  </div>
+
+  <!-- PREVIEW -->
+  <div *ngIf="isPreviewMode" class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <!-- Summary Badges -->
+    <div class="row mb-3">
+      <div class="col">
+        <span class="badge bg-secondary me-2 fw-normal py-2">Total: {{ summary.total }}</span>
+        <span class="badge bg-success me-2 fw-normal py-2">Valid: {{ summary.valid }}</span>
+        <span class="badge bg-danger fw-normal py-2">Invalid: {{ summary.invalid }}</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-end gap-2 mb-3">
+      <button class="btn btn-outline-secondary px-2"
+              (click)="onBack()"
+              style="font-size: 14px;">
+        <i class="fas fa-arrow-left me-1"></i>
+        Back
+      </button>
+
+      <!-- Commit button - only show when invalid count is 0 -->
+      <button class="btn btn-outline-success" *ngIf="summary.invalid === 0" (click)="onCommit()" [disabled]="isCommitting" style="font-size: 14px;">
+        <i class="fas fa-spinner fa-spin me-1" *ngIf="isCommitting"></i>
+        <i class="fas fa-check me-1" *ngIf="!isCommitting"></i>
+        {{ isCommitting ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+
+    <!-- Preview Table -->
+    <div class="table-wrapper">
+      <table class="table table-bordered table-striped table-sm preview-table">
+
+        <thead class="custom-table-head">
+          <tr>
+            <th *ngFor="let key of previewColumnOrder; let i = index"
+                [ngClass]="{
+              'rounded-start': i === 0,
+              'rounded-end': i === previewColumnOrder.length - 1
+            }">
+              {{ key }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of previewRows">
+            <td *ngFor="let key of previewColumnOrder">
+              {{ row[key] }}
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+  <!--FINAL INSERTED DATA-->
+  <div *ngIf="isCommitResultMode" class="card shadow-sm p-3 border-0" style="border-radius: 12px;">
+    <div class="d-flex align-items-center gap-3">
+      <button (click)="onBack()"
+              style="display:inline-flex; align-items:center; gap:6px;
+                 font-size:12px; font-weight:500; padding:8px 16px;
+                 background:linear-gradient(135deg, #215378, #4796BD);
+                 color:#fff; border:none; border-radius:25px;
+                 cursor:pointer; transition:all 0.2s ease;"
+              onmouseover="this.style.transform='translateX(-3px)';"
+              onmouseout="this.style.transform='translateX(0)';">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+
+      <span style="background:#eaf4fb; color:#215378; border:1.5px solid #b6d9ee;
+               border-radius:20px; padding:7px 16px; font-size:12px; font-weight:500;">
+        <i class="fas fa-table me-1"></i> Total: {{ commitResultRows.length }}
+      </span>
+    </div>
+
+    <!-- Result Table -->
+
+    <div class="enquiry-table-wrapper mt-3">
+      <table id="enquiryTable" class="table table-bordered table-striped mb-0">
+        <thead>
+          <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th style="border-top-left-radius: 8px;">S.No.</th>
+            <th *ngFor="let col of commitResultColumns; let last = last"
+                [style.border-top-right-radius]="last ? '8px' : null">
+              {{ col }}
+            </th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr *ngFor="let row of commitResultRows; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td *ngFor="let col of commitResultColumns">
+              <span *ngIf="col === 'Status'; else plainValue"
+                    class="badge"
+                    [ngClass]="row[col] === 'Successfully Inserted' ? 'bg-success' : 'bg-warning text-dark'" style="font-size: 11px;">
+                {{ row[col] }}
+              </span>
+              <ng-template #plainValue>{{ row[col] }}</ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--price Position section-->
+<div class="container-fluid px-0" *ngIf="priecPositionDiv">
+  <div class="card shadow-sm px-4 border-0 py-2 mt-2" style="border-radius: 12px;">
+
+    <div class="row pt-4">
+
+      <!-- State -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedState">
+          <select class="form-select" [(ngModel)]="selectedState" (change)="onStateChange()" name="selectedState">
+            <option [ngValue]="'All'">-- Select State --</option>
+            <option *ngFor="let s of stateList" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+          <label>State</label>
+        </div>
+      </div>
+
+      <!-- HP Range (dropdown) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedHpRange">
+          <select class="form-select" [(ngModel)]="selectedHpRange" (change)="onHpRangeSelect(selectedHpRange)" name="selectedHpRange">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let range of hpRangeList" [value]="range">{{ range }}</option>
+          </select>
+          <label>HP Range</label>
+        </div>
+      </div>
+
+      <!-- HP (dropdown, filtered by HP Range) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedHp">
+          <select class="form-select" [(ngModel)]="selectedHp" (change)="onHpChange()" name="selectedHp"
+                  [disabled]="!selectedHpRange">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let hp of filteredHpList" [ngValue]="hp">{{ hp }}</option>
+          </select>
+          <label>HP</label>
+        </div>
+      </div>
+
+      <!-- Make (dropdown, from backend) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedMake">
+          <select class="form-select" [(ngModel)]="selectedMake" (change)="onMakeChange()" name="selectedMake">
+            <option value="" disabled selected hidden></option>
+            <option *ngFor="let make of makeList" [value]="make">{{ make }}</option>
+          </select>
+          <label>Make</label>
+        </div>
+      </div>
+
+      <!-- Model -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="modelName">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="modelName" name="modelName" />
+          <label>Model</label>
+        </div>
+      </div>
+      <!--drive type-->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="selectedDrive">
+          <select class="form-select" [(ngModel)]="selectedDrive" name="selectedDrive">
+            <option value="" disabled selected hidden></option>
+            <option value="2WD">2WD</option>
+            <option value="4WD">4WD</option>
+          </select>
+          <label>Drive Type</label>
+        </div>
+      </div>
+      <!-- Variant Code (Optional) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="variantCode">
+          <input type="text" class="form-control" placeholder="" [(ngModel)]="variantCode" name="variantCode" />
+          <label>Variant Code (Optional)</label>
+        </div>
+      </div>
+
+
+      <!-- Offer Price (Mentioned in Creative) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="offrPrice">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="offrPrice"
+                 name="offrPrice"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateNetMop()" />
+          <label>Offer Price(Mentioned in Creative)</label>
+        </div>
+      </div>
+
+      <!-- RtoInsurance-->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="rtoInsurance">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="rtoInsurance"
+                 name="rtoInsurance"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateNetMop()" />
+          <label>Rto/Insurance(If on road price taken)</label>
+        </div>
+      </div>
+      <!-- Implement price-->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="implementPrice">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="implementPrice"
+                 name="implementPrice"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateNetMop()" />
+          <label>Implement/Freebie(If included in mop)</label>
+        </div>
+      </div>
+
+
+
+
+      <!-- MOP (Auto Calculated) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="mop">
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="mop"
+                 name="mop"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateMop()"
+                 readonly />
+          <label>MOP(Net mop)</label>
+        </div>
+      </div>
+
+
+
+
+      <!-- Freight -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="freight">
+          <input type="number" class="form-control" placeholder=""
+                 [(ngModel)]="freight" name="freight"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateMop()"
+                 readonly />
+          <label>Freight</label>
+        </div>
+      </div>
+
+      <!-- DLR Margin -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="dlrMargin">
+          <input type="number" class="form-control" placeholder=""
+                 [(ngModel)]="dlrMargin" name="dlrMargin"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateMop()" readonly />
+          <label>DLR Margin</label>
+        </div>
+      </div>
+
+
+
+      <div class="col-xl-6 col-lg-6 col-sm-6">
+        <div class="multi-dropdown-wrapper" (click)="$event.stopPropagation()">
+
+          <label class="multi-dropdown-label">Accessory Name (Select If, Not provided by manufacturer)</label>
+
+          <div class="multi-dropdown-toggle" (click)="toggleDropdown($event)">
+            <!-- Placeholder -->
+            <span class="multi-dropdown-placeholder" *ngIf="selectedAccessory.length === 0">
+              Select Accessory
+            </span>
+            <!-- Selected Tags -->
+            <span *ngFor="let item of selectedAccessory" class="multi-tag">
+              {{ item.name }}
+              <i class="fa-solid fa-xmark"
+                 (click)="$event.stopPropagation(); removeAccessory(item)"></i>
+            </span>
+            <!-- Arrow -->
+            <i class="fa-solid fa-chevron-down multi-dropdown-arrow"
+               [class.rotated]="dropdownOpen"></i>
+          </div>
+
+          <!-- Dropdown Menu -->
+          <div class="multi-dropdown-menu" *ngIf="dropdownOpen">
+            <div *ngFor="let item of accessoriesList"
+                 class="multi-dropdown-item"
+                 [class.selected]="isSelected(item)"
+                 (click)="toggleSelection(item)">
+              <i class="fa-solid fa-check check-icon"></i>
+              {{ item.name }} - {{ item.value }}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Accessories -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="accessories">
+          <input type="number" class="form-control" placeholder=""
+                 [(ngModel)]="accessories" name="accessories"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 (input)="calculateMop()"
+                 readonly />
+          <label>Accessories</label>
+        </div>
+      </div>
+
+
+      <!-- NDP -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="ndp">
+          <input type="number" class="form-control" placeholder=""
+                 [(ngModel)]="ndp" name="ndp"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)"
+                 readonly />
+          <label>NDP (Auto Calculated)</label>
+        </div>
+      </div>
+
+      <!-- Avg. Vol. Per Month -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="avgVolPerMonth">
+          <input type="number" class="form-control" placeholder=""
+                 [(ngModel)]="avgVolPerMonth" name="avgVolPerMonth"
+                 inputmode="numeric"
+                 (keypress)="allowNumbersOnly($event)" />
+          <label>Avg. Vol. Per Month</label>
+        </div>
+      </div>
+
+      <!-- MOP Proof (File Upload - Attachment Option) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom file-upload-wrapper" [class.has-value]="mopProofFile">
+          <div class="file-upload-box" (click)="mopProofInput.click()" [class.has-file]="mopProofFile">
+            <span class="file-label-top">MOP Proof (Attachment Option)</span>
+            <span class="file-upload-text" *ngIf="!mopProofFile">
+              <i class="bi bi-paperclip"></i> Click to attach file
+            </span>
+            <span class="file-upload-text file-name-text" *ngIf="mopProofFile">
+              <i class="bi bi-check-circle-fill text-success"></i> {{ mopProofFileName }}
+            </span>
+            <span class="file-remove-btn" *ngIf="mopProofFile" (click)="removeMopProof($event)">✕</span>
+          </div>
+          <input #mopProofInput type="file" class="d-none"
+                 accept=".pdf,.jpg,.jpeg,.png"
+                 (change)="onMopProofSelected($event)" />
+        </div>
+      </div>
+
+
+      <!-- Avg. Vol. Per Month -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom" [class.has-value]="mopDate">
+          <input type="date" class="form-control" placeholder=""
+                 [(ngModel)]="mopDate" name="mopDate"
+                 (keypress)="allowNumbersOnly($event)" />
+          <label>Mop Date</label>
+        </div>
+      </div>
+      <!-- RC Copy of the Model (Optional - File Upload) -->
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <div class="form-floating-custom file-upload-wrapper" [class.has-value]="rcCopyFile">
+          <div class="file-upload-box" (click)="rcCopyInput.click()" [class.has-file]="rcCopyFile">
+            <span class="file-label-top">RC Copy of the Model (Optional)</span>
+            <span class="file-upload-text" *ngIf="!rcCopyFile">
+              <i class="bi bi-paperclip"></i> Click to attach file
+            </span>
+            <span class="file-upload-text file-name-text" *ngIf="rcCopyFile">
+              <i class="bi bi-check-circle-fill text-success"></i> {{ rcCopyFileName }}
+            </span>
+            <span class="file-remove-btn" *ngIf="rcCopyFile" (click)="removeRcCopy($event)">✕</span>
+          </div>
+          <input #rcCopyInput type="file" class="d-none"
+                 accept=".pdf,.jpg,.jpeg,.png"
+                 (change)="onRcCopySelected($event)" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center py-3">
+      <button type="button"
+              class="btn text-white px-4"
+              [disabled]="!isFormValid()"
+              (click)="submitPricePosition()"
+              style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+        Submit
+      </button>
+    </div>
+
+  </div>
+</div>

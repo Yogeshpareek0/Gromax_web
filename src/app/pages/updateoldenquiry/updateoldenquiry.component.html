@@ -1,0 +1,288 @@
+<div class="container-fluid px-0">
+  <!-- Filter Section -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row g-3 align-items-end mb-3">
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
+        <label for="am" class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showAM">
+        <label for="am" class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
+        <label for="tm" class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDealer">
+        <label for="dealer" class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedDealer">
+          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+        </select>
+      </div>-->
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showStatename">
+        <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
+        <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
+          <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLocation">
+        <label for="location" class="form-label fw-medium mb-0">Location</label>
+        <select class="form-select" [(ngModel)]="selectedLocation">
+          <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <label for="Category" class="form-label fw-medium mb-0">Dealer Category</label>
+        <select class="form-select form-control-custom" id="Category" [(ngModel)]="selectedCategory">
+          <option selected value="">All</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <button class="btn custom-btn" (click)="onShowReport()">
+          <i class="bi bi-clipboard-data"></i>
+          <span>Filter</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-wrapper mt-4">
+    <div class="input-group custom-search-group">
+      <span class="input-group-text bg-white border-0">
+        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+      </span>
+      <input type="text" class="form-control border-0 shadow-none" placeholder="Search by sap & mobile" [(ngModel)]="globalFilter">
+      <button class="btn search-btn text-white" type="button" (click)="searchFilter()">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive mt-4 enquiry-table-wrapper">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Action</th>
+          <th class="text-nowrap fw-normal">SH Name</th>
+          <th class="text-nowrap fw-normal">Am Name</th>
+          <th class="text-nowrap fw-normal">Tm Name</th>
+          <th class="text-nowrap fw-normal">SAP</th>
+          <th class="text-nowrap fw-normal">Dealer Name</th>
+          <th class="text-nowrap fw-normal">Dealer Location</th>
+          <th class="text-nowrap fw-normal">Dealer Category</th>
+          <th class="text-nowrap fw-normal">Customer Name</th>
+          <th class="text-nowrap fw-normal">Mobile</th>
+          <th class="text-nowrap fw-normal">District</th>
+          <th class="text-nowrap fw-normal">Tehsil</th>
+          <th class="text-nowrap fw-normal">Village</th>
+          <th class="text-nowrap fw-normal">State</th>
+          <th class="text-nowrap fw-normal">Delivery Date</th>
+          <th class="text-nowrap fw-normal">Chassis No</th>
+          <th class="text-nowrap fw-normal">Payment Mode</th>
+          <th class="text-nowrap fw-normal">Final SP</th>
+          <th class="text-nowrap fw-normal">DP Amount</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;">Financer</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of paginatedDeliveryEnquiryList; let i = index;" style="cursor:pointer">
+          <td class="text-nowrap">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-center">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer" style="font-size:14px"
+               title="View Details"
+               (click)="onRowClick(item)">
+            </i>
+          </td>
+          <td class="text-nowrap">{{ item.SHName }}</td>
+          <td class="text-nowrap">{{ item.AmName }}</td>
+          <td class="text-nowrap">{{ item.TmName }}</td>
+          <td class="text-nowrap">{{ item.DealerCode }}</td>
+          <td class="text-nowrap">{{ item.DealerName }}</td>
+          <td class="text-nowrap">{{ item.DlrLoc }}</td>
+          <td class="text-nowrap">{{ item.DlrCat | uppercase }}</td>
+          <td class="text-nowrap">{{ item.CustomerName }}</td>
+          <td class="text-nowrap">{{ item.Mobile }}</td>
+          <td class="text-nowrap">{{ item.ProspectDistName || '—' }}</td>
+          <td class="text-nowrap">{{ item.ProspectTehName || '—' }}</td>
+          <td class="text-nowrap">{{ item.ProsVillageName || '—' }}</td>
+          <td class="text-nowrap">{{ item.State || '—' }}</td>
+          <td class="text-nowrap">{{ formatDisplayDate(item.DeliveryDate) }}</td>
+          <td class="text-nowrap">{{ item.ChassisNumber || '—' }}</td>
+          <td class="text-nowrap">{{ item.PaymentMode || '—' }}</td>
+          <td class="text-nowrap">
+            <i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size:11px"></i>
+            {{ item.FinalSellingPrice ? (item.FinalSellingPrice | number) : '—' }}
+          </td>
+          <td class="text-nowrap">
+            <i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size:11px"></i>
+            {{ item.DpAmount ? (item.DpAmount | number) : '—' }}
+          </td>
+          <td class="text-nowrap">{{ item.FinancerName || '—' }}</td>
+        </tr>
+
+        <!-- No Data Row -->
+        <tr *ngIf="!paginatedDeliveryEnquiryList || paginatedDeliveryEnquiryList.length === 0">
+          <td colspan="21" class="text-center py-4">
+            <div class="mb-2 d-flex justify-content-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:48px;height:48px;
+                        background: linear-gradient(135deg,#4e73df,#1cc88a);
+                        color:white;">
+                <i class="fas fa-database fs-5"></i>
+              </div>
+            </div>
+            <h6 class="fw-normal mb-1" style="font-size:15px; color:#2c3e50;">
+              No Delivery Enquiries Found
+            </h6>
+            <p class="mb-0 text-muted" style="font-size:13px;">
+              There is currently no delivery enquiries data available.
+              Try adjusting your filters.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="viewExchangeStockModal" tabindex="-1" aria-labelledby="viewMoreLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0" id="viewMoreLabel">
+            <i class="bi bi-pencil-square me-2"></i>Update Enquiry
+          </h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body p-3" style="max-height: 70vh; overflow-y: auto;">
+
+        <!-- Details Card -->
+        <div class="customer-details-card mb-3" *ngIf="selectedItem">
+          <div class="card-header-custom mb-2">Enquiry Details</div>
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label">SAP</div>
+              <div class="detail-value">{{ selectedItem.DealerCode || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Customer Name</div>
+              <div class="detail-value">{{ selectedItem.CustomerName || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Mobile</div>
+              <div class="detail-value">{{ selectedItem.Mobile || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">District</div>
+              <div class="detail-value">{{ selectedItem.ProspectDistName || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Tehsil</div>
+              <div class="detail-value">{{ selectedItem.ProspectTehName || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Village</div>
+              <div class="detail-value">{{ selectedItem.ProsVillageName || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">State</div>
+              <div class="detail-value">{{ selectedItem.State || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Chassis No</div>
+              <div class="detail-value">{{ selectedItem.ChassisNumber || '—' }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Delivery Date</div>
+              <div class="detail-value">{{ selectedItem.DeliveryDate | date:'dd-MMM-yyyy' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="customer-details-card">
+          <div class="card-header-custom mb-3">Payment Details</div>
+          <form [formGroup]="liquidationForm">
+            <div class="row g-3">
+
+              <!-- SP On-Road -->
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">
+                  SP (On-Road) <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control form-control-custom"
+                       formControlName="finalSellingPrice"
+                       placeholder="Enter selling price"
+                       [class.input-error]="f['finalSellingPrice'].touched && f['finalSellingPrice'].invalid" />
+                <div class="text-danger small mt-1" *ngIf="f['finalSellingPrice'].touched && f['finalSellingPrice'].errors?.['required']">
+                  SP (On-Road) is required.
+                </div>
+                <div class="text-danger small mt-1" *ngIf="f['finalSellingPrice'].touched && f['finalSellingPrice'].errors?.['min']">
+                  SP must be exactly 6 digits.
+                </div>
+                <div class="text-danger small mt-1" *ngIf="f['finalSellingPrice'].touched && f['finalSellingPrice'].errors?.['max']">
+                  SP must be exactly 6 digits.
+                </div>
+              </div>
+
+              <!-- DP Amount -->
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">
+                  DP Amount <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control form-control-custom"
+                       formControlName="dpAmount"
+                       placeholder="Enter DP amount"
+                       [class.input-error]="f['dpAmount'].touched && f['dpAmount'].invalid" />
+                <div class="text-danger small mt-1" *ngIf="f['dpAmount'].touched && f['dpAmount'].errors?.['required']">
+                  DP Amount is required.
+                </div>
+                <div class="text-danger small mt-1" *ngIf="f['dpAmount'].touched && f['dpAmount'].errors?.['max']">
+                  DP Amount must not exceed 6 digits.
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+      </div>
+      <!-- Modal Footer -->
+      <div class="modal-footer pt-0 p-3 d-flex justify-content-center">
+        <button type="button" class="btn btn-submit mt-3" (click)="onSubmit()">
+          Update Enquiry
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

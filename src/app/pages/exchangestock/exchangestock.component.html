@@ -1,0 +1,407 @@
+<div class="container-fluid px-0" (click)="onDocumentClick($event)">
+
+  <!-- Filter Section -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row g-3 align-items-end mb-3">
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
+        <label class="form-label fw-medium mb-0">State Head</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showAM">
+        <label class="form-label fw-medium mb-0">Area Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
+        <label class="form-label fw-medium mb-0">Territory Manager</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+        </select>
+      </div>
+
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDealer">
+        <label class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedDealer">
+          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+        </select>
+      </div>-->
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showStatename">
+        <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
+        <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
+          <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLocation">
+        <label for="location" class="form-label fw-medium mb-0">Location</label>
+        <select class="form-select" [(ngModel)]="selectedLocation">
+          <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6">
+        <label class="form-label fw-medium mb-0">Stock Type</label>
+        <select class="form-select form-control-custom" [(ngModel)]="selectedStockType">
+          <option value="In Stock">In Stock</option>
+          <option value="Sold">Sold</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 align-self-end">
+        <div class="d-flex gap-2">
+          <button class="btn custom-btn" (click)="onShowReport()">
+            <i class="bi bi-clipboard-data"></i> Filter
+          </button>
+          <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px" (click)="exportToExcel()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar: Search + Freeze + Customize -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+    <div class="search-wrapper">
+      <div class="input-group custom-search-group">
+        <span class="input-group-text bg-white border-0">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input type="text" class="form-control border-0 shadow-none"
+               placeholder="Search by sap & mobile" [(ngModel)]="globalFilter">
+        <button class="btn search-btn text-white" type="button" (click)="searchFilter()">Search</button>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+
+      <!-- Freeze Columns -->
+      <div class="position-relative">
+        <button class="btn-freeze" (click)="toggleFreezePanel($event)">
+          <i class="fas fa-thumbtack me-1"></i> Freeze Columns
+          <span *ngIf="frozenColumnKeys.size > 0" class="freeze-badge">{{ frozenColumnKeys.size }}</span>
+        </button>
+        <div class="tool-panel" [class.open]="freezePanelOpen" (click)="$event.stopPropagation()">
+          <div class="tool-panel-title">Select columns to freeze</div>
+          <div class="tool-panel-options">
+            <label *ngFor="let col of freezableColumns" class="tool-panel-option">
+              <input type="checkbox" [checked]="frozenColumnKeys.has(col.key)" (change)="toggleFreezeColumn(col.key, $event)">
+              <span>{{ col.label }}</span>
+            </label>
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="clearAllFreeze()">Clear All</button>
+            <button class="btn btn-sm btn-primary-custom flex-fill" (click)="freezePanelOpen = false">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customize Columns -->
+      <div class="position-relative">
+        <button class="btn-customize" (click)="toggleCustomizePanel($event)">
+          <i class="fas fa-cog me-1"></i> Customize Columns
+        </button>
+        <div class="tool-panel" [class.open]="customizePanelOpen" (click)="$event.stopPropagation()">
+          <div class="tool-panel-title">Show / Hide Columns</div>
+          <div class="tool-panel-options">
+            <label *ngFor="let col of allTableColumns" class="tool-panel-option">
+              <input type="checkbox" [checked]="!hiddenColumns.has(col.key)" (change)="toggleColumnVisibility(col.key, $event)">
+              <span>{{ col.label }}</span>
+            </label>
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="showAllColumns()">Show All</button>
+            <button class="btn btn-sm btn-primary-custom flex-fill" (click)="customizePanelOpen = false">Done</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Active Filters Bar -->
+  <div class="active-filters-bar" *ngIf="activeFilters.size > 0">
+    <span class="filter-bar-label"><i class="fas fa-filter me-1"></i>Active Filters:</span>
+    <span class="filter-chip" *ngFor="let col of getActiveFilterCols()">
+      <span class="filter-chip-col">{{ getColumnLabel(col) }}</span>
+      <span class="filter-chip-vals">{{ getFilterSummary(col) }}</span>
+      <button class="filter-chip-remove" (click)="removeFilter(col)"><i class="fas fa-times"></i></button>
+    </span>
+    <button class="btn-clear-all-filters" (click)="clearAllFilters()">Clear All</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive mt-3 enquiry-table-wrapper" #tableWrapper>
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width:1200px;">
+      <thead>
+        <tr style="--bs-table-bg:#215378;--bs-table-color:white;font-size:14px;">
+
+          <th class="th-cell" [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')" style="border-top-left-radius:8px;">
+            <div class="th-content"><span>S.No.</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('sno')" (click)="openColumnFilter($event,'sno')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Action')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Action')" [style.left.px]="getFrozenLeft('Action')">
+            <div class="th-content"><span>Action</span></div>
+          </th>
+
+          <th *ngIf="showSH && !hiddenColumns.has('SHName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('SHName')" [style.left.px]="getFrozenLeft('SHName')">
+            <div class="th-content"><span>SH Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('SHName')" (click)="openColumnFilter($event,'SHName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="showAM && !hiddenColumns.has('AmName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('AmName')" [style.left.px]="getFrozenLeft('AmName')">
+            <div class="th-content"><span>AM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('AmName')" (click)="openColumnFilter($event,'AmName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="showTM && !hiddenColumns.has('TmName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('TmName')" [style.left.px]="getFrozenLeft('TmName')">
+            <div class="th-content"><span>TM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('TmName')" (click)="openColumnFilter($event,'TmName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DealerCode')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">
+            <div class="th-content"><span>SAP</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerCode')" (click)="openColumnFilter($event,'DealerCode')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DealerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">
+            <div class="th-content"><span>Dealer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerName')" (click)="openColumnFilter($event,'DealerName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('Mobile')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Mobile')" [style.left.px]="getFrozenLeft('Mobile')">
+            <div class="th-content"><span>Mobile</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Mobile')" (click)="openColumnFilter($event,'Mobile')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DlrLoc')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrLoc')" [style.left.px]="getFrozenLeft('DlrLoc')">
+            <div class="th-content"><span>Dealer Location</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrLoc')" (click)="openColumnFilter($event,'DlrLoc')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DlrCat')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">
+            <div class="th-content"><span>Dealer Category</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrCat')" (click)="openColumnFilter($event,'DlrCat')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('CustomerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('CustomerName')" [style.left.px]="getFrozenLeft('CustomerName')">
+            <div class="th-content"><span>Customer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('CustomerName')" (click)="openColumnFilter($event,'CustomerName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('ChassisNumber')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ChassisNumber')" [style.left.px]="getFrozenLeft('ChassisNumber')">
+            <div class="th-content"><span>Chassis No.</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ChassisNumber')" (click)="openColumnFilter($event,'ChassisNumber')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DeliveryDate')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DeliveryDate')" [style.left.px]="getFrozenLeft('DeliveryDate')">
+            <div class="th-content"><span>Delivery Date</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DeliveryDate')" (click)="openColumnFilter($event,'DeliveryDate')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('ExchangeMake')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ExchangeMake')" [style.left.px]="getFrozenLeft('ExchangeMake')">
+            <div class="th-content"><span>Make</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ExchangeMake')" (click)="openColumnFilter($event,'ExchangeMake')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('ExchangeModel')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ExchangeModel')" [style.left.px]="getFrozenLeft('ExchangeModel')">
+            <div class="th-content"><span>Model</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ExchangeModel')" (click)="openColumnFilter($event,'ExchangeModel')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('ExchangeMfgYear')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ExchangeMfgYear')" [style.left.px]="getFrozenLeft('ExchangeMfgYear')">
+            <div class="th-content"><span>Mfg Year</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ExchangeMfgYear')" (click)="openColumnFilter($event,'ExchangeMfgYear')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('MktExchValue')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('MktExchValue')" [style.left.px]="getFrozenLeft('MktExchValue')">
+            <div class="th-content"><span>Market Value</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('MktExchValue')" (click)="openColumnFilter($event,'MktExchValue')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('DealPrice')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealPrice')" [style.left.px]="getFrozenLeft('DealPrice')">
+            <div class="th-content"><span>Deal Price</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealPrice')" (click)="openColumnFilter($event,'DealPrice')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('ExchangeHPCategory')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ExchangeHPCategory')" [style.left.px]="getFrozenLeft('ExchangeHPCategory')">
+            <div class="th-content"><span>HP Category</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ExchangeHPCategory')" (click)="openColumnFilter($event,'ExchangeHPCategory')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('exchangeStockEntry')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('exchangeStockEntry')" [style.left.px]="getFrozenLeft('exchangeStockEntry')">
+            <div class="th-content"><span>Document Type</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('exchangeStockEntry')" (click)="openColumnFilter($event,'exchangeStockEntry')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="!hiddenColumns.has('exchangeStockEntryValue')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('exchangeStockEntryValue')" [style.left.px]="getFrozenLeft('exchangeStockEntryValue')">
+            <div class="th-content"><span>Document Number</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('exchangeStockEntryValue')" (click)="openColumnFilter($event,'exchangeStockEntryValue')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('ExcBuyerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ExcBuyerName')" [style.left.px]="getFrozenLeft('ExcBuyerName')">
+            <div class="th-content"><span>Exchange Buyer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ExcBuyerName')" (click)="openColumnFilter($event,'ExcBuyerName')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('ExcBuyerMob')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ExcBuyerMob')" [style.left.px]="getFrozenLeft('ExcBuyerMob')">
+            <div class="th-content"><span>Exchange Buyer Mobile</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ExcBuyerMob')" (click)="openColumnFilter($event,'ExcBuyerMob')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('SellingPrice')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('SellingPrice')" [style.left.px]="getFrozenLeft('SellingPrice')">
+            <div class="th-content"><span>Liquidation Value</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('SellingPrice')" (click)="openColumnFilter($event,'SellingPrice')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+          <th *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('LiquidationDate')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('LiquidationDate')" [style.left.px]="getFrozenLeft('LiquidationDate')" style="border-top-right-radius:8px;">
+            <div class="th-content"><span>Liquidation Date</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('LiquidationDate')" (click)="openColumnFilter($event,'LiquidationDate')"><i class="fas fa-filter"></i></button></div>
+          </th>
+          <th *ngIf="!hiddenColumns.has('Exchangetrcimage')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Exchangetrcimage')" [style.left.px]="getFrozenLeft('Exchangetrcimage')" style="border-top-right-radius:8px;">
+            <div class="th-content"><span>Ex Proof</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Exchangetrcimage')" (click)="openColumnFilter($event,'Exchangetrcimage')"><i class="fas fa-filter"></i></button></div>
+          </th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stock of displayData; let i = index;" style="cursor:pointer">
+          <td [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td *ngIf="!hiddenColumns.has('Action')" class="text-center" [class.frozen-col]="frozenColumnKeys.has('Action')" [style.left.px]="getFrozenLeft('Action')">
+            <i class="fa-solid fa-arrow-right text-primary cursor-pointer" style="font-size:14px" title="Update Exchange Stock" (click)="onRowClick(stock)"></i>
+          </td>
+          <td *ngIf="showSH && !hiddenColumns.has('SHName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('SHName')" [style.left.px]="getFrozenLeft('SHName')">{{ stock.SHName }}</td>
+          <td *ngIf="showAM && !hiddenColumns.has('AmName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('AmName')" [style.left.px]="getFrozenLeft('AmName')">{{ stock.AmName }}</td>
+          <td *ngIf="showTM && !hiddenColumns.has('TmName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('TmName')" [style.left.px]="getFrozenLeft('TmName')">{{ stock.TmName }}</td>
+          <td *ngIf="!hiddenColumns.has('DealerCode')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">{{ stock.DealerCode }}</td>
+          <td *ngIf="!hiddenColumns.has('DealerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">{{ stock.DealerName }}</td>
+          <td *ngIf="!hiddenColumns.has('Mobile')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Mobile')" [style.left.px]="getFrozenLeft('Mobile')">{{ stock.Mobile }}</td>
+          <td *ngIf="!hiddenColumns.has('DlrLoc')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrLoc')" [style.left.px]="getFrozenLeft('DlrLoc')">{{ stock.DlrLoc }}</td>
+          <td *ngIf="!hiddenColumns.has('DlrCat')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">{{ stock.DlrCat }}</td>
+          <td *ngIf="!hiddenColumns.has('CustomerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('CustomerName')" [style.left.px]="getFrozenLeft('CustomerName')">{{ stock.CustomerName }}</td>
+          <td *ngIf="!hiddenColumns.has('ChassisNumber')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ChassisNumber')" [style.left.px]="getFrozenLeft('ChassisNumber')">{{ stock.ChassisNumber }}</td>
+          <td *ngIf="!hiddenColumns.has('DeliveryDate')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DeliveryDate')" [style.left.px]="getFrozenLeft('DeliveryDate')">{{ formatDisplayDate(stock.DeliveryDate) }}</td>
+          <td *ngIf="!hiddenColumns.has('ExchangeMake')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ExchangeMake')" [style.left.px]="getFrozenLeft('ExchangeMake')">{{ stock.ExchangeMake }}</td>
+          <td *ngIf="!hiddenColumns.has('ExchangeModel')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ExchangeModel')" [style.left.px]="getFrozenLeft('ExchangeModel')">{{ stock.ExchangeModel }}</td>
+          <td *ngIf="!hiddenColumns.has('ExchangeMfgYear')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ExchangeMfgYear')" [style.left.px]="getFrozenLeft('ExchangeMfgYear')">{{ stock.ExchangeMfgYear }}</td>
+          <td *ngIf="!hiddenColumns.has('MktExchValue')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('MktExchValue')" [style.left.px]="getFrozenLeft('MktExchValue')">{{ stock.MktExchValue | number }}</td>
+          <td *ngIf="!hiddenColumns.has('DealPrice')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealPrice')" [style.left.px]="getFrozenLeft('DealPrice')">{{ stock.DealPrice | number }}</td>
+          <td *ngIf="!hiddenColumns.has('ExchangeHPCategory')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ExchangeHPCategory')" [style.left.px]="getFrozenLeft('ExchangeHPCategory')">{{ stock.ExchangeHPCategory }}</td>
+          <td *ngIf="!hiddenColumns.has('exchangeStockEntry')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('exchangeStockEntry')" [style.left.px]="getFrozenLeft('exchangeStockEntry')">{{ stock.exchangeStockEntry }}</td>
+          <td *ngIf="!hiddenColumns.has('exchangeStockEntryValue')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('exchangeStockEntryValue')" [style.left.px]="getFrozenLeft('exchangeStockEntryValue')">{{ stock.exchangeStockEntryValue }}</td>
+          <td *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('ExcBuyerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ExcBuyerName')" [style.left.px]="getFrozenLeft('ExcBuyerName')">{{ stock.ExcBuyerName }}</td>
+          <td *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('ExcBuyerMob')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ExcBuyerMob')" [style.left.px]="getFrozenLeft('ExcBuyerMob')">{{ stock.ExcBuyerMob }}</td>
+          <td *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('SellingPrice')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('SellingPrice')" [style.left.px]="getFrozenLeft('SellingPrice')">{{ stock.SellingPrice }}</td>
+          <td *ngIf="selectedStockTypeAfterFilter === 'Sold' && !hiddenColumns.has('LiquidationDate')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('LiquidationDate')" [style.left.px]="getFrozenLeft('LiquidationDate')">{{ stock.LiquidationDate }}</td>
+          <td *ngIf="!hiddenColumns.has('Exchangetrcimage')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Exchangetrcimage')" [style.left.px]="getFrozenLeft('Exchangetrcimage')">
+            <a *ngIf="stock.excFile" [href]="stock.excFile" target="_blank"
+               class="btn btn-outline-primary btn-xs" style="font-size:10px;">
+              <i class="fas fa-eye me-1"></i>View
+            </a>
+          </td>
+        </tr>
+
+        <tr *ngIf="!displayData || displayData.length === 0">
+          <td colspan="25" class="text-center py-4">
+            <div class="mb-2 d-flex justify-content-center">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:48px;height:48px;background:linear-gradient(135deg,#4e73df,#1cc88a);color:white;">
+                <i class="fa-solid fa-box-open fs-5"></i>
+              </div>
+            </div>
+            <h6 class="fw-normal mb-1" style="font-size:15px;color:#2c3e50;">No Exchange Stock Found</h6>
+            <p class="mb-0 text-muted" style="font-size:13px;">There is currently no exchange stock data available. Try adjusting your filters.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+
+  <!-- Column Filter Dropdown — fully DOM-controlled -->
+  <div #filterDropdownEl class="col-filter-dropdown" (click)="$event.stopPropagation()">
+    <input type="text" class="filter-search-input" placeholder="Search values..."
+           [(ngModel)]="filterSearchText" (input)="onFilterSearch()">
+    <div class="filter-select-actions">
+      <button (click)="selectAllFilterValues()">Select All</button>
+      <button (click)="clearAllFilterValues()">Clear All</button>
+    </div>
+    <div class="filter-values-list">
+      <label *ngFor="let val of filteredDropdownValues" class="filter-value-item">
+        <input type="checkbox" [checked]="tempSelectedValues.has(val)" (change)="toggleFilterValue(val, $event)">
+        <span>{{ val || '(Blank)' }}</span>
+      </label>
+      <div *ngIf="filteredDropdownValues.length === 0" class="no-values-msg">No values found</div>
+    </div>
+    <div class="filter-dropdown-actions">
+      <button class="btn-cancel" (click)="cancelFilter()">Cancel</button>
+      <button class="btn-apply" (click)="applyColumnFilter()">Apply</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal (unchanged) -->
+<div class="modal fade" id="viewExchangeStockModal" tabindex="-1" aria-labelledby="viewMoreLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0"><i class="bi bi-pencil-square me-2"></i>Exchange Stock</h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body p-3" style="max-height:70vh;overflow-y:auto;">
+        <div class="customer-details-card mb-3" *ngIf="selectedItem">
+          <div class="card-header-custom mb-2">Exchange Tractor Details</div>
+          <div class="details-grid">
+            <div class="detail-item"><div class="detail-label">SAP</div><div class="detail-value">{{ selectedItem.DealerCode }}</div></div>
+            <div class="detail-item"><div class="detail-label">Mobile No.</div><div class="detail-value">{{ selectedItem.Mobile }}</div></div>
+            <div class="detail-item"><div class="detail-label">Customer Name</div><div class="detail-value">{{ selectedItem.CustomerName }}</div></div>
+            <div class="detail-item"><div class="detail-label">Model Name</div><div class="detail-value">{{ selectedItem.Model }}</div></div>
+            <div class="detail-item"><div class="detail-label">Model Code</div><div class="detail-value">{{ selectedItem.Modelcode }}</div></div>
+            <div class="detail-item"><div class="detail-label">Chassis Number</div><div class="detail-value"><i class="fa-solid fa-hashtag me-1 text-secondary"></i>{{ selectedItem.ChassisNumber }}</div></div>
+            <div class="detail-item"><div class="detail-label">Delivery Date</div><div class="detail-value"><i class="fa-solid fa-calendar-days me-1 text-primary"></i>{{ formatDisplayDate(selectedItem.DeliveryDate) }}</div></div>
+            <div class="detail-item"><div class="detail-label">Exchange Make</div><div class="detail-value">{{ selectedItem.ExchangeMake }}</div></div>
+            <div class="detail-item"><div class="detail-label">Exchange Model</div><div class="detail-value">{{ selectedItem.ExchangeModel }}</div></div>
+            <div class="detail-item"><div class="detail-label">Mfg Year</div><div class="detail-value">{{ selectedItem.ExchangeMfgYear }}</div></div>
+            <div class="detail-item"><div class="detail-label">Mkt Value Exc Tr.</div><div class="detail-value"><i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size:11px"></i>{{ selectedItem.MktExchValue | number }}</div></div>
+            <div class="detail-item"><div class="detail-label">Deal Price Exc Tr.</div><div class="detail-value"><i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size:11px"></i>{{ selectedItem.DealPrice | number }}</div></div>
+            <div class="detail-item"><div class="detail-label">Customer Ask-Exc Tr.</div><div class="detail-value"><i class="fa-solid fa-indian-rupee-sign me-1 text-success" style="font-size:11px"></i>{{ selectedItem.CustomerAskExchValue | number }}</div></div>
+            <div class="detail-item"><div class="detail-label">HP Category</div><div class="detail-value">{{ selectedItem.ExchangeHPCategory }}</div></div>
+            <div class="detail-item"><div class="detail-label">Document Type</div><div class="detail-value">{{ selectedItem.exchangeStockEntry }}</div></div>
+            <div class="detail-item"><div class="detail-label">Document Number</div><div class="detail-value">{{ selectedItem.exchangeStockEntryValue }}</div></div>
+          </div>
+        </div>
+        <div class="customer-details-card">
+          <div class="card-header-custom mb-0">Liquidation Details</div>
+          <form [formGroup]="liquidationForm">
+            <div class="row g-3">
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">Selling Price of Exc Tr. <span class="text-danger">*</span></label>
+                <input type="number" class="form-control form-control-custom" formControlName="sellingPrice" placeholder="Enter selling price" [class.input-error]="isSubmitted && f['sellingPrice'].invalid" [readonly]="isSold">
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['sellingPrice'].errors?.['required']">Selling price is required.</div>
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['sellingPrice'].errors?.['min']">Price must be greater than 0.</div>
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['sellingPrice'].errors?.['max']">Price must not exceed 6 digits.</div>
+              </div>
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">Exchange Buyer Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-custom" formControlName="customerName" placeholder="Enter customer name" [class.input-error]="isSubmitted && f['customerName'].invalid" [readonly]="isSold">
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['customerName'].errors?.['required']">Exchange Buyer Name is required.</div>
+              </div>
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">Exchange Buyer Mobile <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-custom" formControlName="customerMobile" placeholder="Enter 10-digit mobile" maxlength="10" [class.input-error]="isSubmitted && f['customerMobile'].invalid" [readonly]="isSold">
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['customerMobile'].errors?.['required']">Exchange Buyer Mobile is required.</div>
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['customerMobile'].errors?.['pattern']">Enter valid 10-digit mobile number.</div>
+              </div>
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">District <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-custom" formControlName="district" placeholder="Enter district" [class.input-error]="isSubmitted && f['district'].invalid" [readonly]="isSold">
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['district'].errors?.['required']">District is required.</div>
+              </div>
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">Tehsil <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-custom" formControlName="tehsil" placeholder="Enter tehsil" [class.input-error]="isSubmitted && f['tehsil'].invalid" [readonly]="isSold">
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['tehsil'].errors?.['required']">Tehsil is required.</div>
+              </div>
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <label class="form-label fw-medium mb-1">Village <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-custom" formControlName="village" placeholder="Enter village" [class.input-error]="isSubmitted && f['village'].invalid" [readonly]="isSold">
+                <div class="text-danger mt-1" *ngIf="isSubmitted && f['village'].errors?.['required']">Village is required.</div>
+              </div>
+              <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="isSold">
+                <label class="form-label fw-medium mb-1">Liquidation Date</label>
+                <input type="date" class="form-control form-control-custom" formControlName="liquidationDate" readonly>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer pt-0 p-3 d-flex justify-content-center" *ngIf="selectedStockType === 'In Stock'">
+        <button type="button" class="btn btn-submit mt-3" (click)="onSubmit()">Update Exchange</button>
+      </div>
+    </div>
+  </div>
+</div>
