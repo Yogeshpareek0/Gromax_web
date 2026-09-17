@@ -195,7 +195,15 @@
           <td class="text-nowrap">{{ item.workHrs }}</td>
           <td class="text-nowrap">{{ item.daysTaken }}</td>
 
-          <td class="text-nowrap">{{ item.Status }}</td>
+          <td class="text-nowrap">
+            <span class="status-badge"
+                  [ngClass]="{
+      'status-done': item.Status === 'Done',
+      'status-pending': item.Status === 'Pending'
+    }">
+              {{ item.Status }}
+            </span>
+          </td>
 
           <td class="text-nowrap">{{ item.hoStatus }}</td>
           <td class="text-nowrap">{{ item.hoRemark }}</td>

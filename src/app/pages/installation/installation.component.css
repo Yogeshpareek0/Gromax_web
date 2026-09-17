@@ -377,3 +377,29 @@
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 75px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+}
+
+/* Done */
+.status-done {
+  background-color: #e8f8ef;
+  color: #16834a;
+  border-color: #b7e8ca;
+}
+
+/* Pending */
+.status-pending {
+  background-color: #fff5df;
+  color: #c77900;
+  border-color: #f5d28a;
+}
