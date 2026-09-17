@@ -28,7 +28,7 @@
   </div>
 
   <!-- Create / Update Form Section -->
-  <div *ngIf="(activeTab === 'create' || activeTab === 'update') && (positionId === 'Territory Manager'|| misstatus?.toLowerCase() === 'yes'||positionId === 'Dealer')" class="card shadow-sm rounded-3">
+  <div *ngIf="(activeTab === 'create' || activeTab === 'update') && (positionId === 'Territory Manager'|| misstatus?.toLowerCase() === 'yes'||positionId === 'Dealer'||userName==='wairagal.devidas@gromaxagri.com')" class="card shadow-sm rounded-3">
     <div class="card-body">
       <div class="row g-3">
         <div class="col-lg-3 col-sm-6" *ngIf="showSH">
@@ -73,7 +73,8 @@
           <div class="form-floating-custom">
             <input type="text" [(ngModel)]="name" name="name" class="form-control"
                    [ngClass]="{'is-invalid': submitClicked && !name}"
-                   [disabled]="activeTab==='update' && (ApprovalStatus === 'Approved'||ApprovalStatus === 'Approval Pending')">
+                   [disabled]="(userName!=='wairagal.devidas@gromaxagri.com') && (activeTab==='update' &&
+                   (ApprovalStatus === 'Approved'||ApprovalStatus === 'Approval Pending'))">
             <label>Salesman Name</label>
           </div>
         </div>
@@ -219,7 +220,7 @@
         <thead>
           <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
             <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px; width:10px">S.No.</th>
-            <th class="text-nowrap fw-normal" style="width:10px;" *ngIf="positionId !== 'National Sales Head'">Action</th>
+            <th class="text-nowrap fw-normal" style="width:10px;" *ngIf="(positionId !== 'National Sales Head'||userName==='wairagal.devidas@gromaxagri.com')">Action</th>
             <th class="text-nowrap fw-normal">Salesman Name</th>
             <th class="text-nowrap fw-normal">Mobile Number</th>
             <th class="text-nowrap fw-normal">Dealer Code</th>
@@ -234,7 +235,7 @@
         <tbody style="font-size: 14px;">
           <tr *ngFor="let item of salesmanList; let i = index;">
             <td>{{ i + 1 }}</td>
-            <td *ngIf="positionId !== 'National Sales Head'" class="text-center">
+            <td *ngIf="(positionId !== 'National Sales Head'||userName==='wairagal.devidas@gromaxagri.com')" class="text-center">
               <i class="fa-solid fa-arrow-right text-primary cursor-pointer"
                  style="font-size:14px" title="Update Salesman" (click)="onRowClick(item)"></i>
             </td>
@@ -297,7 +298,7 @@
         <option value="1">Approved</option>
         <option value="0">Pending</option>
         <option value="-1">Rejected</option>
-      
+
       </select>
     </div>
 
