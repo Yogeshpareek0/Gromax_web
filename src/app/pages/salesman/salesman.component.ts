@@ -84,9 +84,9 @@ export class SalesmanComponent implements OnInit {
     //}
 
     if (this.positionId === 'National Sales Head') {
-      this.showSH = true;
-      this.showAM = true;
-      this.showTM = true;
+      this.showSH = false;
+      this.showAM = false;
+      this.showTM = false;
       this.showDealer = true;
     } else if (this.positionId === 'State Head') {
       this.showSH = false;
