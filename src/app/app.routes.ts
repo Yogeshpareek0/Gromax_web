@@ -43,6 +43,8 @@ import { DealermasterComponent } from '../app/pages/dealermaster/dealermaster.co
 import { menuGuard } from './services/guards/menu.guard';
 import { ReimbersementInvComponent } from '../app/pages/ServicePart/reimbersement-inv/reimbersement-inv.component';
 import { MechanicComponent } from '../app/pages/ServicePart/mechanic/mechanic.component';
+import { PdiReportComponent } from '../app/pages/ServicePart/pdi-report/pdi-report.component';
+import { NtirReportComponent } from '../app/pages/ServicePart/ntir-report/ntir-report.component';
 
 
 
@@ -94,7 +96,9 @@ export const routes: Routes = [
       { path: 'pdi', component: PdiComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'PreDeliveryInspection' } },
       { path: 'dealermaster', component: DealermasterComponent, canActivate: [menuGuard], data: { menuGroup: 'Sales', subMenu: 'DealerMaster' } },
       { path: 'reimbursementservice', component: ReimbersementInvComponent },
-      { path: 'Mechanic', component: MechanicComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'Mechanic' } }
+      { path: 'Mechanic', component: MechanicComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'Mechanic' } },
+      { path: 'pdireport', component: PdiReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'PdiReport' } },
+      { path: 'ntirreport', component: NtirReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'NtirReport' } }
 
     ]
 

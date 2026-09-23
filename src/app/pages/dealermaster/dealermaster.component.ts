@@ -563,7 +563,9 @@ export class DealermasterComponent implements OnInit {
       next: (data: any) => {
         const res = data as getApisResponse;
         if (res.message?.toLowerCase() === 'success') {
-          this.dealersList = res.data || [];
+          this.dealersList = (res.data || []).sort((a: any, b: any) =>
+            a.DealerCode.localeCompare(b.DealerCode)
+          );
         }
       },
       error: () => {
@@ -878,10 +880,15 @@ export class DealermasterComponent implements OnInit {
       this.dealerForm.reset({ activeStatus: 'Active' });
       this.resetForm();
       this.loadDealersForUpdate();
+      this.resetBaseLocationForm();
+
       this.getHOFilter();
       this.getCcmList();
-    } else {
+
+    }
+    else {
       this.resetUpdateForm();
+      this.resetBaseLocationForm();
       this.dealerForm.reset({ activeStatus: 'Active' });
     }
   }
@@ -936,6 +943,8 @@ export class DealermasterComponent implements OnInit {
 
   onEmployeeChange(): void {
     const empType = this.baseLocationForm.get('employeeId')?.value;
+    this.baseLocationForm.patchValue({ stateCode: '' });
+
     this.districtListBaseLocation = [];
     this.tehsilListBaseLocation = [];
     this.villageList = [];
@@ -963,33 +972,32 @@ export class DealermasterComponent implements OnInit {
 
     const payload = {
       employeeType: this.nullIfBlank(formValue.employeeType),
-      employeeId: this.nullIfBlank(formValue.employeeId),
-      stateCode: this.nullIfBlank(formValue.stateCode),
-      stateName: this.nullIfBlank(formValue.stateName),
-      districtCode: this.nullIfBlank(formValue.districtCode?.DistrictCode),
-      districtName: this.nullIfBlank(formValue.districtName),
-      tehsilCode: this.nullIfBlank(formValue.tehsilCode?.TehsilCode),
-      tehsilName: this.nullIfBlank(formValue.tehsilName),
-      villageCode: this.nullIfBlank(formValue.villageCode?.VillageCode),
-      villageName: this.nullIfBlank(formValue.villageName),
+      employeeId: this.nullIfBlank(formValue.employeeId)
+        ? Number(formValue.employeeId) : null,
+      stateCode: this.nullIfBlank(formValue.stateCode)
+        ? Number(formValue.stateCode) : null,
+      districtCode: this.nullIfBlank(formValue.districtCode)
+        ? Number(formValue.districtCode) : null,
+      tehsilCode: this.nullIfBlank(formValue.tehsilCode)
+        ? Number(formValue.tehsilCode) : null,
+      villageCode: this.nullIfBlank(formValue.villageCode)
+        ? Number(formValue.villageCode) : null,
       otherLocation: this.nullIfBlank(formValue.otherLocation)
     };
 
     // TODO: API call - save base location
-    // this.apis.addBaseLocation(payload).subscribe({
-    //   next: (res: any) => {
-    //     if (res?.message?.toLowerCase() === 'success') {
-    //       Swal.fire({ icon: 'success', title: 'Success', text: 'Base Location Added Successfully', confirmButtonText: 'OK' })
-    //         .then(() => this.resetBaseLocationForm());
-    //     } else {
-    //       this.apis.showAlert('error', 'Error!', res?.message || 'Failed to add base location.');
-    //     }
-    //   },
-    //   error: () => { this.apis.showAlert('error', 'Error!', 'An error occurred. Please try again.'); }
-    // });
+    this.apis.addBaseLocation(payload).subscribe({
+      next: (res: any) => {
+        if (res?.message?.toLowerCase() === 'success') {
+          this.apis.showAlert('success', 'Success!', 'Base Location Added Successfully.').then(() => this.resetBaseLocationForm());
+        } else {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed to add base location.');
+        }
+      },
+      error: () => { this.apis.showAlert('error', 'Error!', 'An error occurred. Please try again.'); }
+    });
   }
 
-  // ==================== RESET BASE LOCATION FORM ====================
 
   resetBaseLocationForm(): void {
     this.baseLocationForm.reset();
@@ -1068,7 +1076,6 @@ export class DealermasterComponent implements OnInit {
   }
 
   onBaseDistrictChange(): void {
-    debugger;
     const districtCode = this.baseLocationForm.get('districtCode')?.value;
     const districtObj = this.districtListBaseLocation.find(x => x.DistrictCode === districtCode);
 
@@ -1096,12 +1103,11 @@ export class DealermasterComponent implements OnInit {
 
 
   onBasetehsilCodeChange(): void {
-    debugger;
     const tehsilCode = this.baseLocationForm.get('tehsilCode')?.value;
-    const tehsilObj = this.districtListBaseLocation.find(x => x.TehsilCode === tehsilCode);
+    const tehsilObj = this.tehsilListBaseLocation.find(x => x.TehsilCode === tehsilCode);
 
     this.baseLocationForm.patchValue({
-      districtName: tehsilObj?.TehsilName || '',
+      tehsilName: tehsilObj?.TehsilName || '',
       villageCode: null,
 
     });
@@ -1109,7 +1115,7 @@ export class DealermasterComponent implements OnInit {
 
     if (!tehsilCode) return;
 
-    this.apis.getDistrictList('Tehsil', this.baseLocationForm.get('tehsilName')?.value, tehsilCode).subscribe({
+    this.apis.getDistrictList('Tehsil', tehsilObj?.TehsilName || '', tehsilCode).subscribe({
       next: (data) => {
         const res = data as getApisResponse;
         if (res.message?.toLowerCase() === 'success') {

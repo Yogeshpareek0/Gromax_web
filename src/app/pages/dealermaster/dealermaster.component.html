@@ -10,12 +10,12 @@
         <button class="nav-link" id="update-dealer-tab" data-bs-toggle="tab" data-bs-target="#update-dealer-pane" type="button" role="tab" (click)="tabChange('update')">
           Update Dealer
         </button>
-      <!--</li>
+      </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="base-location-tab" data-bs-toggle="tab" data-bs-target="#base-location-pane" type="button" role="tab" (click)="tabChange('baselocation')">
           Add Base Location
         </button>
-      </li>-->
+      </li>
     </ul>
   </div>
 
@@ -390,7 +390,7 @@
               <div class="form-floating-custom" [class.has-value]="updateDealerForm.get('dealerId')?.value">
                 <select class="form-select" formControlName="dealerId" (change)="onSelectDealerForUpdate()">
                   <option value="" disabled selected hidden></option>
-                  <option *ngFor="let dealer of dealersList" [value]="dealer.DealerCode">{{ dealer.DealerName }} - {{ dealer.DealerCode }}</option>
+                  <option *ngFor="let dealer of dealersList" [value]="dealer.DealerCode">{{ dealer.DealerCode }}-{{ dealer.DealerName }}</option>
                 </select>
                 <label>Select Dealer</label>
                 <small class="text-danger" *ngIf="hasUpdateError('dealerId')">Please select a dealer</small>
@@ -668,7 +668,7 @@
               <div class="form-floating-custom" [class.has-value]="baseLocationForm.get('villageCode')?.value">
                 <select class="form-select" formControlName="villageCode">
                   <option [ngValue]="null" disabled selected hidden></option>
-                  <option *ngFor="let v of villageList" [ngValue]="v">{{ v.VillageName }}</option>
+                  <option *ngFor="let v of villageList" [ngValue]="v.VillageCode">{{ v.VillageName }}</option>
                 </select>
                 <label>Village</label>
                 <small class="text-danger" *ngIf="hasBaseLocationError('villageCode')">Required</small>

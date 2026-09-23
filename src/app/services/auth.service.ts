@@ -111,7 +111,7 @@ export class AuthService {
   }
 
   logout() {
-    
+
     sessionStorage.clear();
     localStorage.clear();
     this.clearAllCookies();
@@ -894,6 +894,24 @@ export class AuthService {
 
   getEmployeeListByPosition(params: any) {
     return this.http.get(this.baseUrl + 'Api/Home/getEmployeeListByPosition', { params });
+  }
+
+  addBaseLocation(params: any) {
+    return this.http.post(this.baseUrl + 'Api/Home/addBaseLocation', params);
+  }
+
+
+  getPDIReport(request: any) {
+    return this.http.get(this.baseUrl + 'Api/Services/pdiReport', { params: request });
+  }
+  allDealerList(id: number) {
+    const params = new HttpParams()
+      .set('status', id)
+    return this.http.get(this.baseUrl + 'Api/Home/allDealerList', { params });
+  }
+
+  getNTIRReport(request: any) {
+    return this.http.get(this.baseUrl + 'Api/Services/ntirReport', { params: request });
   }
 
 }

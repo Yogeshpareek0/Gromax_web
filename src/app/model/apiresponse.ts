@@ -1116,7 +1116,7 @@ export interface PartRow {
   selected: any | null;
   saved: boolean;
   qty: string;
- /* labour: string;*/
+  /* labour: string;*/
   remark: string;
   errors?: Record<string, string>;
 }
@@ -1186,4 +1186,76 @@ export interface DealerRequestModel {
   activeStatus: string;
 }
 
+export interface PDIReport {
+  DealerCode: string;
+  DealerName: string;
+  StateName: string;
+  ModelCode: string;
+  ModelName: string;
+  engineNo: string;
+  runningHours: string;
+  Name: string;
+  section: string;
+  brand: string;
+  photo1: string;
+  photo2: string;
+  remark: string;
+  pdiDate: string;
+  length: number;
+  chasisno: string;
 
+
+}
+export interface PdiCount {
+  totalTractorsCount: number;
+  pdiPendingCount: number;
+  pdiCompletedCount: number;
+  defectFoundCount: number;
+}
+
+export interface PdiDataResponse {
+  countResponse: PdiCount,
+  pdiReport: PDIReport[]
+}
+export interface PDIResponse {
+  statusCode: number;
+  message: string;
+  data: PdiDataResponse;
+}
+
+export interface NTIRReport {
+  DealerCode: string;
+  DealerName: string;
+  StateName: string;
+  ModelCode: string;
+  ModelName: string;
+  engineNo: string;
+  runningHours: string;
+  Name: string;
+  section: string;
+  brand: string;
+  photo1: string;
+  photo2: string;
+  remark: string;
+  ntirDate: string;
+  length: number;
+  chasisno: string;
+}
+
+export interface NtirCount {
+  totalTractorsCount: number;
+  ntirPendingCount: number;
+  ntirCompletedCount: number;
+  defectFoundCount: number;
+}
+
+export interface NtirDataResponse {
+  countResponse: NtirCount,
+  ntirReport: NTIRReport[]
+}
+
+export interface NTIRResponse {
+  statusCode: number;
+  message: string;
+  data: NtirDataResponse;
+}

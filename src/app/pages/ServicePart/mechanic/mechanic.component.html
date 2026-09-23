@@ -296,34 +296,162 @@
     <div class="enquiry-table-wrapper">
       <table id="mechanicTable" class="table table-bordered table-striped" style="min-width: 1600px;">
         <thead>
+
+          <!-- ================= MAIN HEADER ================= -->
           <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
-            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px; width:10px">S.No.</th>
-            <th class="text-nowrap fw-normal" style="width:10px;" *ngIf="positionId === 'Service CCM'">Action</th>
-            <th class="text-nowrap fw-normal">Dealer Code</th>
-            <th class="text-nowrap fw-normal">Dealer Name</th>
-            <th class="text-nowrap fw-normal">State Name</th>
-            <th class="text-nowrap fw-normal">Location</th>
 
-            <th class="text-nowrap fw-normal">Mechanic Name</th>
-            <th class="text-nowrap fw-normal">Contact No.</th>
-            <th class="text-nowrap fw-normal">Aadhar Card No.</th>
-            <th class="text-nowrap fw-normal">Type</th>
-            <th class="text-nowrap fw-normal">Education</th>
-            <th class="text-nowrap fw-normal">Exp. in Dealership</th>
-            <th class="text-nowrap fw-normal">Prior Exp.</th>
-            <th class="text-nowrap fw-normal">Total Exp.</th>
-            <th class="text-nowrap fw-normal">Physical</th>
-            <th class="text-nowrap fw-normal">Virtual</th>
-            <th class="text-nowrap fw-normal">Installation</th>
-            <th class="text-nowrap fw-normal">Hydraulic</th>
-            <th class="text-nowrap fw-normal">Engine</th>
-            <th class="text-nowrap fw-normal">Training</th>
-            <th class="text-nowrap fw-normal">System</th>
+            <th rowspan="2"
+                class="text-nowrap fw-normal"
+                style="border-top-left-radius: 8px; width:10px;">
+              S.No.
+            </th>
 
-            <th class="text-nowrap fw-normal">Approval Status</th>
-            <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Remark</th>
+            <th rowspan="2"
+                class="text-nowrap fw-normal"
+                style="width:10px;"
+                *ngIf="positionId === 'Service CCM'">
+              Action
+            </th>
+
+            <!-- Dealer Details -->
+            <th colspan="4" class="text-nowrap fw-normal text-center">
+              Dealer Details
+            </th>
+
+            <!-- Mechanic Details -->
+            <th colspan="7" class="text-nowrap fw-normal text-center">
+              Mechanic Details
+            </th>
+
+            <!-- Prior Experience -->
+            <th colspan="2" class="text-nowrap fw-normal text-center">
+              Prior Exp in Trac Ind or Others (Yrs)
+            </th>
+
+            <!-- Gurukul Training -->
+            <th colspan="2" class="text-nowrap fw-normal text-center">
+              No. of Trainings Completed at Gurukul
+            </th>
+
+            <!-- Other Training Details -->
+            <th colspan="5" class="text-nowrap fw-normal text-center">
+              Training Details
+            </th>
+
+            <!-- Approval Details -->
+            <th colspan="2"
+                class="text-nowrap fw-normal text-center"
+                style="border-top-right-radius: 6px;">
+              Approval Details
+            </th>
 
           </tr>
+
+
+          <!-- ================= SUB HEADER ================= -->
+          <tr style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+
+            <!-- Dealer Details -->
+            <th class="text-nowrap fw-normal">
+              Dealer Code
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Dealer Name
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              State Name
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Location
+            </th>
+
+
+            <!-- Mechanic Details -->
+            <th class="text-nowrap fw-normal">
+              Mechanic Name
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Contact No.
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Aadhar Card No.
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Type
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Education
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Exp. in Dealership
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Total Exp.
+            </th>
+
+
+            <!-- Prior Experience -->
+            <th class="text-nowrap fw-normal">
+              Prior Exp.
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Prior Exp. Year
+            </th>
+
+
+            <!-- Gurukul Training -->
+            <th class="text-nowrap fw-normal text-center">
+              Physical
+            </th>
+
+            <th class="text-nowrap fw-normal text-center">
+              Virtual
+            </th>
+
+
+            <!-- Other Training Details -->
+            <th class="text-nowrap fw-normal">
+              Installation
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Hydraulic
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Engine
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Training
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              System
+            </th>
+
+
+            <!-- Approval Details -->
+            <th class="text-nowrap fw-normal">
+              Approval Status
+            </th>
+
+            <th class="text-nowrap fw-normal">
+              Remark
+            </th>
+
+          </tr>
+
         </thead>
         <tbody style="font-size: 14px;">
           <tr *ngFor="let item of mechanicList; let i = index;">
@@ -343,8 +471,10 @@
             <td class="text-nowrap">{{ item.typeOfMechanic }}</td>
             <td class="text-nowrap">{{ item.education }}</td>
             <td class="text-nowrap">{{ item.experienceInGromax }}</td>
-            <td class="text-nowrap">{{ item.priorExperience }}</td>
             <td class="text-nowrap">{{ item.totalExperience }}</td>
+
+            <td class="text-nowrap">{{ item.priorExperience }}</td>
+            <td class="text-nowrap">{{ item.priorExperienceYears }}</td>
             <td class="text-nowrap">{{ item.physicalTrainingCount }}</td>
             <td class="text-nowrap">{{ item.virtualTrainingCount }}</td>
             <td class="text-nowrap">{{ item.installationAttendance }}</td>
