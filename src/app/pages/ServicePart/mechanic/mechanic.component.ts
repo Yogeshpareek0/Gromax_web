@@ -126,7 +126,7 @@ export class MechanicComponent implements OnInit {
       },
 
       error: (err) => {
-        console.error('Get Mechanic List Error:', err);
+        //console.error('Get Mechanic List Error:', err);
 
         this.mechanicList = [];
 
@@ -158,7 +158,7 @@ export class MechanicComponent implements OnInit {
       },
 
       error: (err) => {
-        console.error('Get Mechanic List Error:', err);
+        //console.error('Get Mechanic List Error:', err);
 
         this.approvalList = [];
 
@@ -280,7 +280,7 @@ export class MechanicComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Mechanic API Error:', err);
+        //console.error('Mechanic API Error:', err);
 
         this.toastr.error(
           err?.message || 'Unable to save mechanic details.',
@@ -313,7 +313,7 @@ export class MechanicComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Mechanic API Error:', err);
+        //console.error('Mechanic API Error:', err);
 
         this.toastr.error(
           err?.message || 'Unable to save mechanic details.',
@@ -441,7 +441,7 @@ export class MechanicComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Mechanic Approval API Error:', err);
+        //console.error('Mechanic Approval API Error:', err);
 
         this.toastr.error(
           err?.error?.message || 'Unable to update mechanic approval status.',

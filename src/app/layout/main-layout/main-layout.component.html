@@ -179,6 +179,16 @@
             </li>
           </ul>
 
+          <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
+            <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
+                *ngIf="hasSubMenu('Service','ItemScore')"
+                [class.active]="activeRoute === 'additemscore'"
+                (click)="onNavigate('additemscore')">
+              <img src="assets/images/score.png" alt="additemscore" class="menu-icon me-2" />
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">Item Score</a>
+            </li>
+          </ul>
+
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
@@ -197,6 +207,17 @@
               <img src="assets/images/reimbersement.png" alt="reimbursementservice" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Reimbursement Service
+              </a>
+            </li>
+          </ul>
+          <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
+            <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
+                *ngIf="hasSubMenu('Service','GenerateInvoiceList')"
+                [class.active]="activeRoute === 'generatedinvoicelist'"
+                (click)="onNavigate('generatedinvoicelist')">
+              <img src="assets/images/generatedinvoicelist.png" alt="generatedinvoicelist" class="menu-icon me-2" />
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
+                Generated Invoice List
               </a>
             </li>
           </ul>

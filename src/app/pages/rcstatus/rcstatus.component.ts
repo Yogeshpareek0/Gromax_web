@@ -72,7 +72,7 @@ export class RcstatusComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error loading RC status list:', err);
+        //console.error('Error loading RC status list:', err);
         this.apis.showAlert('error', 'Error!', 'Failed to load data');
         this.rcStatusList = [];
       }
@@ -138,7 +138,7 @@ export class RcstatusComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error updating RC status:', err);
+        //console.error('Error updating RC status:', err);
         this.apis.showAlert('error', 'Error!', 'Failed to update RC Status');
       }
     });

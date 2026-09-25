@@ -1,0 +1,261 @@
+<div class="container-fluid px-0">
+
+  <!-- ==================== DEALER LIST ==================== -->
+  <ng-container *ngIf="view === 'dealers'">
+
+    <div class="card shadow-sm px-4 border-0 pb-1 pt-4 mt-2" style="border-radius: 12px;">
+      <div class="row">
+        <div class="col-xl-4 col-lg-5 col-sm-8">
+          <div class="form-floating-custom" [class.has-value]="dealerSearch">
+            <input type="text" class="form-control" placeholder=" "
+                   [(ngModel)]="dealerSearch" (ngModelChange)="filterDealers()" />
+            <label>Search Dealer Code / Name / Location</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-4">
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 900px;">
+        <thead>
+          <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">Location</th>
+            <th class="text-nowrap fw-normal">State</th>
+            <th class="text-nowrap fw-normal">Status</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="dealerLoading">
+            <td colspan="7">
+              <div class="d-flex justify-content-center align-items-center py-3">
+                <div class="spinner-border spinner-border-sm me-2" style="color:#4796BD"></div>
+                <span style="font-size:13px; color:#4796BD">Loading dealers...</span>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!dealerLoading && filteredDealers.length === 0">
+            <td colspan="7">
+              <div class="is-empty">
+                <div class="is-empty-icon"><i class="fa-solid fa-store"></i></div>
+                <p class="mb-0" style="font-size: 14px; color: #333;">No Dealer Found</p>
+              </div>
+            </td>
+          </tr>
+
+          <ng-container *ngIf="!dealerLoading">
+            <tr *ngFor="let d of filteredDealers; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><span class="is-code-badge">{{ d.DealerCode }}</span></td>
+              <td>{{ d.DealerName }}</td>
+              <td>{{ d.Location?.trim() || '-' }}</td>
+              <td>{{ d.StateName || '-' }}</td>
+              <td>
+                <span *ngIf="isDealerInProgress(d)" class="is-badge is-badge-warning">In Progress</span>
+                <span *ngIf="!isDealerInProgress(d)" class="is-badge is-badge-muted">Not Started</span>
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm is-action-btn" (click)="onDealerClick(d)">
+                  <i class="fa-solid" [ngClass]="isDealerInProgress(d) ? 'fa-pen' : 'fa-play'" style="font-size:9px"></i>
+                  {{ isDealerInProgress(d) ? 'Continue' : 'Start' }}
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <!-- ==================== GROUP LIST ==================== -->
+  <ng-container *ngIf="view === 'groups'">
+    <div class="nda-form-header mb-2 mt-2">
+      <button type="button" class="nda-back-btn" (click)="backToDealers()">
+        <span class="nda-back-arrow"><i class="fa-solid fa-arrow-left"></i></span>
+        <span>Back</span>
+      </button>
+      <div class="is-dealer-info">
+        <span class="is-code-badge">{{ selectedDealer?.DealerCode }}</span>
+        <span class="is-dealer-name">{{ selectedDealer?.DealerName }}</span>
+      </div>
+    </div>
+
+    <div class="card shadow-sm px-4 border-0 py-3 mt-2" style="border-radius: 12px;">
+
+      <div *ngIf="groupLoading" class="d-flex justify-content-center align-items-center py-4">
+        <div class="spinner-border spinner-border-sm me-2" style="color:#4796BD"></div>
+        <span style="font-size:13px; color:#4796BD">Loading groups...</span>
+      </div>
+
+      <div *ngIf="!groupLoading && groupNames.length === 0" class="is-empty">
+        <div class="is-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+        <p class="mb-0" style="font-size: 14px; color: #333;">No Group Data Found</p>
+      </div>
+
+      <div class="row g-3" *ngIf="!groupLoading && groupNames.length > 0">
+        <div class="col-xl-4 col-lg-6" *ngFor="let g of groupNames; let i = index">
+          <div class="is-group-card" (click)="openGroup(g)">
+            <span class="is-group-index">{{ i + 1 }}</span>
+            <div class="flex-fill">
+              <div class="is-group-name">{{ g }}</div>
+              <div class="is-group-sub">
+                {{ groupStatusMap[g]?.done || 0 }}/{{ groupStatusMap[g]?.total || 0 }} items done
+              </div>
+            </div>
+            <span class="is-status-circle" [class.done]="groupStatusMap[g]?.complete">
+              <i class="fa-solid fa-check" *ngIf="groupStatusMap[g]?.complete"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center pt-4 pb-2" *ngIf="!groupLoading && groupNames.length > 0">
+        <button type="button" class="btn text-white px-4"
+                [disabled]="!allGroupsComplete || submitting"
+                (click)="submitAll()"
+                style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!submitting" class="fa-solid fa-paper-plane me-1"></i>
+          {{ submitting ? 'Submitting...' : (allGroupsComplete ? 'Submit Score' : 'Complete all sections to submit') }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ==================== GROUP ITEMS ==================== -->
+  <ng-container *ngIf="view === 'items'">
+    <div class="nda-form-header mb-2 mt-2">
+      <button type="button" class="nda-back-btn" (click)="backToGroups()">
+        <span class="nda-back-arrow"><i class="fa-solid fa-arrow-left"></i></span>
+        <span>Back</span>
+      </button>
+      <div class="is-dealer-info">
+        <span class="is-code-badge">{{ selectedDealer?.DealerCode }}</span>
+        <span class="is-dealer-name">{{ selectedGroup }}</span>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-3">
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 900px;">
+        <thead>
+          <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Item</th>
+            <th class="text-nowrap fw-normal">Max Score</th>
+            <th class="text-nowrap fw-normal">Score</th>
+            <th class="text-nowrap fw-normal">Photo</th>
+            <th class="text-nowrap fw-normal">Status</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="groupItems.length === 0">
+            <td colspan="7">
+              <div class="is-empty">
+                <div class="is-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                <p class="mb-0" style="font-size: 14px; color: #333;">No Items Found For This Group</p>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let item of groupItems; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ item.groupItem }}</td>
+            <td>{{ item.maxScore ?? '-' }}</td>
+            <td>{{ getPoint(item)?.score ?? '-' }}</td>
+            <td>
+              <span *ngIf="isPhotoSectionEnabled(item)" class="is-badge is-badge-info">
+                {{ getPoint(item)?.images?.length || 0 }}/{{ getMinPhoto(item) }} Req
+              </span>
+              <span *ngIf="!isPhotoSectionEnabled(item)" class="is-badge is-badge-muted">N/A</span>
+            </td>
+            <td>
+              <span *ngIf="getPoint(item)" class="is-badge is-badge-success">
+                <i class="fa-solid fa-check me-1" style="font-size:9px"></i>Done
+              </span>
+              <span *ngIf="!getPoint(item)" class="is-badge is-badge-warning">Pending</span>
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm is-action-btn" (click)="openScoreModal(item)">
+                <i class="fa-solid" [ngClass]="getPoint(item) ? 'fa-pen' : 'fa-star'" style="font-size:9px"></i>
+                {{ getPoint(item) ? 'Edit' : 'Fill Score' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <!-- ==================== SCORE + PHOTO MODAL ==================== -->
+  <div class="modal fade" tabindex="-1" [class.show]="showModal"
+       [style.display]="showModal ? 'block' : 'none'"
+       [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
+    <div class="modal-dialog modal-dialog-top modal-dialog-scrollable">
+      <div class="modal-content" *ngIf="modalItem">
+
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title is-modal-title">{{ modalItem.groupItem }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Score -->
+          <div *ngIf="getAllowedScores(modalItem).length > 0">
+            <div class="is-section-label">Select Score <span class="text-muted">(Max {{ modalItem.maxScore ?? '-' }})</span></div>
+            <div class="is-score-wrap">
+              <button type="button" *ngFor="let s of getAllowedScores(modalItem)"
+                      class="is-score-chip" [class.selected]="tempScore === s"
+                      (click)="selectScore(s)">
+                {{ s }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Photos -->
+          <div class="mt-4" *ngIf="isPhotoSectionEnabled(modalItem)">
+            <div class="is-section-label">
+              Photo (min {{ getMinPhoto(modalItem) }}, max {{ getMaxPhoto(modalItem) }})
+            </div>
+            <div class="is-photo-grid">
+              <div class="is-photo-slot" *ngFor="let slot of tempSlots; let si = index">
+                <div *ngIf="slot.preview" class="is-photo-card">
+                  <img [src]="slot.preview" alt="photo" />
+                  <div class="is-photo-uploading" *ngIf="slot.uploading">
+                    <div class="spinner-border spinner-border-sm text-white"></div>
+                  </div>
+                  <button type="button" class="is-photo-remove" *ngIf="!slot.uploading" (click)="removePhoto(si)">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <div *ngIf="!slot.preview" class="is-photo-empty" (click)="pickPhoto(si, fileInput)">
+                  <i class="fa-solid fa-camera"></i>
+                  <span>Add photo</span>
+                </div>
+              </div>
+            </div>
+            <div class="is-photo-hint">
+              {{ uploadedCount }}/{{ getMinPhoto(modalItem) }} required photo(s) added
+            </div>
+          </div>
+
+          <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-secondary" style="font-size:.90rem !important" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn text-white px-4"
+                  [disabled]="!canMarkDone()"
+                  (click)="onDone()"
+                  style="background-color: #4796BD; border-radius: 50px; font-size: .90rem !important">
+            <i class="fa-solid fa-check me-1"></i> Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade" *ngIf="showModal" [class.show]="showModal"></div>
+</div>

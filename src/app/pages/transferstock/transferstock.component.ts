@@ -257,7 +257,7 @@ export class TransferstockComponent implements OnInit {
       },
       error: (err) => {
         // Server/network error
-        console.error('Insert Stock API error:', err);
+        //console.error('Insert Stock API error:', err);
         this.apis.showAlert('error', 'Error!', 'Server error: Unable to insert stock data. Please try again later.');
       }
     });

@@ -52,7 +52,7 @@ export class NdaformComponent implements OnInit {
   subSourceOptions: string[] = [];
 
   subSourceMapping: any = {
-    'HO': ['FB/Insta', 'WhatsApp', 'Toll-Free', 'Website', 'Google', 'Others'],
+    'HO': ['FB/Insta', 'WhatsApp', 'Toll-Free', 'Website', 'Google', 'AI Calling', 'Others'],
     'AGGREGATOR': ['Tractor Junction', 'Tractor Guru', 'CMV 360', 'Tractor Gyaan', 'Plantix', 'Other'],
     'TM': ['Field Visit', 'BTL', 'HO Digital', 'Referral', 'Other'],
     'AM': ['Field Visit', 'BTL', 'HO Digital', 'Referral', 'Other'],
@@ -1075,7 +1075,7 @@ export class NdaformComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error(err);
+        //console.error(err);
         this.apis.showAlert('error', 'Error!', 'Failed to load TM data.');
       }
     });
@@ -1098,7 +1098,7 @@ export class NdaformComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error(err);
+        //console.error(err);
         this.apis.showAlert('error', 'Error!', 'Failed to load Employee data.');
       }
     })
@@ -1165,7 +1165,7 @@ export class NdaformComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error(err);
+        //console.error(err);
         this.apis.showAlert(
           'error',
           'Error!',

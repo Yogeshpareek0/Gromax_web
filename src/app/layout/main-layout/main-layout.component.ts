@@ -121,8 +121,8 @@ export class MainLayoutComponent implements OnInit {
 
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry', 'stocktransfer', 'rcstatus',
       'retailpunch', 'exchangestock', 'updateoldenquiry', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
-    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport','ntirreport'];
-    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic']; // 🔑 naya array
+    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport'];
+    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist']; // 🔑 naya array
 
     if (path !== 'dynamicreport') {
       this.activeDashboardId = null;
@@ -185,8 +185,8 @@ export class MainLayoutComponent implements OnInit {
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry',
       'stocktransfer', 'rcstatus', 'retailpunch', 'exchangestock', 'updateoldenquiry',
       'updtoldretailedenq', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
-    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport','ntirreport'];
-    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic'];
+    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport'];
+    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist'];
 
     this.isSalesOpen = false;
     this.isBusinessReportsOpen = false;
@@ -222,7 +222,7 @@ export class MainLayoutComponent implements OnInit {
   }
 
   logout() {
-   
+
     sessionStorage.clear();
     this.apis.logout();
   }
@@ -269,7 +269,9 @@ export class MainLayoutComponent implements OnInit {
       generatejob: 'Generate Job Card',
       dealermaster: 'Add Dealer',
       reimbursementservice: 'Reimbursement Service',
-      Mechanic: 'Mechanic Master'
+      generatedinvoicelist: 'Generated Invoice List',
+      Mechanic: 'Mechanic Master',
+      additemscore: 'Add Item Score'
 
 
     }

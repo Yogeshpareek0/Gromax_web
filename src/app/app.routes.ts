@@ -45,6 +45,7 @@ import { ReimbersementInvComponent } from '../app/pages/ServicePart/reimbersemen
 import { MechanicComponent } from '../app/pages/ServicePart/mechanic/mechanic.component';
 import { PdiReportComponent } from '../app/pages/ServicePart/pdi-report/pdi-report.component';
 import { NtirReportComponent } from '../app/pages/ServicePart/ntir-report/ntir-report.component';
+import { ItemScoreComponent } from '../app/pages/ServicePart/item-score/item-score.component';
 
 
 
@@ -95,10 +96,13 @@ export const routes: Routes = [
       { path: 'generatejob', component: GeneratejobcardComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'GenerateJobCard' } },
       { path: 'pdi', component: PdiComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'PreDeliveryInspection' } },
       { path: 'dealermaster', component: DealermasterComponent, canActivate: [menuGuard], data: { menuGroup: 'Sales', subMenu: 'DealerMaster' } },
-      { path: 'reimbursementservice', component: ReimbersementInvComponent },
+      { path: 'reimbursementservice', component: ReimbersementInvComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'ReimbursementService' } },
       { path: 'Mechanic', component: MechanicComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'Mechanic' } },
       { path: 'pdireport', component: PdiReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'PdiReport' } },
-      { path: 'ntirreport', component: NtirReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'NtirReport' } }
+      { path: 'ntirreport', component: NtirReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'NtirReport' } },
+      { path: 'additemscore', component: ItemScoreComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'ItemScore' } },
+      { path: 'generatedinvoicelist', component: ReimbersementInvComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'GenerateInvoiceList' } },
+
 
     ]
 

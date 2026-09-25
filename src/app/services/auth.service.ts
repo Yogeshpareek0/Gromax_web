@@ -113,7 +113,7 @@ export class AuthService {
   logout() {
 
     sessionStorage.clear();
-    localStorage.clear();
+    /*localStorage.clear();*/
     this.clearAllCookies();
     /*window.location.href = window.location.origin;*/
 
@@ -914,4 +914,20 @@ export class AuthService {
     return this.http.get(this.baseUrl + 'Api/Services/ntirReport', { params: request });
   }
 
+  // ===== Item Score (Reimbursement) =====
+  getReimbursementList() {
+    return this.http.get(this.baseUrl + 'Api/Services/getReimbursementList');
+  }
+
+  uploadItemScoreImage(formData: FormData, fileName: string) {
+    const params = new HttpParams().set('FileName', fileName);
+    return this.http.post(this.baseUrl + 'Api/Home/imageSave', formData, {
+      params,
+      responseType: 'text'
+    });
+  }
+
+  insertReimbursementScore(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/insertReimbursementScore', payload);
+  }
 }

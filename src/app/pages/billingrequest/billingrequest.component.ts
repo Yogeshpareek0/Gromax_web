@@ -146,9 +146,6 @@ export class BillingrequestComponent {
       },
 
       error: (err) => {
-
-        console.error(err);
-
         this.apis.showAlert(
           'error',
           'Error!',

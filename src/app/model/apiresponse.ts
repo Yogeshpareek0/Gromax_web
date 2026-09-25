@@ -1259,3 +1259,29 @@ export interface NTIRResponse {
   message: string;
   data: NtirDataResponse;
 }
+
+/*ITEM-SCORE*/
+
+export interface DraftPoint {
+  groupName: string;
+  score: number;
+  images: string[];
+}
+
+export interface ItemScoreDraft {
+  dealerCode: string;
+  dealerName: string;
+  points: { [pointId: string]: DraftPoint };
+}
+
+export interface ItemScorePhotoSlot {
+  preview: string | null;
+  serverUrl: string | null;
+  uploading: boolean;
+}
+
+export interface GroupStatus {
+  total: number;
+  done: number;
+  complete: boolean;
+}

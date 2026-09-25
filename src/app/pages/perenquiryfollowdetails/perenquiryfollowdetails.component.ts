@@ -1494,8 +1494,8 @@ export class PerenquiryfollowdetailsComponent implements OnInit {
       new Date(today.getFullYear(), today.getMonth(), 1)
     );
 
-    console.log('today', todayDate);
-    console.log('startDate', currentMonthStart);
+    //console.log('today', todayDate);
+    //console.log('startDate', currentMonthStart);
     // ❌ Invalid cases
     if (
       value &&

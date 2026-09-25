@@ -788,7 +788,7 @@ export class UploadexcelComponent implements OnInit {
 
       await this.protectAndSaveWorkbook(workbook, this.downloadFileName, true);
     } catch (error) {
-      console.error('Excel generation error:', error);
+      //console.error('Excel generation error:', error);
       this.apis.showAlert('error', 'Error', 'Failed to generate Excel file.');
     }
   }
@@ -1331,7 +1331,7 @@ export class UploadexcelComponent implements OnInit {
 
       await this.protectAndSaveWorkbook(workbook, this.downloadFileName, true);
     } catch (error) {
-      console.error('Excel generation error:', error);
+      //console.error('Excel generation error:', error);
       this.apis.showAlert('error', 'Error', 'Failed to generate Excel file.');
     }
   }
@@ -1579,7 +1579,7 @@ export class UploadexcelComponent implements OnInit {
 
       await this.protectAndSaveWorkbook(workbook, this.downloadFileName, true);
     } catch (error) {
-      console.error('Excel generation error:', error);
+      //console.error('Excel generation error:', error);
       this.apis.showAlert('error', 'Error', 'Failed to generate Excel file.');
     }
   }
@@ -2918,7 +2918,7 @@ export class UploadexcelComponent implements OnInit {
         this.apis.showAlert('error', 'Error', 'Failed to fetch Outlook Report data.');
       }
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       this.outlookFormatData = [];
       this.apis.showAlert('error', 'Error', 'Outlook Report data fetch failed.');
     }
@@ -3659,7 +3659,7 @@ export class UploadexcelComponent implements OnInit {
       this.downloadFileName = `RevisedBdrc_${this.selectedState}.xlsx`;
       this.protectAndSaveWorkbook(workbook, this.downloadFileName, true);
     } catch (error) {
-      console.error('Excel generation error:', error);
+      //console.error('Excel generation error:', error);
       this.apis.showAlert('error', 'Error', 'Failed to generate Excel file.');
     }
   }
@@ -3789,7 +3789,7 @@ export class UploadexcelComponent implements OnInit {
         this.apis.showAlert('error', 'Error', 'Failed to fetch Pdd Report data.');
       }
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       this.pddFormatData = [];
       this.apis.showAlert('error', 'Error', 'Pdd Report data fetch failed.');
     }
@@ -3914,7 +3914,7 @@ export class UploadexcelComponent implements OnInit {
       saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), filename);
 
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       this.apis.showAlert('error', 'Error', 'Failed to download Excel file.');
     }
   }

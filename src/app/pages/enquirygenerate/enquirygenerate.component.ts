@@ -207,7 +207,7 @@ export class EnquirygenerateComponent implements OnInit {
 
   // STATIC MAPPINGS
   subSourceMapping: any = {
-    'HO': ['FB/Insta', 'WhatsApp', 'Toll-Free', 'Website', 'Google', 'Others'],
+    'HO': ['FB/Insta', 'WhatsApp', 'Toll-Free', 'Website', 'Google', 'AI Calling', 'Others'],
     'AGGREGATOR': ['Tractor Junction', 'Tractor Guru', 'CMV 360', 'Tractor Gyaan', 'Plantix', 'Other'],
     'TM': ['Field Visit', 'BTL', 'HO Digital', 'Other'],
     'FO': ['Field Visit', 'BTL', 'HO Digital', 'Other'],
@@ -1159,7 +1159,7 @@ export class EnquirygenerateComponent implements OnInit {
 
   //onActulDeliveryDateChange
   onActulDeliveryDateChange(event: any) {
-   
+
     const value = event.target.value;
     this.actualDeliveryError = '';
 

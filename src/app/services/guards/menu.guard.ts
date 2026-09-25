@@ -8,10 +8,10 @@ export const menuGuard: CanActivateFn = (route, state) => {
   const permi = inject(PermissionService)
 
   const requiredMenu = route.data['subMenu'];
-  console.log('requiredMenu', requiredMenu);
+  
   /* debugger;*/
   const hasAccess = permi.hasSubmenuPermission(requiredMenu);
-  console.log('hasAccess', hasAccess);
+  
 
   if (hasAccess) {
     return true;
