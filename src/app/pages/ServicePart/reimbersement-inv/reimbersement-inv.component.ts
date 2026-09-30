@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PermissionService } from '../../../services/userpermission/permission.service';
+import { Router } from '@angular/router';
 
 declare var bootstrap: any;
 
@@ -35,12 +36,19 @@ export class ReimbersementInvComponent implements OnInit {
   positionId: string | null = '';
   userName: string | null = '';
 
-  constructor(private http: HttpClient, private apis: AuthService, public permission: PermissionService) { }
+  currentUrl: string = '';
+
+  constructor(private http: HttpClient, private apis: AuthService, public permission: PermissionService, private router: Router) { }
 
   ngOnInit(): void {
 
     this.positionId = sessionStorage.getItem('possitionId');
-    if (this.positionId === 'Dealer') {
+    this.currentUrl = this.router.url;
+    if (this.currentUrl.includes('/main/generatedinvoicelist')) {
+      this.activeTab = 'generated';
+      this.getGeneratedList();
+    }
+    else if (this.positionId === 'Dealer') {
       this.activeTab = 'free-services';
       this.getFreeServiceList();
     }

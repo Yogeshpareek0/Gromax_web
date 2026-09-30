@@ -86,6 +86,9 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
   // Track grouping state
   isGrouping: Record<number, boolean> = {};
 
+
+  pdfDownloadingId: string | null = null;
+
   // Add these properties in your component class
   monthOptions = [
     { value: 1, label: 'January' },
@@ -542,6 +545,9 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
       if (this.shouldHideStateColumn(sectionId, col)) {
         this.columnVisibility[sectionId][col] = false;
       }
+      if (this.isIdColumn(col)) {
+        this.columnVisibility[sectionId][col] = false;
+      }
     });
 
     // Set frozen columns
@@ -622,6 +628,10 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
       }
       if (colLower === 'mop url' || colLower === ' rc url') {
         this.columnWidths[sectionId][col] = 100;
+        return;
+      }
+      if (colLower === 'printreport') {
+        this.columnWidths[sectionId][col] = 90;
         return;
       }
 
@@ -999,6 +1009,9 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
     columns.forEach(col => {
       this.initColumnState(sectionId, col);
       if (this.shouldHideStateColumn(sectionId, col)) {
+        this.columnVisibility[sectionId][col] = false;
+      }
+      if (this.isIdColumn(col)) {
         this.columnVisibility[sectionId][col] = false;
       }
     });
@@ -1418,8 +1431,12 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
     if (!data?.rows?.length) return null;
 
     const allColumns = data.columns || [];
+    //const visibleColumns = allColumns.filter(col =>
+    //  this.columnVisibility[sectionId]?.[col] !== false
+    //);
+
     const visibleColumns = allColumns.filter(col =>
-      this.columnVisibility[sectionId]?.[col] !== false
+      this.columnVisibility[sectionId]?.[col] !== false && !this.isPrintColumn(col)
     );
 
     return {
@@ -2052,6 +2069,7 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
   }
 
   isTextColumn(sectionId: number, column: string): boolean {
+    if (this.isPrintColumn(column)) return false;
     const rows = this.currentSectionData[sectionId]?.rows;
     if (!rows?.length) return false;
 
@@ -2646,5 +2664,74 @@ export class DynamicreportComponent implements OnInit, OnDestroy {
   isUrlColumn(col: string): boolean {
     const lower = col.toLowerCase().trim();
     return lower === 'mop url' || lower === 'rc url';
+  }
+
+
+  /*print job card*/
+  isPrintColumn(col: string): boolean {
+    return (col || '').toLowerCase().trim() === 'printreport';
+  }
+
+  isIdColumn(col: string): boolean {
+    return ['jobcardmasterid', 'jobcardid'].includes((col || '').toLowerCase().trim());
+  }
+
+  private getJobCardIdFromRow(row: any): string | null {
+    return row?.['Id'] || null;
+  }
+
+  isPrinting(row: any): boolean {
+    const id = this.getJobCardIdFromRow(row);
+    return !!id && this.pdfDownloadingId === id;
+  }
+
+  printJobCard(row: any, event?: Event): void {
+   
+    event?.stopPropagation();
+
+    const jobCardId = this.getJobCardIdFromRow(row);
+    if (!jobCardId) {
+      this.apis.showAlert('warning', 'Warning!', 'Job Card Id not found for this record.');
+      return;
+    }
+
+    this.pdfDownloadingId = jobCardId;
+
+    this.apis.downloadJobCardPdf(jobCardId).subscribe({
+      next: (res: any) => {
+        const blob = res.body as Blob;
+        const fileName =
+          this.getFileNameFromHeader(res.headers.get('Content-Disposition')) ||
+          `JobCard_${jobCardId}.pdf`;
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        this.pdfDownloadingId = null;
+      },
+      error: async (err: any) => {
+        this.pdfDownloadingId = null;
+        let msg = 'PDF download failed. Please try again.';
+        try {
+          if (err?.error instanceof Blob) {
+            const text = await err.error.text();
+            msg = JSON.parse(text)?.message || msg;
+          }
+        } catch { }
+        this.apis.showAlert('error', 'Error!', msg);
+      }
+    });
+  }
+
+  private getFileNameFromHeader(header: string | null): string | null {
+    if (!header) return null;
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(header);
+    return match ? decodeURIComponent(match[1]) : null;
   }
 }

@@ -930,4 +930,25 @@ export class AuthService {
   insertReimbursementScore(payload: any) {
     return this.http.post(this.baseUrl + 'Api/Services/insertReimbursementScore', payload);
   }
+
+  uploadInstallationImage(formData: FormData) {
+    return this.http.post(this.baseUrl + 'Api/Home/InsertInstallationImgv1', formData, {
+      responseType: 'text'
+    });
+  }
+  downloadJobCardPdf(jobCardMasterId: string) {
+    return this.http.get(this.baseUrl + 'Api/Services/GetJobCardPdf', {
+      params: { jobCardMasterId },
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  removeJobCardDraft(params: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/removeJobCardDraft', params);
+  }
+
+  getMechanicDropdownList() {
+    return this.http.get(this.baseUrl + 'Api/Services/getMechanicDropdownList');
+  }
 }

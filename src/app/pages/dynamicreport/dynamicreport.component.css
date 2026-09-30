@@ -943,3 +943,31 @@
 .freeze-col.negative-cell:hover {
   background-color: #ffcccc !important;
 }
+
+.print-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #318ec2, #215378);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(33, 83, 120, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+  .print-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 83, 120, 0.35);
+  }
+
+  .print-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }

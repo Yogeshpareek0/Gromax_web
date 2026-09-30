@@ -6,6 +6,8 @@ import { saveAs } from 'file-saver';
 import { AuthService } from '../../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { HttpParams } from '@angular/common/http';
+import { PermissionService } from '../../../services/userpermission/permission.service';
+import { PersonModel } from '../../../model/apiresponse';
 
 @Component({
   selector: 'app-mechanic',
@@ -22,6 +24,7 @@ export class MechanicComponent implements OnInit {
 
   // ── Form Fields ────────────────────────────────────────────────────────────
   mechanicName: string = '';
+  selectedDealer: string | null = '';
   contactNo: string = '';
   aadharNo: string = '';
   typeOfMechanic: string = '';
@@ -37,8 +40,16 @@ export class MechanicComponent implements OnInit {
   engineAttendance: string = '';
   completeTraining: string = '';
   systemProcess: string = '';
+  skillLevel: number = 0;
+  serviceManpower: number = 0;
   currentStatus: string = '';
   inactiveDate: any = null;
+
+
+  dealersList: any[] = [];
+  serviceDropdownList: any[] = [];
+  skillLevelDropdownList: any[] = [];
+
 
   // ── Form State ─────────────────────────────────────────────────────────────
   submitClicked: boolean = false;
@@ -63,12 +74,14 @@ export class MechanicComponent implements OnInit {
   rejectRemark: string = '';
   rejectSubmitClicked: boolean = false;
 
-  constructor(private apis: AuthService, private toastr: ToastrService) { }
+  constructor(private apis: AuthService, private toastr: ToastrService, public permission: PermissionService) { }
 
   ngOnInit(): void {
     // SessionStorage se position lane wala code tu apne handle karega
     this.positionId = sessionStorage.getItem('possitionId') ?? null;
     this.loadMechanicList();
+    this.loadDealers();
+    this.getMechanicDropdownList();
   }
 
 
@@ -177,13 +190,27 @@ export class MechanicComponent implements OnInit {
 
   private validateMechanicForm(): boolean {
     if (
+      !this.selectedDealer ||
       !this.mechanicName ||
       !this.contactNo ||
       !this.isPhoneValid(this.contactNo) ||
       !this.aadharNo ||
+      !this.isAadharValid(this.aadharNo) ||
       !this.typeOfMechanic ||
       !this.education ||
       !this.experienceInDealership ||
+      !this.priorExperience ||
+      !this.priorExperienceYears ||
+      !this.totalExperience ||
+      !this.physicalTraining ||
+      !this.virtualTraining ||
+      !this.installationAttendance ||
+      !this.hydraulicAttendance ||
+      !this.engineAttendance ||
+      !this.completeTraining ||
+      !this.systemProcess ||
+      !this.serviceManpower ||
+      !this.skillLevel ||
       !this.currentStatus
     ) {
       return false;
@@ -204,6 +231,10 @@ export class MechanicComponent implements OnInit {
         currentStatus: this.currentStatus,
         deletedStatusDate: this.inactiveDate ?? null
       }),
+      ...(
+        this.activeTab === 'create' && {
+          dealerCode: this.selectedDealer || null
+        }),
       mechanicName: this.mechanicName,
       contactNo: this.contactNo,
       aadharCardNo: this.aadharNo,
@@ -238,12 +269,17 @@ export class MechanicComponent implements OnInit {
       engineAttendance: this.engineAttendance || null,
 
       completeTractorTraining: this.completeTraining || null,
-      systemAndProcess: this.systemProcess || null
+      systemAndProcess: this.systemProcess || null,
+      skillLevel: this.skillLevel || null,
+      serviceManpower: this.serviceManpower || null,
     };
   }
 
   onSubmitMechanic(): void {
     this.submitClicked = true;
+    if (this.positionId === "Dealer")
+      this.selectedDealer = sessionStorage.getItem('dealerCode') ?? null;
+
 
     // Validation
     if (!this.validateMechanicForm()) {
@@ -342,9 +378,14 @@ export class MechanicComponent implements OnInit {
     this.engineAttendance = item.engineAttendance;
     this.completeTraining = item.completeTractorTraining;
     this.systemProcess = item.systemAndProcess;
+    this.serviceManpower = item.serviceManpower;
+    this.skillLevel = item.skillLevel;
     this.currentStatus = item.isDeleted === false ? 'Active' : 'Inactive';
     this.inactiveDate = item.deletedDate;
     this.approvalStatus = item.approvalStatus;
+    this.selectedDealer = item.dealerCode;
+    this.serviceManpower = item.serviceManpower;
+    this.skillLevel = item.skillLevel;
 
     this.activeTab = 'update';
   }
@@ -367,18 +408,23 @@ export class MechanicComponent implements OnInit {
     this.engineAttendance = '';
     this.completeTraining = '';
     this.systemProcess = '';
+    this.skillLevel = 0;
+    this.serviceManpower = 0;
     this.currentStatus = '';
     this.inactiveDate = null;
     this.approvalStatus = '';
     this.mechanicId = '';
     this.submitClicked = false;
+    this.selectedDealer = '';
   }
 
   // ── Validation Helpers ────────────────────────────────────────────────────
   isPhoneValid(phone: string): boolean {
     return /^[0-9]{10}$/.test(phone);
   }
-
+  isAadharValid(aadhar: string): boolean {
+    return /^[2-9][0-9]{11}$/.test(aadhar);
+  }
   allowNumbersOnly(event: KeyboardEvent): void {
     const charCode = event.charCode;
     if (charCode < 48 || charCode > 57) {
@@ -514,6 +560,8 @@ export class MechanicComponent implements OnInit {
         "Engine": item.engineAttendance,
         "Complete Training": item.completeTraining,
         "System & Process": item.systemProcess,
+        "Skill Level": item.skillLevel,
+        "Service Manpower": item.serviceManpower,
         "Current Status": item.currentStatus,
         "Approval Status": item.approvalStatus
       }));
@@ -556,6 +604,45 @@ export class MechanicComponent implements OnInit {
 
     saveAs(blob, fileName);
   }
+
+  loadDealers(): void {
+    this.dealersList = [];
+
+    this.apis.allDealerList(1).subscribe({
+      next: (res: any) => {
+        if (res.statusCode === 200) {
+          this.dealersList = res.data || [];
+        }
+        else {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed to fetch dealer list.');
+        }
+      },
+      error: () => {
+        this.apis.showAlert('error', 'Error!', 'Failed to fetch dealer list.');
+      }
+    });
+  }
+
+
+  getMechanicDropdownList() {
+    this.apis.getMechanicDropdownList().subscribe({
+      next: (res: any) => {
+        if (res.statusCode === 200) {
+          this.serviceDropdownList = res?.data?.serviceManagerList || [];
+          this.skillLevelDropdownList = res?.data?.skillLevelList || [];
+
+          /*this.dealersList = res?.data?. || [];*/
+        }
+        else {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed to fetch dealer list.');
+        }
+      },
+      error: () => {
+        this.apis.showAlert('error', 'Error!', 'Failed to fetch dealer list.');
+      }
+    });
+  }
+
 
 
 }

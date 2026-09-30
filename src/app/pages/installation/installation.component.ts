@@ -4,9 +4,11 @@ import { HttpClient } from '@angular/common/http';
 import { PaginationComponent } from '../../layout/pagination/pagination.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { getApisResponse } from '../../model/apiresponse';
+import { getApisResponse, UploadSlot } from '../../model/apiresponse';
+import { ToastrService } from 'ngx-toastr';
 
 declare var bootstrap: any;
+
 
 @Component({
   selector: 'app-installation',
@@ -15,7 +17,24 @@ declare var bootstrap: any;
   templateUrl: './installation.component.html',
   styleUrl: './installation.component.css'
 })
+
+
 export class InstallationComponent implements OnInit {
+
+
+  readonly IMAGE_LABELS: string[] = ['Cluster Meter Photo', 'Tractor with Implements Photo', 'Photo with Customer', 'Chassis Plate Photo'];
+
+  uploadSlots: UploadSlot[] = [];
+  selectedInstallation: any = null;
+  workingHrs: string = '';
+  installAddress: string = '';
+  latitude: string = '';
+  longitude: string = '';
+  locationStatus: 'idle' | 'fetching' | 'done' | 'failed' = 'idle';
+  isUploading: boolean = false;
+  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+  isAddressLoading: boolean = false;
 
   installationList: any[] = [];
   installationCount: any[] = [];
@@ -44,6 +63,13 @@ export class InstallationComponent implements OnInit {
   customStartYear: number;
   customEndMonth: number;
   customEndYear: number;
+  selectedChassis: string = '';
+
+
+  IsEditablePermission: boolean = false;
+  IsAddPermission: boolean = false;
+
+  mobileNo: string = '';
 
   months = [
     { value: 1, label: 'January' },
@@ -61,7 +87,7 @@ export class InstallationComponent implements OnInit {
   ];
   years: number[] = [];
 
-  constructor(private http: HttpClient, private apis: AuthService) {
+  constructor(private http: HttpClient, private apis: AuthService, private toaster: ToastrService) {
     const now = new Date();
     this.customStartMonth = now.getMonth() + 1;
     this.customStartYear = now.getFullYear();
@@ -74,8 +100,15 @@ export class InstallationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    debugger;
     this.positionId = sessionStorage.getItem('possitionId');
     this.userName = sessionStorage.getItem('userName');
+    if (this.positionId === 'Dealer' || this.positionId === 'National Sales Head') {
+      this.IsAddPermission = true;
+    }
+    //if (this.positionId === 'National Service Head' || this.positionId === 'National Sales Head') {
+    //  this.IsEditablePermission = true;
+    //}
     this.getStateList();
     this.getInstallationv1();
   }
@@ -192,7 +225,7 @@ export class InstallationComponent implements OnInit {
   }
 
   getInstallationv1(page: number = 1): void {
-   
+
     const offset = (page - 1) * this.itemsPerPage;
     const { startDate, endDate } = this.getDateRange();
 
@@ -204,12 +237,13 @@ export class InstallationComponent implements OnInit {
       Dealership: this.selectedDealership || 'All',
       StartDate: startDate,
       EndDate: endDate,
-      IsDownload:'No'
+      IsDownload: 'No',
+      ChassisNo: this.selectedChassis?.trim() || null
     };
 
     this.apis.getInstallationv1(request).subscribe({
       next: (res: any) => {
-        
+
         if (res.Message && res.Message.toLowerCase() === 'success') {
           this.installationList = res.InstallationList || [];
           this.installationCount = res.InstallationCount || [];
@@ -226,7 +260,7 @@ export class InstallationComponent implements OnInit {
               : 0;
           }
           this.currentPage = page;
-          
+
         } else {
           this.apis.showAlert('error', 'Error!', 'Failed fetching data. Please try again.');
         }
@@ -262,7 +296,8 @@ export class InstallationComponent implements OnInit {
       Dealership: this.selectedDealership || 'All',
       StartDate: startDate,
       EndDate: endDate,
-      IsDownload: 'Yes'
+      IsDownload: 'Yes',
+      ChassisNo: this.selectedChassis || null
     };
 
     this.apis.getInstallationv1(request).subscribe({
@@ -301,6 +336,8 @@ export class InstallationComponent implements OnInit {
       }
     });
   }
+
+
 
   onRowClick(installationId: string): void {
     const request = { Id: installationId };
@@ -362,4 +399,250 @@ export class InstallationComponent implements OnInit {
   nextImage(): void {
     if (this.lightboxIndex < this.installationImages.length - 1) this.lightboxIndex++;
   }
+
+
+  /*  upload Installation*/
+
+  onClickAddIcon(item: any): void {
+    this.selectedInstallation = item;
+    this.resetUploadForm();
+    this.fetchLocation();
+
+    //if (this.IsEditablePermission) {
+    //  this.workingHrs = item?.workHrs != null ? item.workHrs.toString() : '';
+
+
+    //  const request = { Id: item?.InstallationId };
+    //  this.apis.getImagesOnId(request).subscribe({
+    //    next: (res: any) => {
+    //      if (res?.message?.toLowerCase() === 'success' && Array.isArray(res.data)) {
+    //        this.installAddress = res?.data[0]?.Address;
+    //        this.bindExistingImages(res.data);
+    //      } else {
+    //        this.toaster.error('Failed fetching images. Please try again.', 'Error');
+    //      }
+    //    },
+    //    error: () => {
+    //      this.toaster.error('An error occurred while fetching images. Please try again.', 'Error');
+    //    }
+    //  });
+    //}
+
+    const modalEl = document.getElementById('addInstallationModal');
+    if (!modalEl) return;
+
+    modalEl.addEventListener('hide.bs.modal', () => {
+      (document.activeElement as HTMLElement)?.blur();
+    }, { once: true });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      this.resetUploadForm();
+    }, { once: true });
+
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+
+  //private bindExistingImages(data: any[]): void {
+  //  data.filter(d => d?.ImgUrl).forEach(d => {
+  //    const tag = (d.TagName || '').trim().toLowerCase();
+  //    let slot = this.uploadSlots.find(s => s.label.trim().toLowerCase() === tag);
+
+  //    // TagName IMAGE_LABELS mein nahi mila to naya slot bana do
+  //    if (!slot) {
+  //      slot = { label: d.TagName || 'Image', file: null, preview: null, existingUrl: null };
+  //      this.uploadSlots.push(slot);
+  //    }
+
+  //    slot.existingUrl = d.ImgUrl;
+  //    slot.preview = d.ImgUrl;
+  //  });
+  //}
+
+  private resetUploadForm(): void {
+    this.uploadSlots?.forEach(s => s.file && s.preview && URL.revokeObjectURL(s.preview));
+    this.uploadSlots = this.IMAGE_LABELS.map(label => ({
+      label, file: null, preview: null, existingUrl: null
+    }));
+    this.workingHrs = '';
+    this.installAddress = '';
+    this.isUploading = false;
+  }
+
+  fetchLocation(): void {
+    if (!navigator.geolocation) {
+      this.locationStatus = 'failed';
+      return;
+    }
+    this.locationStatus = 'fetching';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        this.latitude = pos.coords.latitude.toString();
+        this.longitude = pos.coords.longitude.toString();
+        this.locationStatus = 'done';
+        this.getAddressFromLatLng(pos.coords.latitude, pos.coords.longitude);
+      },
+      () => {
+        this.latitude = '';
+        this.longitude = '';
+        this.locationStatus = 'failed';
+        this.installAddress = '';
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  private getAddressFromLatLng(lat: number, lng: number): void {
+    this.isAddressLoading = true;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=en`;
+
+    this.http.get<any>(url).subscribe({
+      next: res => {
+        this.isAddressLoading = false;
+        if (this.installAddress?.trim()) return;
+
+        const a = res?.address || {};
+        const parts = [
+          a.house_number,
+          a.road,
+          a.neighbourhood || a.suburb,
+          a.village || a.town || a.city,
+          a.state_district || a.county,
+          a.state,
+          a.postcode
+        ].filter(Boolean);
+
+        this.installAddress = parts.length ? parts.join(', ') : (res?.display_name || '');
+      },
+      error: () => {
+        this.isAddressLoading = false;
+      }
+    });
+  }
+
+  onImageSelect(event: Event, idx: number): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // same file dobara select ho sake
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.toaster.warning('Please select an image file only.', 'Invalid File');
+      return;
+    }
+    if (file.size > this.MAX_FILE_SIZE) {
+      this.toaster.warning('Image size should be less than 10 MB.', 'File Too Large');
+      return;
+    }
+
+    const slot = this.uploadSlots[idx];
+    if (slot.file && slot.preview) URL.revokeObjectURL(slot.preview);
+    slot.file = file;
+    slot.preview = URL.createObjectURL(file);
+  }
+
+  removeImage(idx: number): void {
+    const slot = this.uploadSlots[idx];
+    if (slot.file && slot.preview) URL.revokeObjectURL(slot.preview);
+    slot.file = null;
+    slot.preview = null;
+    slot.existingUrl = null;
+  }
+
+  get selectedImageCount(): number {
+    return this.uploadSlots.filter(s => s.file || s.existingUrl).length;
+  }
+
+  saveInstallation(): void {
+    debugger;
+    if (this.isUploading) return;
+
+    if (!this.workingHrs?.toString().trim()) {
+      this.toaster.warning('Please enter Working Hours.', 'Required');
+      return;
+    }
+    if (!this.validateMobileNo()) {
+      return;
+    }
+
+    const hasAnyImage = this.uploadSlots.some(s => s.file || s.existingUrl);
+    if (!hasAnyImage) {
+      this.toaster.warning('Please upload at least one image.', 'Required');
+      return;
+    }
+
+    // API ko sirf naye / replace kiye hue files jaate hain
+    const filled = this.uploadSlots.filter(s => s.file);
+    if (filled.length !== 4) {
+      this.toaster.warning('Please upload All images.', 'Required');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('InstallationMasterId', this.selectedInstallation?.InstallationId ?? '');
+    formData.append('Latitude', this.latitude || '');
+    formData.append('Longitude', this.longitude || '');
+    formData.append('Address', this.installAddress || '');
+    formData.append('WorkingHrs', this.workingHrs.toString().trim());
+    formData.append('MobileNo', this.mobileNo || '');
+
+    // Index continuous hona chahiye (0,1,2...), warna .NET list binding toot jaati hai
+    const ts = Date.now();
+    filled.forEach((slot, i) => {
+      formData.append(`installationImages[${i}].TagName`, slot.label);
+      formData.append(`installationImages[${i}].Image`, slot.file as File, `image_${ts}_${i + 1}.jpg`);
+    });
+
+    this.isUploading = true;
+
+    this.apis.uploadInstallationImage(formData).subscribe({
+      next: (res: any) => {
+        this.isUploading = false;
+        if (res?.statusCode === 200) {
+          this.toaster.success('Images Uploaded Successfully!', 'Success');
+          const modalEl = document.getElementById('addInstallationModal');
+          if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+          this.getInstallationv1(this.currentPage);
+        } else {
+          this.toaster.error('Failed to upload images.', 'Error');
+        }
+      },
+      error: () => {
+        this.isUploading = false;
+        this.toaster.error('Failed to upload images. Please try again.', 'Error');
+      }
+    });
+  }
+
+  searchValue(input: HTMLInputElement) {
+    this.selectedChassis = input.value;
+    this.getInstallationv1();
+  }
+
+  validateMobileNo(): boolean {
+
+    // Remove anything other than digits
+    this.mobileNo = this.mobileNo.replace(/\D/g, '');
+
+    if (!this.mobileNo) {
+      this.toaster.warning('Mobile number is required.', 'Required');
+      return false;
+    }
+
+    if (this.mobileNo.length !== 10) {
+      this.toaster.warning('Mobile number must be exactly 10 digits.', 'Required');
+
+      return false;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(this.mobileNo)) {
+      this.toaster.warning('Please enter a valid mobile number.', 'Required');
+
+      return false;
+    }
+
+    return true;
+  }
+
 }
+

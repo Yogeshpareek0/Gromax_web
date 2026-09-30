@@ -403,3 +403,167 @@
   color: #c77900;
   border-color: #f5d28a;
 }
+
+/* ===== Add Installation Modal ===== */
+#addInstallationModal .modal-body {
+  background: #f8fafc;
+}
+
+.location-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #dbe5ec;
+  background: #fff;
+  color: #215378;
+}
+
+  .location-chip.loc-done {
+    background: #e8f8ef;
+    color: #16834a;
+    border-color: #b7e8ca;
+  }
+
+  .location-chip.loc-failed {
+    background: #fff5df;
+    color: #c77900;
+    border-color: #f5d28a;
+  }
+
+.loc-retry {
+  border: none;
+  background: transparent;
+  color: #215378;
+  font-weight: 600;
+  font-size: 12px;
+  text-decoration: underline;
+  padding: 0;
+  cursor: pointer;
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .upload-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+.upload-slot-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #215378;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-slot-box {
+  position: relative;
+  aspect-ratio: 4/3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e9eef3;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin: 0;
+}
+
+  .upload-slot-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+.upload-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fff;
+  border: 2px dashed #4796BD;
+  color: #4796BD;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+  .upload-empty i {
+    font-size: 22px;
+  }
+
+  .upload-empty span {
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .upload-empty:hover {
+    background: #eef7fc;
+    transform: translateY(-2px);
+  }
+
+.upload-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(228, 94, 46, 0.92);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+  .upload-remove:hover:not(:disabled) {
+    transform: scale(1.1);
+  }
+
+  .upload-remove:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+.add-install-footer {
+  background: #fff;
+  border-top: 1px solid #e2eaf0;
+  padding: 10px 20px;
+}
+.search-wrapper {
+  max-width: 380px;
+}
+
+.custom-search-group {
+  border: 1px solid #4796BD;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: 0.3s ease;
+}
+
+.search-btn {
+  background-color: #4796BD;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 0;
+}
+
+  .search-btn:hover {
+    background-color: #3a7fa1;
+    border: 1px solid #3a7fa1;
+  }

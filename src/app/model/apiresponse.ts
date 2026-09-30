@@ -1285,3 +1285,10 @@ export interface GroupStatus {
   done: number;
   complete: boolean;
 }
+
+export interface UploadSlot {
+  label: string;
+  file: File | null;
+  preview: string | null;
+  existingUrl: string | null;
+}

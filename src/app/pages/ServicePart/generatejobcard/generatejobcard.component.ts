@@ -34,7 +34,7 @@ export class GeneratejobcardComponent {
   // ── PAYLOAD DATATYPE MAPPING ──
   // ═══════════════════════════════════════════════════════════════
   payloadFieldTypes: Record<string, string> = {
-    'fuel': 'decimal',
+    'fuel': 'string',
     'frontTyrePressureLeft': 'decimal',
     'frontTyrePressureRight': 'decimal',
     'rearTyrePressureLeft': 'decimal',
@@ -66,7 +66,7 @@ export class GeneratejobcardComponent {
   fieldErrors: Record<string, string> = {};
 
   fieldCharRules: Record<string, { pattern: RegExp; message: string; exactLength?: number }> = {
-    fuel: { pattern: /^[0-9]*\.?[0-9]*$/, message: 'Only numbers and single decimal point allowed (0-9.)' },
+    fuel: { pattern: /^(Full|Half|Low)$/, message: 'Please select fuel level (Full / Half / Low)' },
     alternateMobileNo: { pattern: /^[0-9]*$/, message: 'Only numeric digits allowed (0-9)', exactLength: 10 },
     frontTyrePressureLeft: { pattern: /^[0-9]*\.?[0-9]*$/, message: 'Only numbers and single decimal point allowed (0-9.)' },
     frontTyrePressureRight: { pattern: /^[0-9]*\.?[0-9]*$/, message: 'Only numbers and single decimal point allowed (0-9.)' },
@@ -83,6 +83,7 @@ export class GeneratejobcardComponent {
     customerAckName: { pattern: /^[a-zA-Z0-9\s\-]*$/, message: 'Only letters, numbers, spaces and hyphens allowed' },
     jobCardType: { pattern: /^.+$/, message: 'Job Card Type is required' },
     dateTime: { pattern: /^\d{4}-\d{2}-\d{2}$/, message: 'Please select a valid date' },
+    labourCost: { pattern: /^[0-9]*\.?[0-9]*$/, message: 'Only numbers and single decimal point allowed (0-9.)' },
   };
 
   validateAndFilter(field: string, rawValue: string, filterFn: (v: string) => string): string {
@@ -104,6 +105,13 @@ export class GeneratejobcardComponent {
     return filtered;
   }
 
+  validateFuel() {
+    if (!this.fuel || !this.fuelTypes.includes(this.fuel)) {
+      this.fieldErrors['fuel'] = this.fieldCharRules['fuel'].message;
+    } else {
+      delete this.fieldErrors['fuel'];
+    }
+  }
   hasFieldError(field: string): boolean {
     return !!this.fieldErrors[field];
   }
@@ -582,7 +590,7 @@ export class GeneratejobcardComponent {
   }
 
   onLabourCostChange(value: string) {
-    this.labourCost = this.validateAndFilter('fuel', value, v => this.filterDecimal(v));
+    this.labourCost = this.validateAndFilter('labourCost', value, v => this.filterDecimal(v));
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -927,6 +935,7 @@ export class GeneratejobcardComponent {
 
   allRequiredSectionsFilled(): boolean {
     // REQUIRED: Complaints (at least one with complaint + action)
+    const fuelOk = this.fuelTypes.includes(this.fuel);
     const complaintsOk = this.complaintRows.some(r =>
       r.complaint?.trim() && r.actionTaken?.trim()
     );
@@ -939,7 +948,7 @@ export class GeneratejobcardComponent {
       r.selected && r.qty && parseFloat(r.qty) > 0
     );
 
-    return complaintsOk && missingOk && spareOk;
+    return fuelOk && complaintsOk && missingOk && spareOk;
   }
 
   allSectionsSaved(): boolean {
@@ -952,6 +961,8 @@ export class GeneratejobcardComponent {
 
   handleSubmitPress() {
     this.validateJobCardType();
+    this.validateFuel();
+
 
     if (this.hasAnyFieldError || this.hasAnyRowError) {
       this.toastr.warning(
@@ -1169,7 +1180,7 @@ export class GeneratejobcardComponent {
 
   mapMasterData(master: any): void {
     this.jobCardType = master.jobCardType || '';
-    this.fuel = master.fuel ?? 0;
+    this.fuel = this.fuelTypes.includes(master.fuel) ? master.fuel : '';
 
     this.dealerName = master.dealerName || '';
     this.tractorSlNo = master.tractorSlNo || '';
@@ -1281,6 +1292,7 @@ export class GeneratejobcardComponent {
   selectFuel(fuelOption: string) {
     this.fuel = fuelOption;
     this.fuelDropdownOpen = false;
+    this.validateFuel();
   }
 
   @HostListener('document:click', ['$event'])
@@ -1293,6 +1305,19 @@ export class GeneratejobcardComponent {
   }
 
   onDateChange(newDate: string) {
+    const selectedDate = new Date(newDate);
+    const today = new Date();
+
+    // Time ko ignore karke sirf date compare karna
+    selectedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate > today) {
+      this.fieldErrors['dateTime'] = 'Future date is not allowed';
+      this.dateTime = '';
+      return;
+    }
+
     this.dateTime = newDate;
     this.validateDate();
   }
@@ -1303,5 +1328,24 @@ export class GeneratejobcardComponent {
     } else {
       delete this.fieldErrors['dateTime'];
     }
+  }
+
+  cancelJobCard() {
+    this.submitting = true;
+    const payload = { jobCardMasterId: this.item?.JobCardMasterId || null };
+    this.jobCardService.removeJobCardDraft(payload).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.toastr.success('Job Card draft cancelled successfully.', 'Success');
+        this.backToSearch();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.submitting = false;
+        this.toastr.error(
+          'Failed to cancel the Job Card draft.',
+          'Error'
+        );
+      }
+    });
   }
 }

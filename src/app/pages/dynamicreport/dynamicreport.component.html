@@ -581,12 +581,43 @@
                           </tr>
 
                           <!-- Grouped Rows - Detail rows -->
+                          <!--<ng-container *ngIf="expandedGroups[section.id][g.mapKey]">
+        <tr *ngFor="let r of g.rows">
+          <ng-container *ngFor="let col of data.columns">
+            <td *ngIf="columnVisibility[section.id][col]"
+                [style.text-align]="isUrlColumn(col) ? 'center' : null"
+                [style.vertical-align]="isUrlColumn(col) ? 'middle' : null"
+                [class.freeze-col]="isFrozen(section.id, col)"
+                [class.negative-cell]="isNegativeValue(r[col], section.id, col, r)"
+                [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+                [style.width.px]="columnWidths[section.id][col]"
+                [style.min-width.px]="columnWidths[section.id][col]"
+                [style.max-width.px]="columnWidths[section.id][col]"
+                [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
+
+              <ng-container *ngIf="isUrlColumn(col); else normalCellG">
+                <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer"
+                   title="View"
+                   style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
+                  View Image
+                </a>
+                <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+              </ng-container>
+              <ng-template #normalCellG>
+                {{ r[col] }}
+              </ng-template>
+
+            </td>
+          </ng-container>
+        </tr>
+      </ng-container>-->
+                          <!-- Grouped Rows - Detail rows -->
                           <ng-container *ngIf="expandedGroups[section.id][g.mapKey]">
                             <tr *ngFor="let r of g.rows">
                               <ng-container *ngFor="let col of data.columns">
                                 <td *ngIf="columnVisibility[section.id][col]"
-                                    [style.text-align]="isUrlColumn(col) ? 'center' : null"
-                                    [style.vertical-align]="isUrlColumn(col) ? 'middle' : null"
+                                    [style.text-align]="isUrlColumn(col) || isPrintColumn(col) ? 'center' : null"
+                                    [style.vertical-align]="isUrlColumn(col) || isPrintColumn(col) ? 'middle' : null"
                                     [class.freeze-col]="isFrozen(section.id, col)"
                                     [class.negative-cell]="isNegativeValue(r[col], section.id, col, r)"
                                     [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
@@ -595,16 +626,28 @@
                                     [style.max-width.px]="columnWidths[section.id][col]"
                                     [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
 
-                                  <ng-container *ngIf="isUrlColumn(col); else normalCellG">
-                                    <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer"
-                                       title="View"
-                                       style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
-                                      View Image
-                                    </a>
-                                    <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+                                  <!-- PRINT BUTTON -->
+                                  <ng-container *ngIf="isPrintColumn(col); else nonPrintCellG">
+                                    <button type="button" class="print-btn" title="Print Job Card"
+                                            [disabled]="isPrinting(r)"
+                                            (click)="printJobCard(r, $event)">
+                                      <i class="fas" [ngClass]="isPrinting(r) ? 'fa-spinner fa-spin' : 'fa-print'"></i>
+                                      <span>{{ isPrinting(r) ? 'Wait...' : 'Print' }}</span>
+                                    </button>
                                   </ng-container>
-                                  <ng-template #normalCellG>
-                                    {{ r[col] }}
+
+                                  <!-- URL / NORMAL CELL -->
+                                  <ng-template #nonPrintCellG>
+                                    <ng-container *ngIf="isUrlColumn(col); else normalCellG">
+                                      <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer" title="View"
+                                         style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
+                                        View Image
+                                      </a>
+                                      <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+                                    </ng-container>
+                                    <ng-template #normalCellG>
+                                      {{ r[col] }}
+                                    </ng-template>
                                   </ng-template>
 
                                 </td>
@@ -615,12 +658,43 @@
                       </ng-container>
 
                       <!-- Regular Rows -->
+                      <!--<ng-container *ngIf="!groupByColumn[section.id]">
+    <tr *ngFor="let r of getFilteredRows(section.id)">
+      <ng-container *ngFor="let col of data.columns">
+        <td *ngIf="columnVisibility[section.id][col]"
+            [style.text-align]="isUrlColumn(col) ? 'center' : null"
+            [style.vertical-align]="isUrlColumn(col) ? 'middle' : null"
+            [class.freeze-col]="isFrozen(section.id, col)"
+            [class.negative-cell]="isNegativeValue(r[col], section.id, col, r)"
+            [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
+            [style.width.px]="columnWidths[section.id][col]"
+            [style.min-width.px]="columnWidths[section.id][col]"
+            [style.max-width.px]="columnWidths[section.id][col]"
+            [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
+
+          <ng-container *ngIf="isUrlColumn(col); else normalCell">
+            <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer"
+               title="View"
+               style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
+              View Image
+            </a>
+            <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+          </ng-container>
+          <ng-template #normalCell>
+            {{ r[col] }}
+          </ng-template>
+
+        </td>
+      </ng-container>
+    </tr>
+  </ng-container>-->
+                      <!-- Regular Rows -->
                       <ng-container *ngIf="!groupByColumn[section.id]">
                         <tr *ngFor="let r of getFilteredRows(section.id)">
                           <ng-container *ngFor="let col of data.columns">
                             <td *ngIf="columnVisibility[section.id][col]"
-                                [style.text-align]="isUrlColumn(col) ? 'center' : null"
-                                [style.vertical-align]="isUrlColumn(col) ? 'middle' : null"
+                                [style.text-align]="isUrlColumn(col) || isPrintColumn(col) ? 'center' : null"
+                                [style.vertical-align]="isUrlColumn(col) || isPrintColumn(col) ? 'middle' : null"
                                 [class.freeze-col]="isFrozen(section.id, col)"
                                 [class.negative-cell]="isNegativeValue(r[col], section.id, col, r)"
                                 [style.left.px]="isFrozen(section.id, col) ? getFrozenLeft(section.id, col) : null"
@@ -629,16 +703,28 @@
                                 [style.max-width.px]="columnWidths[section.id][col]"
                                 [style.background-color]="shouldApplyColumnColor(section.id, col) ? getColumnBackgroundColor(section.id, col) : ''">
 
-                              <ng-container *ngIf="isUrlColumn(col); else normalCell">
-                                <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer"
-                                   title="View"
-                                   style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
-                                  View Image
-                                </a>
-                                <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+                              <!-- PRINT BUTTON -->
+                              <ng-container *ngIf="isPrintColumn(col); else nonPrintCell">
+                                <button type="button" class="print-btn" title="Print Job Card"
+                                        [disabled]="isPrinting(r)"
+                                        (click)="printJobCard(r, $event)">
+                                  <i class="fas" [ngClass]="isPrinting(r) ? 'fa-spinner fa-spin' : 'fa-print'"></i>
+                                  <span>{{ isPrinting(r) ? 'Wait...' : 'Print' }}</span>
+                                </button>
                               </ng-container>
-                              <ng-template #normalCell>
-                                {{ r[col] }}
+
+                              <!-- URL / NORMAL CELL -->
+                              <ng-template #nonPrintCell>
+                                <ng-container *ngIf="isUrlColumn(col); else normalCell">
+                                  <a *ngIf="r[col]" [href]="r[col]" target="_blank" rel="noopener noreferrer" title="View"
+                                     style="color:#007bff; font-size:13px; cursor:pointer; text-decoration:none">
+                                    View Image
+                                  </a>
+                                  <span *ngIf="!r[col]" style="color:#ccc;">—</span>
+                                </ng-container>
+                                <ng-template #normalCell>
+                                  {{ r[col] }}
+                                </ng-template>
                               </ng-template>
 
                             </td>

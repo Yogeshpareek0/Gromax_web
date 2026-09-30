@@ -10,7 +10,7 @@
 
     <!-- Add Mechanic Tab - Sirf Dealer ko -->
     <button class="btn tab-btn me-2 px-3 py-2"
-            *ngIf="positionId === 'Dealer'"
+            *ngIf="permission.dealerAccess()||permission.ccmAccess()"
             [ngClass]="{ 'custom-btn': activeTab === 'create'||activeTab === 'update', 'btn-outline': activeTab !== 'create' && activeTab !== 'update' }"
             (click)="showCreate()" style="font-size:14px">
       {{ activeTab === 'update' ? 'Update Mechanic' : 'Add Mechanic' }}
@@ -36,6 +36,18 @@
   <div *ngIf="(activeTab === 'create' || activeTab === 'update')" class="card shadow-sm rounded-3">
     <div class="card-body">
       <div class="row g-3">
+        <!-- Dealer Code list -->
+        <div class="col-lg-3 col-sm-6" *ngIf="!permission.dealerAccess()">
+          <div class="form-floating-custom">
+            <select class="form-select" [(ngModel)]="selectedDealer" name="selectedDealer"
+                    [ngClass]="{'is-invalid': submitClicked && !selectedDealer}"
+                    [disabled]="activeTab==='update'">
+              <option value="">Select Dealer</option>
+              <option *ngFor="let dealer of dealersList" [value]="dealer.DealerCode">{{ dealer.DealerCode}}-{{ dealer.DealerName }}</option>
+            </select>
+            <label>Dealer</label>
+          </div>
+        </div>
         <!-- Mechanic Name -->
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
@@ -64,7 +76,7 @@
             <input type="text" [(ngModel)]="aadharNo" name="aadharNo" maxlength="12"
                    class="form-control" pattern="[0-9]{0,12}"
                    (keypress)="allowNumbersOnly($event)"
-                   [ngClass]="{'is-invalid': submitClicked && !aadharNo}"
+                   [ngClass]="{'is-invalid': submitClicked && (!aadharNo || !isAadharValid(aadharNo))}"
                    [disabled]="activeTab==='update'">
             <label>Aadhar Card No.</label>
           </div>
@@ -109,6 +121,7 @@
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
             <input type="text" [(ngModel)]="priorExperience" name="priorExperience" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !priorExperience.trim()}"
                    [disabled]="activeTab==='update'">
             <label>Prior Experience in Tractor</label>
           </div>
@@ -118,6 +131,7 @@
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
             <input type="number" [(ngModel)]="priorExperienceYears" name="priorExperienceYears" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !priorExperienceYears}"
                    min="0" [disabled]="activeTab==='update'">
             <label>No. of years</label>
           </div>
@@ -127,6 +141,7 @@
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
             <input type="number" [(ngModel)]="totalExperience" name="totalExperience" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !totalExperience}"
                    min="0" [disabled]="activeTab==='update'">
             <label>Total Experience [Years]</label>
           </div>
@@ -136,6 +151,7 @@
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
             <input type="number" [(ngModel)]="physicalTraining" name="physicalTraining" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !physicalTraining}"
                    min="0" [disabled]="activeTab==='update'">
             <label>No. of Trainings (Physical)</label>
           </div>
@@ -145,6 +161,7 @@
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
             <input type="number" [(ngModel)]="virtualTraining" name="virtualTraining" class="form-control"
+                   [ngClass]="{'is-invalid': submitClicked && !virtualTraining}"
                    min="0" [disabled]="activeTab==='update'">
             <label>No. of Trainings (Virtual)</label>
           </div>
@@ -153,7 +170,9 @@
         <!-- Installation Attendance -->
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
-            <select [(ngModel)]="installationAttendance" name="installationAttendance" class="form-select">
+            <select [(ngModel)]="installationAttendance" name="installationAttendance" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !installationAttendance}">
+
               <option value="" disabled selected hidden></option>
               <option value="Attend">Attend</option>
               <option value="Not Attend">Not Attend</option>
@@ -165,7 +184,8 @@
         <!-- Hydraulic Attendance -->
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
-            <select [(ngModel)]="hydraulicAttendance" name="hydraulicAttendance" class="form-select">
+            <select [(ngModel)]="hydraulicAttendance" name="hydraulicAttendance" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !hydraulicAttendance}">
               <option value="" disabled selected hidden></option>
               <option value="Attend">Attend</option>
               <option value="Not Attend">Not Attend</option>
@@ -177,7 +197,8 @@
         <!-- Engine Attendance -->
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
-            <select [(ngModel)]="engineAttendance" name="engineAttendance" class="form-select">
+            <select [(ngModel)]="engineAttendance" name="engineAttendance" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !engineAttendance}">
               <option value="" disabled selected hidden></option>
               <option value="Attend">Attend</option>
               <option value="Not Attend">Not Attend</option>
@@ -189,7 +210,8 @@
         <!-- Complete Tractor Training -->
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
-            <select [(ngModel)]="completeTraining" name="completeTraining" class="form-select">
+            <select [(ngModel)]="completeTraining" name="completeTraining" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !completeTraining}">
               <option value="" disabled selected hidden></option>
               <option value="Completed">Completed</option>
               <option value="Not Completed">Not Completed</option>
@@ -201,12 +223,52 @@
         <!-- System and Process -->
         <div class="col-lg-3 col-sm-6">
           <div class="form-floating-custom">
-            <select [(ngModel)]="systemProcess" name="systemProcess" class="form-select">
+            <select [(ngModel)]="systemProcess" name="systemProcess" class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !systemProcess}">
               <option value="" disabled selected hidden></option>
               <option value="Completed">Completed</option>
               <option value="Not Completed">Not Completed</option>
             </select>
             <label>System and Process</label>
+          </div>
+        </div>
+
+        <!-- Service Manpower -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="serviceManpower"
+                    name="serviceManpower"
+                    class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !serviceManpower}">
+
+              <option *ngFor="let item of serviceDropdownList"
+                      [value]="item.id">
+                {{ item.dropdown_name }}
+              </option>
+
+            </select>
+
+            <label>Service Manpower</label>
+          </div>
+        </div>
+
+
+        <!-- Skill Level -->
+        <div class="col-lg-3 col-sm-6">
+          <div class="form-floating-custom">
+            <select [(ngModel)]="skillLevel"
+                    name="skillLevel"
+                    class="form-select"
+                    [ngClass]="{'is-invalid': submitClicked && !skillLevel}">
+
+              <option *ngFor="let item of skillLevelDropdownList"
+                      [value]="item.id">
+                {{ item.dropdown_name }}
+              </option>
+
+            </select>
+
+            <label>Skill Level</label>
           </div>
         </div>
 
@@ -433,7 +495,7 @@
             </th>
 
             <th class="text-nowrap fw-normal">
-              Training
+              Complete Tractor Training(Gurukul)
             </th>
 
             <th class="text-nowrap fw-normal">
@@ -528,7 +590,7 @@
 
               <td class="text-nowrap">{{item.dealerName}}</td>
               <td class="text-nowrap">{{item.stateName}}</td>
-              <td class="text-nowrap">{{item.location}}</td>  
+              <td class="text-nowrap">{{item.location}}</td>
               <td class="text-nowrap">{{ item.mechanicName }}</td>
               <td class="text-nowrap">{{ item.contactNo }}</td>
               <td class="text-nowrap">{{ item.typeOfMechanic }}</td>

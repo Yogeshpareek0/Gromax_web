@@ -140,63 +140,61 @@
 
   <!-- Job Card Type + Fuel -->
   <div class="jc-card">
+
+
+    <!--<div class="jc-card">-->
     <div class="jc-section-header">
       <span class="jc-section-title">Job card type &amp; fuel</span>
     </div>
 
-    <div class="jc-card">
-      <div class="jc-section-header">
-        <span class="jc-section-title">Job card type &amp; fuel</span>
-      </div>
-
-      <div class="jc-toprow">
-        <!-- Job Card Type Dropdown -->
-        <div class="form-floating-custom" [class.open]="jobCardTypeDropdownOpen">
-          <input type="text"
-                 placeholder=" "
-                 [value]="jobCardType"
-                 readonly
-                 (click)="toggleJobCardTypeDropdown()"
-                 [class.input-error]="hasFieldError('jobCardType')" />
-          <label>Job Card Type</label>
-          <i class="fa fa-chevron-down chevron"></i>
-          <div class="dropdown-panel" *ngIf="jobCardTypeDropdownOpen">
-            <div class="dropdown-option"
-                 *ngFor="let opt of jobCardTypes"
-                 [class.selected]="opt === jobCardType"
-                 (click)="selectJobCardType(opt)">
-              {{ opt }}
-            </div>
-          </div>
-          <div class="field-error" *ngIf="hasFieldError('jobCardType')">
-            {{ getFieldError('jobCardType') }}
+    <div class="jc-toprow">
+      <!-- Job Card Type Dropdown -->
+      <div class="form-floating-custom" [class.open]="jobCardTypeDropdownOpen">
+        <input type="text"
+               placeholder=" "
+               [value]="jobCardType"
+               readonly
+               (click)="toggleJobCardTypeDropdown()"
+               [class.input-error]="hasFieldError('jobCardType')" />
+        <label>Job Card Type</label>
+        <i class="fa fa-chevron-down chevron"></i>
+        <div class="dropdown-panel" *ngIf="jobCardTypeDropdownOpen">
+          <div class="dropdown-option"
+               *ngFor="let opt of jobCardTypes"
+               [class.selected]="opt === jobCardType"
+               (click)="selectJobCardType(opt)">
+            {{ opt }}
           </div>
         </div>
+        <div class="field-error" *ngIf="hasFieldError('jobCardType')">
+          {{ getFieldError('jobCardType') }}
+        </div>
+      </div>
 
-        <!-- Fuel Dropdown ✅ -->
-        <div class="form-floating-custom" [class.open]="fuelDropdownOpen">
-          <input type="text"
-                 placeholder=" "
-                 [value]="fuel"
-                 readonly
-                 (click)="toggleFuelDropdown()"
-                 [class.input-error]="hasFieldError('fuel')" />
-          <label>Fuel</label>
-          <i class="fa fa-chevron-down chevron"></i>
-          <div class="dropdown-panel" *ngIf="fuelDropdownOpen">
-            <div class="dropdown-option"
-                 *ngFor="let fuelOpt of fuelTypes"
-                 [class.selected]="fuelOpt === fuel"
-                 (click)="selectFuel(fuelOpt)">
-              {{ fuelOpt }}
-            </div>
+      <!-- Fuel Dropdown ✅ -->
+      <div class="form-floating-custom" [class.open]="fuelDropdownOpen">
+        <input type="text"
+               placeholder=" "
+               [value]="fuel"
+               readonly
+               (click)="toggleFuelDropdown()"
+               [class.input-error]="hasFieldError('fuel')" />
+        <label>Fuel</label>
+        <i class="fa fa-chevron-down chevron"></i>
+        <div class="dropdown-panel" *ngIf="fuelDropdownOpen">
+          <div class="dropdown-option"
+               *ngFor="let fuelOpt of fuelTypes"
+               [class.selected]="fuelOpt === fuel"
+               (click)="selectFuel(fuelOpt)">
+            {{ fuelOpt }}
           </div>
-          <div class="field-error" *ngIf="hasFieldError('fuel')">
-            {{ getFieldError('fuel') }}
-          </div>
+        </div>
+        <div class="field-error" *ngIf="hasFieldError('fuel')">
+          {{ getFieldError('fuel') }}
         </div>
       </div>
     </div>
+    <!--</div>-->
   </div>
 
   <!-- Job Card Details -->
@@ -669,6 +667,12 @@
             (click)="handleSubmitPress()">
       <i class="fa fa-check" *ngIf="!submitting"></i>
       {{ submitting ? 'Saving...' : (item.IsClosed === false ? 'Update job card' : 'Submit job card') }}
+    </button>
+    <button type="button"
+            class="cancel-btn"
+            (click)="cancelJobCard()">
+      <i class="fa fa-times" *ngIf="!item.IsClosed && !item.IsRejected"></i>
+      Cancel Job card
     </button>
     <p class="section-reminder" *ngIf="!allSectionsSaved() || hasAnyFieldError || hasAnyRowError">
       ⚠ {{ (hasAnyFieldError || hasAnyRowError) ? 'Kuch fields me invalid value hai, unhe theek karo' : 'Please fill all required sections: Complaints, Missing Parts, and Spare Parts' }}

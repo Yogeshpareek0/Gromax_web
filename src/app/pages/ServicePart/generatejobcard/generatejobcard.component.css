@@ -521,39 +521,107 @@ select:-webkit-autofill {
 }
 
 .submit-btn {
-  padding: 10px 18px;
-  border-radius: 30px;
-  border: none;
-  background: #4796bd;
+  min-width: 190px;
+  height: 44px;
+  padding: 0 26px;
+  border-radius: 50px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #52a6cf 0%, #3a7ba0 100%);
   color: #fff;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 500;
+  letter-spacing: 0.2px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(71, 150, 189, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-  .submit-btn:hover {
-    background: #3a7ba0;
+  .submit-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 18px rgba(71, 150, 189, 0.4);
+  }
+
+  .submit-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(71, 150, 189, 0.3);
+  }
+
+  .submit-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(71, 150, 189, 0.3);
   }
 
   .submit-btn:disabled {
-    background: #a9cfe0;
+    background: #b9d8e6;
+    box-shadow: none;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.75;
   }
 
-    .submit-btn:disabled:hover {
-      background: #a9cfe0;
-    }
+  .submit-btn i {
+    font-size: 15px;
+  }
+
+.cancel-btn {
+  min-width: 190px;
+  height: 44px;
+  padding: 0 26px;
+  border-radius: 50px;
+  border: 1px solid #e6b8b8;
+  background: #fff;
+  color: #c85454;
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+  .cancel-btn:hover {
+    background: #fff3f3;
+    border-color: #c85454;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(200, 84, 84, 0.15);
+  }
+
+  .cancel-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  .cancel-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(200, 84, 84, 0.2);
+  }
+
+  .cancel-btn i {
+    font-size: 15px;
+  }
 
 .jc-submit-row {
-  text-align: center;
-  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 18px;
+  border-top: 1px solid #eff5f8;
 }
+
+  .jc-submit-row .section-reminder {
+    flex-basis: 100%;
+    margin: 4px 0 0;
+  }
 
 .confirm-overlay {
   position: fixed;
@@ -1206,6 +1274,17 @@ select:-webkit-autofill {
 }
 
 @media (max-width: 480px) {
+  .jc-submit-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    min-width: auto;
+  }
+
   .jc-card {
     padding: 16px 12px;
   }

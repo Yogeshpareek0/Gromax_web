@@ -46,5 +46,12 @@ export class PermissionService {
     else
       return false;
   }
+  ccmAccess(): boolean {
+    const positionId = sessionStorage.getItem('possitionId');
+    if (positionId === 'Service CCM')
+      return true;
+    else
+      return false;
+  }
 
 }

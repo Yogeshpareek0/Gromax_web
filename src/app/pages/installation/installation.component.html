@@ -128,7 +128,17 @@
 
     </div>
   </div>
-
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+    <div class="search-wrapper">
+      <div class="input-group custom-search-group">
+        <span class="input-group-text bg-white border-0">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input #mobileInput type="text" class="form-control border-0 shadow-none" placeholder="Search chassis no...">
+        <button class="btn search-btn text-white" type="button" (click)="searchValue(mobileInput)">Search</button>
+      </div>
+    </div>
+  </div>
   <!-- Table -->
   <div class="enquiry-table-wrapper mt-3">
     <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1200px;">
@@ -163,11 +173,26 @@
       <tbody style="font-size: 14px;">
         <tr *ngFor="let item of installationList; let i = index;" style="cursor:pointer">
           <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
-
           <td class="text-center">
-            <button class="action-icon-btn" title="View Installation Images" (click)="onRowClick(item.InstallationId)">
-              <i class="fa-solid fa-images"></i>
+            <!-- Pending hone par Add button -->
+            <button *ngIf="item.Status === 'Pending' && IsAddPermission ; else viewImages"
+                    class="action-icon-btn"
+                    [title]="item.Status === 'Pending' ? 'Add Installation Images' : 'Edit Installation Images'"
+                    (click)="onClickAddIcon(item)">
+              <i class="fa-solid fa-plus"></i>
+
+
+
             </button>
+
+            <!-- Pending nahi hai to existing button -->
+            <ng-template #viewImages>
+              <button class="action-icon-btn"
+                      title="View Installation Images"
+                      (click)="onRowClick(item.InstallationId)">
+                <i class="fa-solid fa-images"></i>
+              </button>
+            </ng-template>
           </td>
 
           <td class="text-nowrap">{{ item.state }}</td> <!-- State -->
@@ -301,6 +326,132 @@
         <span class="lightbox-counter">{{ lightboxIndex + 1 }} / {{ installationImages.length }}</span>
         <button class="lightbox-arrow" (click)="nextImage()" [disabled]="lightboxIndex === installationImages.length - 1">
           <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Add Installation Modal -->
+<div class="modal fade" id="addInstallationModal" tabindex="-1" data-bs-backdrop="static"
+     aria-labelledby="addInstallationModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" style="margin-top: 60px;">
+    <div class="modal-content installation-modal-content">
+
+      <!-- Header -->
+      <div class="modal-header installation-modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="modal-icon-wrap">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <div>
+            <h5 class="modal-title mb-0" id="addInstallationModalLabel">Add Installation</h5>
+            <small *ngIf="selectedInstallation">
+              {{ selectedInstallation.ChassisNumber }} · {{ selectedInstallation.CustomerName }}
+            </small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                [disabled]="isUploading"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-3 p-md-4">
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">
+              Working Hrs <span class="text-danger">*</span>
+            </label>
+            <input type="text" inputmode="decimal" class="form-control form-control-sm"
+                   placeholder="e.g. 3.5" [(ngModel)]="workingHrs" [disabled]="isUploading" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">
+              Customer Mobile No <span class="text-danger">*</span>
+            </label>
+
+            <input type="text"
+                   inputmode="numeric"
+                   maxlength="10"
+                   class="form-control form-control-sm"
+                   placeholder="Mobile"
+                   [(ngModel)]="mobileNo"
+                   [disabled]="isUploading" />
+          </div>
+
+          <!--<div class="col-md-8">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">Address</label>
+            <input type="text" class="form-control form-control-sm"
+                   placeholder="Installation address" [(ngModel)]="installAddress" [disabled]="true"/>
+          </div>-->
+
+          <div class="col-12">
+            <div class="location-chip" [ngClass]="'loc-' + locationStatus">
+              <ng-container [ngSwitch]="locationStatus">
+                <span *ngSwitchCase="'fetching'">
+                  <span class="spinner-border spinner-border-sm me-1"></span> Fetching location...
+                </span>
+                <span *ngSwitchCase="'done'">
+                  <i class="fa-solid fa-location-dot me-1"></i> {{ latitude }}, {{ longitude }}
+                </span>
+                <span *ngSwitchCase="'failed'">
+                  <i class="fa-solid fa-triangle-exclamation me-1"></i> Location not available
+                </span>
+              </ng-container>
+              <button type="button" class="loc-retry" *ngIf="locationStatus === 'failed'"
+                      (click)="fetchLocation()">
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="mb-0" style="font-size:14px;">Installation Images <span class="text-danger">*</span></h6>
+          <small class="text-muted">{{ selectedImageCount }} / {{ uploadSlots.length }} selected</small>
+        </div>
+
+        <div class="upload-grid">
+          <div class="upload-slot" *ngFor="let slot of uploadSlots; let idx = index">
+            <div class="upload-slot-label">{{ slot.label }}</div>
+
+            <div class="upload-slot-box" *ngIf="slot.preview; else emptySlot">
+              <img [src]="slot.preview" [alt]="slot.label" />
+              <button type="button" class="upload-remove" title="Remove"
+                      (click)="removeImage(idx)" [disabled]="isUploading">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <ng-template #emptySlot>
+              <label class="upload-slot-box upload-empty" [attr.for]="'instImg' + idx">
+                <i class="fa-solid fa-camera"></i>
+                <span>Click to upload</span>
+              </label>
+            </ng-template>
+
+            <input type="file" accept="image/*" hidden [id]="'instImg' + idx"
+                   (change)="onImageSelect($event, idx)" />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer add-install-footer">
+        <button type="button" class="btn btn-light btn-sm px-3" data-bs-dismiss="modal"
+                [disabled]="isUploading">
+          Cancel
+        </button>
+        <button type="button" class="btn custom-btn btn-sm px-4" (click)="saveInstallation()"
+                [disabled]="isUploading">
+          <span *ngIf="isUploading" class="spinner-border spinner-border-sm me-1"></span>
+          {{ isUploading ? 'Uploading...' : 'Save' }}
         </button>
       </div>
 

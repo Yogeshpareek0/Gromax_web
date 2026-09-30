@@ -2,7 +2,7 @@
   <!-- Tabs Navigation -->
   <div class="d-flex gap-2 mt-3 mb-3">
     <button (click)="switchTab('free-services')"
-            *ngIf="permission.dealerAccess()"
+            *ngIf="permission.dealerAccess() && !currentUrl.includes('/main/generatedinvoicelist')"
             [style.background]="activeTab === 'free-services' ? '#4796BD' : '#fff'"
             [style.color]="activeTab === 'free-services' ? 'white' : '#666'"
             style="border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s;">
@@ -10,7 +10,7 @@
     </button>
 
     <button (click)="switchTab('installations')"
-            *ngIf="permission.dealerAccess()"
+            *ngIf="permission.dealerAccess()  && !currentUrl.includes('/main/generatedinvoicelist')"
             [style.background]="activeTab === 'installations' ? '#4796BD' : '#fff'"
             [style.color]="activeTab === 'installations' ? 'white' : '#666'"
             style="border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s;">
