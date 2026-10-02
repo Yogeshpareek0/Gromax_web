@@ -1,0 +1,146 @@
+.custom-btn {
+  background-color: #4796BD !important;
+  color: white !important;
+  border-radius: 8px;
+  border: none !important;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+  .custom-btn:hover {
+    background-color: #3a7fa6 !important;
+    transform: translateY(-1px);
+  }
+
+/* Summary cards - non clickable */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 1px solid;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  cursor: default;
+  user-select: none;
+}
+
+.summary-label {
+  font-size: 14px;
+}
+
+.summary-value {
+  font-size: 13px;
+}
+
+.summary-icon {
+  background: white;
+  border-radius: 50%;
+  padding: 6px 4px 2px 6px;
+  font-size: 20px;
+}
+
+.enquiry-table-wrapper {
+  height: calc(100vh - 156px);
+  overflow: auto;
+  width: 100%;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+#enquiryTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 12px 8px;
+}
+
+#enquiryTable tbody td {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 8px;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #eef7fc;
+  color: #215378;
+  border: 1px solid #c9e2ef;
+}
+
+.pdf-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid #E45E2E;
+  background: #fff3ee;
+  color: #E45E2E;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+  .pdf-link:hover {
+    background: #E45E2E;
+    color: #fff;
+  }
+
+.search-wrapper {
+  max-width: 380px;
+}
+
+.custom-search-group {
+  border: 1px solid #4796BD;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.search-btn {
+  background-color: #4796BD;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 0;
+}
+
+  .search-btn:hover {
+    background-color: #3a7fa1;
+  }
+
+.pdf-link {
+  cursor: pointer;
+  padding: 0;
+}
+
+  .pdf-link:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+.pdf-pending {
+  border-color: #6c7a89;
+  background: #f1f4f7;
+  color: #6c7a89;
+}
+
+  .pdf-pending:hover:not(:disabled) {
+    background: #6c7a89;
+    color: #fff;
+  }

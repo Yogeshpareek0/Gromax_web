@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { getApisResponse, UploadSlot } from '../../model/apiresponse';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+
 
 declare var bootstrap: any;
 
@@ -33,6 +35,7 @@ export class InstallationComponent implements OnInit {
   locationStatus: 'idle' | 'fetching' | 'done' | 'failed' = 'idle';
   isUploading: boolean = false;
   private readonly MAX_FILE_SIZE = 10 * 1024 * 1024;
+  readonly MAX_REMARK_CHARS = 100;
 
   isAddressLoading: boolean = false;
 
@@ -69,6 +72,12 @@ export class InstallationComponent implements OnInit {
   IsEditablePermission: boolean = false;
   IsAddPermission: boolean = false;
 
+
+  approvalItem: any = null;
+  approvalRemark: string = '';
+  isApproving: boolean = false;
+  isApprovalImgLoading: boolean = false;
+
   mobileNo: string = '';
 
   months = [
@@ -86,7 +95,10 @@ export class InstallationComponent implements OnInit {
     { value: 12, label: 'December' }
   ];
   years: number[] = [];
-
+  get remarkWordCount(): number {
+    const text = this.approvalRemark?.trim();
+    return text ? text.split(/\s+/).length : 0;
+  }
   constructor(private http: HttpClient, private apis: AuthService, private toaster: ToastrService) {
     const now = new Date();
     this.customStartMonth = now.getMonth() + 1;
@@ -100,7 +112,6 @@ export class InstallationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    debugger;
     this.positionId = sessionStorage.getItem('possitionId');
     this.userName = sessionStorage.getItem('userName');
     if (this.positionId === 'Dealer' || this.positionId === 'National Sales Head') {
@@ -254,7 +265,11 @@ export class InstallationComponent implements OnInit {
             this.totalItems = this.installationCount[0]?.TotalDelivery || 0;
           } else if (this.activeLead === 'TotalDone') {
             this.totalItems = this.installationCount[0]?.TotalDone || 0;
-          } else {
+          }
+          else if (this.activeLead === 'ApprovalPending') {
+            this.totalItems = this.installationCount[0]?.ApprovalPending || 0;
+          }
+          else {
             this.totalItems = this.installationList.length > 0
               ? (this.installationList[0].TotalCounts || this.installationList.length)
               : 0;
@@ -372,7 +387,6 @@ export class InstallationComponent implements OnInit {
     this.lightboxIndex = index;
 
     const lightboxEl = document.getElementById('lightboxModal');
-    const installModal = document.getElementById('installationModal');
     if (!lightboxEl) return;
 
     // Blur focus before lightbox hides to prevent aria-hidden warning
@@ -383,7 +397,7 @@ export class InstallationComponent implements OnInit {
     // Restore parent modal's open state after lightbox fully closes
     lightboxEl.addEventListener('hidden.bs.modal', () => {
       setTimeout(() => {
-        if (installModal?.classList.contains('show')) {
+        if (document.querySelector('.modal.show')) {
           document.body.classList.add('modal-open');
         }
       }, 10);
@@ -554,7 +568,7 @@ export class InstallationComponent implements OnInit {
   }
 
   saveInstallation(): void {
-    debugger;
+
     if (this.isUploading) return;
 
     if (!this.workingHrs?.toString().trim()) {
@@ -643,6 +657,112 @@ export class InstallationComponent implements OnInit {
 
     return true;
   }
+
+  IsApprovalPermission(item: any): boolean {
+    if (item.Status === 'Done' && item.ApprovalStatus === 0 && (this.positionId === 'National Service Head' || this.positionId === 'National Sales Head'))
+      return true;
+    return false;
+  }
+
+
+
+
+
+  onApprovalClick(item: any): void {
+    this.approvalItem = item;
+    this.approvalRemark = '';
+    this.isApproving = false;
+    this.installationImages = [];
+    this.isApprovalImgLoading = true;
+
+    this.apis.getImagesOnId({ Id: item.InstallationId }).subscribe({
+      next: (res: any) => {
+        this.isApprovalImgLoading = false;
+        if (res?.message?.toLowerCase() === 'success') {
+          this.installationImages = res.data
+            ?.filter((i: any) => i?.ImgUrl)
+            .map((i: any) => ({ Url: i.ImgUrl })) || [];
+        }
+      },
+      error: () => {
+        this.isApprovalImgLoading = false;
+        this.toaster.error('Failed fetching images.', 'Error');
+      }
+    });
+
+    const modalEl = document.getElementById('approvalModal');
+    if (!modalEl) return;
+
+    modalEl.addEventListener('hide.bs.modal', () => {
+      (document.activeElement as HTMLElement)?.blur();
+    }, { once: true });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      this.approvalItem = null;
+      this.approvalRemark = '';
+    }, { once: true });
+
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+
+  onApprovalAction(action: 'Approve' | 'Reject'): void {
+    if (this.isApproving) return;
+
+    if (action === 'Reject' && !this.approvalRemark?.trim()) {
+      this.toaster.warning('Please enter remark for rejection.', 'Required');
+      return;
+    }
+    if ((this.approvalRemark?.length || 0) > this.MAX_REMARK_CHARS) {
+      this.toaster.warning(`Remark can have maximum ${this.MAX_REMARK_CHARS} characters.`, 'Required');
+      return;
+    }
+
+    const isApprove = action === 'Approve';
+
+    Swal.fire({
+      title: isApprove ? 'Approve Installation?' : 'Reject Installation?',
+      html: `Chassis No: <b>${this.approvalItem?.ChassisNumber ?? ''}</b><br/>Are you sure you want to ${action.toLowerCase()} this installation?`,
+      icon: isApprove ? 'question' : 'warning',
+      showCancelButton: true,
+      confirmButtonText: isApprove ? 'Yes, Approve' : 'Yes, Reject',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: isApprove ? '#4D963A' : '#E45E2E',
+      cancelButtonColor: '#6c757d',
+      reverseButtons: true
+    }).then(result => {
+      if (result.isConfirmed) this.submitApproval(action);
+    });
+  }
+
+  private submitApproval(action: 'Approve' | 'Reject'): void {
+    const request = {
+      InstallationId: this.approvalItem?.InstallationId,
+      ApprovalStatus: action === 'Approve' ? 1 : -1,   // 1 = Approved, 2 = Rejected
+      Remark: this.approvalRemark?.trim() || '',
+    };
+
+    this.isApproving = true;
+
+    this.apis.updateInstallationApproval(request).subscribe({
+      next: (res: any) => {
+        this.isApproving = false;
+        if (res?.statusCode === 200) {
+          this.toaster.success(`Installation ${action === 'Approve' ? 'Approved' : 'Rejected'} Successfully!`, 'Success');
+          const modalEl = document.getElementById('approvalModal');
+          if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+          this.getInstallationv1(this.currentPage);
+        } else {
+          this.toaster.error(res?.message || 'Action failed.', 'Error');
+        }
+      },
+      error: () => {
+        this.isApproving = false;
+        this.toaster.error('Something went wrong. Please try again.', 'Error');
+      }
+    });
+  }
+
+
 
 }
 

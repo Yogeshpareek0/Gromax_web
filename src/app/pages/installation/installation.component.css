@@ -41,6 +41,15 @@
     color: white !important;
   }
 
+.active-approval {
+  background-color: #518cc7;
+  transition: 0.3s;
+}
+
+  .active-approval p {
+    color: white !important;
+  }
+
 .active-hot {
   background-color: #E45E2E;
   transition: 0.3s;
@@ -377,6 +386,7 @@
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -404,6 +414,11 @@
   border-color: #f5d28a;
 }
 
+.status-rejected {
+  background-color: #c13737;
+  color: #fff1f1;
+  border-color: #c13737;
+}
 /* ===== Add Installation Modal ===== */
 #addInstallationModal .modal-body {
   background: #f8fafc;
@@ -545,6 +560,7 @@
   border-top: 1px solid #e2eaf0;
   padding: 10px 20px;
 }
+
 .search-wrapper {
   max-width: 380px;
 }
@@ -566,4 +582,102 @@
   .search-btn:hover {
     background-color: #3a7fa1;
     border: 1px solid #3a7fa1;
+  }
+/* ===== Approval Modal ===== */
+#approvalModal .modal-body {
+  background: #f8fafc;
+}
+
+.approval-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #215378;
+  margin-bottom: 8px;
+  padding-left: 8px;
+  border-left: 3px solid #4796BD;
+}
+
+.approval-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e2eaf0;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.approval-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+  .approval-detail-item span {
+    font-size: 11px;
+    color: #6c7a89;
+  }
+
+  .approval-detail-item strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2d3a;
+    word-break: break-word;
+  }
+
+.approval-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 576px) {
+  .approval-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.approval-img-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .approval-img-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.btn-approve {
+  background-color: #4796BD !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px;
+}
+
+  .btn-approve:hover:not(:disabled) {
+    background-color: #3a7fa6 !important;
+  }
+
+.btn-reject {
+  background-color: #fff !important;
+  color: #E45E2E !important;
+  border: 1.5px solid #E45E2E !important;
+  border-radius: 8px;
+}
+
+  .btn-reject:hover:not(:disabled) {
+    background-color: #E45E2E !important;
+    color: #fff !important;
+  }
+
+.remark-counter {
+  text-align: right;
+  font-size: 11px;
+  color: #6c7a89;
+  margin-top: 4px;
+}
+
+  .remark-counter.limit {
+    color: #E45E2E;
+    font-weight: 600;
   }

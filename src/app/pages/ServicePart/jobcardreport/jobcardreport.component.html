@@ -1,0 +1,176 @@
+<div class="container-fluid px-0">
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+
+    <!-- Summary Cards (non-clickable) -->
+    <div class="summary-grid mt-2 mb-3">
+      <div class="summary-card" *ngFor="let c of summaryCards" [style.borderColor]="c.color">
+        <div>
+          <p class="mb-0 summary-label" [style.color]="c.color">{{ c.label }}</p>
+          <p class="text-dark mb-0 summary-value">{{ jobCardCount?.[c.key] ?? 0 }}</p>
+        </div>
+        <div class="summary-icon">
+          <i [class]="c.icon" [style.color]="c.color"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Row -->
+    <div class="row align-items-end g-2 mb-2">
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">Duration</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedDuration" (change)="onDurationChange()">
+          <option value="this Month">This Month</option>
+          <option value="this Quarter">This Quarter</option>
+          <option value="last Quarter">Last Quarter</option>
+          <option value="this FY">This FY</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <ng-container *ngIf="selectedDuration === 'custom'">
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Start Month</label>
+          <div class="d-flex gap-1">
+            <select class="form-select form-select-sm" [(ngModel)]="customStartMonth">
+              <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+            </select>
+            <select class="form-select form-select-sm" [(ngModel)]="customStartYear" style="max-width: 90px;">
+              <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">End Month</label>
+          <div class="d-flex gap-1">
+            <select class="form-select form-select-sm" [(ngModel)]="customEndMonth">
+              <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+            </select>
+            <select class="form-select form-select-sm" [(ngModel)]="customEndYear" style="max-width: 90px;">
+              <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">State Name</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedState" (change)="onStateChange()">
+          <option *ngFor="let s of stateList" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">Dealership Name</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedDealership">
+          <option value="All">All Dealerships</option>
+          <option *ngFor="let d of dealerList" [value]="d.DealerCode">
+            {{ d.DealerName }} ({{ d.DlrLoc }})
+          </option>
+        </select>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">Job Type</label>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedJobType">
+          <option value="All">All</option>
+          <option *ngFor="let j of jobCardTypes" [value]="j">{{ j }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <button class="btn w-100 custom-btn py-2" (click)="onShowReport()" [disabled]="isLoading" style="font-size:13px;">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!isLoading" class="bi bi-clipboard-data me-1"></i> Show Report
+        </button>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+        <button class="btn w-100 custom-btn py-2" (click)="exportToExcel()" style="font-size:13px;">
+          <i class="fas fa-download me-1"></i> Download
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+    <div class="search-wrapper">
+      <div class="input-group custom-search-group">
+        <span class="input-group-text bg-white border-0">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input #searchInput type="text" class="form-control border-0 shadow-none"
+               placeholder="Search job card no / customer / mobile..."
+               (keyup.enter)="searchValue(searchInput)">
+        <button class="btn search-btn text-white" type="button" (click)="searchValue(searchInput)">Search</button>
+      </div>
+    </div>
+  </div>-->
+
+  <!-- Table -->
+  <div class="enquiry-table-wrapper mt-3">
+    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1400px;">
+      <thead>
+        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">State</th>
+          <th class="text-nowrap fw-normal">Dealer Code</th>
+          <th class="text-nowrap fw-normal">Dealer Name</th>
+          <th class="text-nowrap fw-normal">Location</th>
+          <th class="text-nowrap fw-normal">Job Card No</th>
+          <th class="text-nowrap fw-normal">Job Card Date</th>
+          <th class="text-nowrap fw-normal">Job Card Type</th>
+          <th class="text-nowrap fw-normal">Customer Name</th>
+          <th class="text-nowrap fw-normal">Customer Mobile</th>
+          <th class="text-nowrap fw-normal">Regn No</th>
+          <th class="text-nowrap fw-normal">Model</th>
+          <th class="text-nowrap fw-normal">Work Hours</th>
+          <th class="text-nowrap fw-normal">Date Of Sale</th>
+          <th class="text-nowrap fw-normal">Work Nature</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius: 6px;">Job Card PDF</th>
+        </tr>
+      </thead>
+      <tbody style="font-size: 14px;">
+        <tr *ngFor="let item of reportList; let i = index;">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-nowrap">{{ item.StateName || '-' }}</td>
+          <td class="text-nowrap">{{ item.DealerCode || '-' }}</td>
+          <td class="text-nowrap">{{ item.DealerName || '-' }}</td>
+          <td class="text-nowrap">{{ item.Location || '-' }}</td>
+          <td class="text-nowrap">{{ item.JobCardNo || '-' }}</td>
+          <td class="text-nowrap">{{ item.JobCardDate ? (item.JobCardDate | date:'dd-MM-yyyy') : '-' }}</td>
+          <td class="text-nowrap">
+            <span class="type-badge">{{ item.JobCardType || '-' }}</span>
+          </td>
+          <td class="text-nowrap">{{ item.CustomerName || '-' }}</td>
+          <td class="text-nowrap">{{ item.CustomerMobile || '-' }}</td>
+          <td class="text-nowrap">{{ item.RegnNo || '-' }}</td>
+          <td class="text-nowrap">{{ item.Model || '-' }}</td>
+          <td class="text-nowrap">{{ item.WorkHours ?? '-' }}</td>
+          <td class="text-nowrap">{{ item.DateOfSale ? (item.DateOfSale | date:'dd-MM-yyyy') : '-' }}</td>
+          <td class="text-nowrap">{{ item.WorkNature || '-' }}</td>
+          <td class="text-nowrap text-center">
+            <button type="button" class="pdf-link"
+                    [class.pdf-pending]="!item.pdfURL"
+                    [title]="item.pdfURL ? 'View PDF' : 'Generate PDF'"
+                    [disabled]="generatingPdfId === item.jobCardMasterId"
+                    (click)="openJobCardPdf(item)">
+              <span *ngIf="generatingPdfId === item.jobCardMasterId; else pdfIcon"
+                    class="spinner-border spinner-border-sm"></span>
+              <ng-template #pdfIcon><i class="fa-solid fa-file-pdf"></i></ng-template>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="!isLoading && reportList.length === 0">
+          <td colspan="16" class="text-center text-muted py-4">No records found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination [totalItems]="totalItems"
+                  [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage"
+                  (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>

@@ -50,6 +50,22 @@
           </div>
         </div>
       </div>
+
+      <div class="col-xl-4 col-lg-4 col-sm-6 mb-3" (click)="setActiveLead('ApprovalPending')">
+        <div class="card text-white border-0 shadow-sm"
+             [ngClass]="{'active-approval': activeLead === 'ApprovalPending'}"
+             style="border-radius: 14px; border: 1px solid #518cc7 !important; cursor: pointer">
+          <div class="card-body d-flex align-items-center justify-content-between py-2">
+            <div>
+              <p class="mb-0" style="font-size: 14px; color: #518cc7">Approval Pending</p>
+              <p class="text-dark mb-0" style="font-size:13px">{{i.ApprovalPending ?? 0}}</p>
+            </div>
+            <div style="background: white; border-radius: 50%; padding: 6px 4px 2px 6px">
+              <i class="fa-solid fa-clock" style="color: #518cc7; font-size: 20px; "></i>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Filter Row -->
@@ -174,24 +190,42 @@
         <tr *ngFor="let item of installationList; let i = index;" style="cursor:pointer">
           <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
           <td class="text-center">
-            <!-- Pending hone par Add button -->
-            <button *ngIf="item.Status === 'Pending' && IsAddPermission ; else viewImages"
-                    class="action-icon-btn"
-                    [title]="item.Status === 'Pending' ? 'Add Installation Images' : 'Edit Installation Images'"
-                    (click)="onClickAddIcon(item)">
-              <i class="fa-solid fa-plus"></i>
 
+            <ng-container *ngIf="IsApprovalPermission(item); else viewImages">
 
+              <!-- Approval Permission hai -->
+              <button class="action-icon-btn"
+                      [title]="'Edit Installation Images'"
+                      (click)="onApprovalClick(item)">
+                <i class="fa-solid fa-plus"></i>
+              </button>
 
-            </button>
+            </ng-container>
 
-            <!-- Pending nahi hai to existing button -->
+            <!--<ng-template #checkAddPermission>-->
+
+              <!-- Approval Permission nahi hai, Add Permission check karo -->
+              <!--<ng-container *ngIf="item.Status === 'Pending' && IsAddPermission; else viewImages">
+
+                <button class="action-icon-btn"
+                        title="Add Installation Images"
+                        (click)="onClickAddIcon(item)">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+
+              </ng-container>
+
+            </ng-template>-->
+
+            <!-- Dono permission conditions false hone par -->
             <ng-template #viewImages>
+
               <button class="action-icon-btn"
                       title="View Installation Images"
                       (click)="onRowClick(item.InstallationId)">
                 <i class="fa-solid fa-images"></i>
               </button>
+
             </ng-template>
           </td>
 
@@ -230,7 +264,15 @@
             </span>
           </td>
 
-          <td class="text-nowrap">{{ item.hoStatus }}</td>
+          <td class="text-nowrap">
+            <span class="status-badge"
+                  [ngClass]="{
+  'status-done': item.hoStatus === 'Approved',
+  'status-pending': item.hoStatus === 'Pending',
+  'status-rejected': item.hoStatus === 'Rejected'}">
+              {{ item.hoStatus }}
+            </span>
+          </td>
           <td class="text-nowrap">{{ item.hoRemark }}</td>
         </tr>
       </tbody>
@@ -298,6 +340,136 @@
           </div>
         </ng-template>
 
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal fade" id="approvalModal" tabindex="-1" data-bs-backdrop="static"
+     aria-labelledby="approvalModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" style="margin-top: 60px;">
+    <div class="modal-content installation-modal-content">
+
+      <!-- Header -->
+      <div class="modal-header installation-modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="modal-icon-wrap">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <h5 class="modal-title mb-0" id="approvalModalLabel">Installation Approval</h5>
+            <small *ngIf="approvalItem">
+              {{ approvalItem.ChassisNumber }} · {{ approvalItem.CustomerName }}
+            </small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                [disabled]="isApproving"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body p-3 p-md-4" *ngIf="approvalItem">
+
+        <!-- Details -->
+        <div class="approval-section-title">Basic Details</div>
+        <div class="approval-detail-grid mb-3">
+          <div class="approval-detail-item">
+            <span>Dealer</span>
+            <strong>{{ approvalItem.DealerName }} ({{ approvalItem.DealerCode }})</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Location</span>
+            <strong>{{ approvalItem.location || '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Chassis Number</span>
+            <strong>{{ approvalItem.ChassisNumber }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Model</span>
+            <strong>{{ approvalItem.Model || '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Customer Name</span>
+            <strong>{{ approvalItem.CustomerName || '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Mobile</span>
+            <strong>{{ approvalItem.Mobile || '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Date Of Delivery</span>
+            <strong>{{ approvalItem.DeliveryDate ? (approvalItem.DeliveryDate | date:'dd-MM-yyyy') : '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Date Of Installation</span>
+            <strong>{{ approvalItem.installationDate || '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Working Hrs</span>
+            <strong>{{ approvalItem.workHrs ?? '-' }}</strong>
+          </div>
+          <div class="approval-detail-item">
+            <span>Days Taken</span>
+            <strong>{{ approvalItem.daysTaken ?? '-' }}</strong>
+          </div>
+          <div class="approval-detail-item approval-full">
+            <span>Address</span>
+            <strong>{{ approvalItem.address || '-' }}</strong>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div class="approval-section-title">Installation Images</div>
+        <div *ngIf="isApprovalImgLoading" class="text-center py-3">
+          <span class="spinner-border spinner-border-sm text-primary"></span>
+          <small class="ms-2 text-muted">Loading images...</small>
+        </div>
+
+        <ng-container *ngIf="!isApprovalImgLoading">
+          <div class="approval-img-grid mb-3" *ngIf="installationImages.length > 0; else noApprovalImg">
+            <div class="img-gallery-item" *ngFor="let img of installationImages; let idx = index"
+                 (click)="openLightbox(idx)">
+              <div class="img-card">
+                <img [src]="img.Url" [alt]="img.Url || 'Installation Image'" loading="lazy" />
+                <div class="img-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                <span class="img-badge">{{ img.Url || (idx + 1) }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noApprovalImg>
+            <p class="text-muted mb-3" style="font-size:13px;">No images found.</p>
+          </ng-template>
+        </ng-container>
+
+        <!-- Remark -->
+        <label class="form-label fw-medium mb-1" style="font-size:13px;">
+          Remark <small class="text-muted">(required for rejection)</small>
+        </label>
+        <textarea class="form-control form-control-sm" rows="3"
+                  placeholder="Enter remark..."
+                  [maxlength]="MAX_REMARK_CHARS"
+                  [(ngModel)]="approvalRemark"
+                  [disabled]="isApproving"></textarea>
+        <div class="remark-counter" [class.limit]="(approvalRemark.length || 0) >= MAX_REMARK_CHARS">
+          {{ approvalRemark.length || 0 }} / {{ MAX_REMARK_CHARS }} characters
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer add-install-footer">
+       
+        <button type="button" class="btn btn-sm px-4 btn-reject"
+                (click)="onApprovalAction('Reject')" [disabled]="isApproving">
+          <i class="fa-solid fa-xmark me-1"></i> Reject
+        </button>
+        <button type="button" class="btn btn-sm px-4 btn-approve"
+                (click)="onApprovalAction('Approve')" [disabled]="isApproving">
+          <span *ngIf="isApproving" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!isApproving" class="fa-solid fa-check me-1"></i> Approve
+        </button>
       </div>
 
     </div>

@@ -121,7 +121,7 @@ export class MainLayoutComponent implements OnInit {
 
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry', 'stocktransfer', 'rcstatus',
       'retailpunch', 'exchangestock', 'updateoldenquiry', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
-    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport'];
+    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport','jobcardreport'];
     const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist']; // 🔑 naya array
 
     if (path !== 'dynamicreport') {
@@ -185,7 +185,7 @@ export class MainLayoutComponent implements OnInit {
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry',
       'stocktransfer', 'rcstatus', 'retailpunch', 'exchangestock', 'updateoldenquiry',
       'updtoldretailedenq', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
-    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport'];
+    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport','jobcardreport'];
     const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist'];
 
     this.isSalesOpen = false;
@@ -247,6 +247,7 @@ export class MainLayoutComponent implements OnInit {
       business_performance: 'Business Performance Master',
       pdireport: 'PDI Report',
       ntirreport: 'NTIR Report',
+      jobcardreport: 'JobCard Report',
       stocktransfer: 'Dealer Stock Transfer',
       /*    stockreturn: 'Dealer Stock Return',*/
       inventory_data: 'Stock Master',

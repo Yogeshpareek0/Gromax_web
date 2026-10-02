@@ -951,4 +951,20 @@ export class AuthService {
   getMechanicDropdownList() {
     return this.http.get(this.baseUrl + 'Api/Services/getMechanicDropdownList');
   }
+
+  updateInstallationApproval(params: any) {
+    return this.http.post(this.baseUrl + 'Api/Home/updateInstallationApproval', params);
+  }
+
+  getJobCardReport(req: any): Observable<any> {
+    let params = new HttpParams();
+    Object.keys(req).forEach(k => {
+      if (req[k] !== null && req[k] !== undefined) params = params.set(k, req[k]);
+    });
+    return this.http.get(this.baseUrl + 'Api/Services/jobCardReport', { params });
+  }
+  addJobCardPdf(jobCardMasterId: string) {
+    const params = new HttpParams().set('jobCardMasterId', jobCardMasterId);
+    return this.http.post(this.baseUrl + 'Api/Services/addJobCardPdf', {}, { params });
+  }
 }

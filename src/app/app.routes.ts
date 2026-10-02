@@ -46,6 +46,7 @@ import { MechanicComponent } from '../app/pages/ServicePart/mechanic/mechanic.co
 import { PdiReportComponent } from '../app/pages/ServicePart/pdi-report/pdi-report.component';
 import { NtirReportComponent } from '../app/pages/ServicePart/ntir-report/ntir-report.component';
 import { ItemScoreComponent } from '../app/pages/ServicePart/item-score/item-score.component';
+import { JobcardreportComponent } from '../app/pages/ServicePart/jobcardreport/jobcardreport.component';
 
 
 
@@ -102,6 +103,7 @@ export const routes: Routes = [
       { path: 'ntirreport', component: NtirReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'NtirReport' } },
       { path: 'additemscore', component: ItemScoreComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'ItemScore' } },
       { path: 'generatedinvoicelist', component: ReimbersementInvComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'GenerateInvoiceList' } },
+      { path: 'jobcardreport', component: JobcardreportComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'JobCardReport' } },
 
 
     ]
