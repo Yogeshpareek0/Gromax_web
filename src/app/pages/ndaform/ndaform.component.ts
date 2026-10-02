@@ -10,6 +10,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { PaginationComponent } from '../../layout/pagination/pagination.component';
 import { PermissionService } from '../../services/userpermission/permission.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-ndaform',
@@ -28,6 +29,8 @@ export class NdaformComponent implements OnInit {
   showAM: boolean = false;
   showTM: boolean = false;
   showFO: boolean = false;
+
+  showRemainingFields: boolean = false;
 
   stateHeadList: PersonModel[] = [];
   areaManagersList: PersonModel[] = [];
@@ -169,7 +172,8 @@ export class NdaformComponent implements OnInit {
     private router: Router,
     private http: HttpClient,
     private apis: AuthService,
-    private permission: PermissionService
+    private permission: PermissionService,
+    private toast: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -829,6 +833,8 @@ export class NdaformComponent implements OnInit {
             allowOutsideClick: false, allowEscapeKey: false, confirmButtonText: 'OK',
             customClass: { title: 'swal-title-small', htmlContainer: 'swal-text-small' }
           }).then(result => { if (result.isConfirmed) this.showTableView(); });
+
+          this.showRemainingFields = false;
         } else {
           this.apis.showAlert('error', 'Error!', response?.message || 'Failed to generate NDA enquiry.');
         }
@@ -1120,6 +1126,40 @@ export class NdaformComponent implements OnInit {
     this.selectedNdaMasterId = '';
     this.SelectedStateCode = null;
     document.body.style.overflow = 'auto';
+  }
+
+  CheckPhoneNumber(): void {
+
+    if (!this.partyMobile || !/^\d{10}$/.test(this.partyMobile)) {
+      this.showRemainingFields = false;
+      return;
+    }
+
+    this.showRemainingFields = false;
+
+    this.apis.CheckNDAEnquiryMobile(this.partyMobile).subscribe({
+      next: (data: any) => {
+
+        if (data?.message?.toLowerCase() === 'success') {
+          
+          if(data.data === true)
+          {
+            this.showRemainingFields = true;
+            this.toast.warning('This mobile number is already registered.');
+          }
+          else{
+            this.showRemainingFields = false;
+          }
+          
+        } else {
+          this.showRemainingFields = false;
+        }
+      },
+      error: (err: any) => {
+        this.showRemainingFields = false;
+       
+      }
+    });
   }
 
   handleSubmit() {

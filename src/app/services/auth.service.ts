@@ -967,4 +967,9 @@ export class AuthService {
     const params = new HttpParams().set('jobCardMasterId', jobCardMasterId);
     return this.http.post(this.baseUrl + 'Api/Services/addJobCardPdf', {}, { params });
   }
+
+  CheckNDAEnquiryMobile(mobileNo: string) {
+    const params = new HttpParams().set('mobileNo', mobileNo);
+    return this.http.get(this.baseUrl + 'Api/Home/CheckNDAEnquiryMobile', { params });
+  }
 }
