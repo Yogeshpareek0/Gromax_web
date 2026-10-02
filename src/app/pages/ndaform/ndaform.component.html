@@ -9,9 +9,7 @@
       <div *ngIf="userName === 'wairagal.devidas@gromaxagri.com' ||
               userName === 'ykp900155@gmail.com'">
 
-        <button type="button"
-                class="nda-add-btn"
-                (click)="openNdaOpenList()">
+        <button type="button" class="nda-add-btn" (click)="openNdaOpenList()">
 
           <span class="nda-add-text">
             Nda Open List
@@ -19,9 +17,7 @@
 
         </button>
 
-        <button type="button"
-                class="nda-add-btn"
-                (click)="PendingConversionByList(1)">
+        <button type="button" class="nda-add-btn" (click)="PendingConversionByList(1)">
 
           <span class="nda-add-text">
             Conversion By Pending List
@@ -35,19 +31,14 @@
       <!-- Right Side -->
       <div class="d-flex align-items-center ms-auto">
 
-        <button *ngIf="listType === 'NdaList'"
-                type="button"
-                class="nda-export-btn"
-                (click)="exportToExcel()">
+        <button *ngIf="listType === 'NdaList'" type="button" class="nda-export-btn" (click)="exportToExcel()">
 
           <i class="fas fa-download"></i>
 
         </button>
 
 
-        <button type="button"
-                class="nda-add-btn"
-                (click)="showAddForm()">
+        <button type="button" class="nda-add-btn" (click)="showAddForm()">
 
           <span class="nda-add-icon">
             <i class="fa-solid fa-plus"></i>
@@ -121,9 +112,8 @@
         <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
           <label for="mobileFilter" class="form-label fw-medium mb-0">Mobile Number</label>
           <input type="text" id="mobileFilter" class="form-control" [(ngModel)]="selectedMobileNumber"
-                 placeholder="Search by mobile" maxlength="10"
-                 pattern="[0-9]*" inputmode="numeric"
-                 (keypress)="allowNumbersOnly($event)">
+            placeholder="Search by mobile" maxlength="10" pattern="[0-9]*" inputmode="numeric"
+            (keypress)="allowNumbersOnly($event)">
         </div>
         <!--<div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
           <label for="location" class="form-label fw-medium mb-0">Location</label>
@@ -173,9 +163,8 @@
 
             <th class="text-nowrap fw-normal">LOI Status</th>
 
-            <th *ngIf="isSuperAdmin && listType === 'PendingConversion'"
-                class="text-nowrap fw-normal"
-                style="border-top-right-radius: 6px;">
+            <th *ngIf="isSuperAdmin && listType === 'PendingConversion'" class="text-nowrap fw-normal"
+              style="border-top-right-radius: 6px;">
               Conv. By
             </th>
 
@@ -197,7 +186,8 @@
                   <i class="fa-solid fa-file-circle-xmark" style="font-size: 20px; color: #4796BD;"></i>
                 </div>
                 <p class="mb-0" style="font-size: 14px; color: #333;">No NDA Enquiries Found</p>
-                <p class="mb-0" style="font-size: 12px; color: #919191;">Click "Add NDA Enquiry" to add a new enquiry</p>
+                <p class="mb-0" style="font-size: 12px; color: #919191;">Click "Add NDA Enquiry" to add a new enquiry
+                </p>
               </div>
             </td>
           </tr>
@@ -205,8 +195,8 @@
             <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
             <td *ngIf="listType === 'NdaList'">
               <button class="btn btn-sm"
-                      style="background-color: #EBF5FB; color: #215378; border: 1px solid #4796BD; border-radius: 20px;font-size:10px;padding:4px 6px"
-                      (click)="openFollowupModal(item)">
+                style="background-color: #EBF5FB; color: #215378; border: 1px solid #4796BD; border-radius: 20px;font-size:10px;padding:4px 6px"
+                (click)="openFollowupModal(item)">
                 <i class="fa-solid fa-phone" style="font-size:9px"></i> Followup
               </button>
             </td>
@@ -228,9 +218,7 @@
 
             <td>{{ item.CodeOpenedStatus??'-' }}</td>
             <td *ngIf="isSuperAdmin && listType === 'PendingConversion'">
-              <button type="button"
-                      class="btn btn-sm btn-primary"
-                      (click)="openModal(item)">
+              <button type="button" class="btn btn-sm btn-primary" (click)="openModal(item)">
                 <i class="fa-solid fa-pen-to-square me-1"></i>
                 Update
               </button>
@@ -243,7 +231,8 @@
       </table>
     </div>
 
-    <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+    <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)"></app-pagination>
   </ng-container>
 
   <!-- ==================== GENERATE FORM ==================== -->
@@ -258,7 +247,16 @@
 
     <div class="card shadow-sm px-4 border-0 py-2 mt-2" style="border-radius: 12px;">
       <div class="row pt-4">
-
+        <!-- Party Mobile -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="form-floating-custom" [class.has-value]="partyMobile">
+            <input type="text" class="form-control" placeholder="" maxlength="10" [(ngModel)]="partyMobile"
+              pattern="[0-9]*" inputmode="numeric" (keypress)="allowNumbersOnly($event)"
+              (ngModelChange)="showRemainingFields = false" (blur)="CheckPhoneNumber()"/>
+            <label>Party Mobile</label>
+          </div>
+        </div>
+        <ng-container *ngIf="showRemainingFields">
         <!-- State Head -->
         <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
           <div class="form-floating-custom" [class.has-value]="selectedSH">
@@ -322,16 +320,6 @@
           </div>
         </div>
 
-        <!-- Party Mobile -->
-        <div class="col-xl-3 col-lg-4 col-sm-6">
-          <div class="form-floating-custom" [class.has-value]="partyMobile">
-            <input type="text" class="form-control" placeholder="" maxlength="10"
-                   [(ngModel)]="partyMobile" pattern="[0-9]*" inputmode="numeric"
-                   (keypress)="allowNumbersOnly($event)" />
-            <label>Party Mobile</label>
-          </div>
-        </div>
-
         <!-- Enquiry Current Status (always Open in generate mode) -->
         <div class="col-xl-3 col-lg-4 col-sm-6">
           <div class="form-floating-custom has-value">
@@ -384,8 +372,8 @@
             </div>
             <div class="multi-dropdown-menu" *ngIf="talukaDropdownOpen">
               <div *ngFor="let t of talukaList" class="multi-dropdown-item"
-                   [class.selected]="interestedTaluka.includes(+t.Tehsil)"
-                   (click)="onTalukaCheckChange($event, t.Tehsil,t.TehsilName)">
+                [class.selected]="interestedTaluka.includes(+t.Tehsil)"
+                (click)="onTalukaCheckChange($event, t.Tehsil,t.TehsilName)">
                 <i class="fa-solid fa-check check-icon"></i>{{ t.TehsilName }}
               </div>
             </div>
@@ -417,9 +405,7 @@
         </div>-->
         <div class="col-xl-3 col-lg-4 col-sm-6">
           <div class="form-floating-custom" [class.has-value]="interestedLocationName">
-            <select class="form-select"
-                    [(ngModel)]="interestedLocationName"
-                    name="interestedLocationName">
+            <select class="form-select" [(ngModel)]="interestedLocationName" name="interestedLocationName">
               <option value="" disabled selected hidden></option>
               <option *ngFor="let loc of locationOptions" [value]="loc">
                 {{ loc }}
@@ -454,8 +440,8 @@
         </div>
         <div class="col-xl-3 col-lg-4 col-sm-6">
           <div class="form-floating-custom" [class.has-value]="expectedConversionDate">
-            <input type="date" class="form-control" [(ngModel)]="expectedConversionDate"
-                   [min]="todayDate" max="max60Days" (change)="validateConversionDate()" />
+            <input type="date" class="form-control" [(ngModel)]="expectedConversionDate" [min]="todayDate"
+              max="max60Days" (change)="validateConversionDate()" />
             <label>Expected Conversion Date</label>
             <small class="text-danger" *ngIf="conversionDateError" style="font-size: 12px;">
               {{ conversionDateError }}
@@ -466,8 +452,8 @@
 
         <div class="col-xl-3 col-lg-4 col-sm-6">
           <div class="form-floating-custom" [class.has-value]="nextFollowupDate">
-            <input type="date" class="form-control" style="font-size:14px"
-                   [min]="todayDate" [max]="max30Days" [(ngModel)]="nextFollowupDate" (change)="validateNextFollowDate()" />
+            <input type="date" class="form-control" style="font-size:14px" [min]="todayDate" [max]="max30Days"
+              [(ngModel)]="nextFollowupDate" (change)="validateNextFollowDate()" />
             <label>Next Follow-up Date</label>
             <small class="text-danger" *ngIf="nextFollowUpDateError" style="font-size: 12px;">
               {{ nextFollowUpDateError }}
@@ -477,12 +463,8 @@
 
         <div class="col-xl-3 col-lg-4 col-sm-6">
           <div class="form-floating-custom" [class.has-value]="remarks">
-            <input type="text"
-                   class="form-control"
-                   style="font-size:14px"
-                   maxlength="100"
-                   [(ngModel)]="remarks"
-                   placeholder=" " />
+            <input type="text" class="form-control" style="font-size:14px" maxlength="100" [(ngModel)]="remarks"
+              placeholder=" " />
             <label>Remarks</label>
             <small class="text-danger" *ngIf="remarksError" style="font-size: 12px;">
               {{ remarksError }}
@@ -492,15 +474,15 @@
 
 
         <div class="text-center pb-3 col-12 mt-2">
-          <button type="button" class="btn text-white px-4"
-                  [disabled]="!isFormValid()"
-                  (click)="onSubmit()"
-                  style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+          <button type="button" class="btn text-white px-4" [disabled]="!isFormValid()" (click)="onSubmit()"
+            style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
             Generate NDA Enquiry
           </button>
         </div>
 
+      </ng-container>
       </div>
+      
     </div>
   </ng-container>
 
@@ -516,19 +498,18 @@
     <!-- ===== TABS ===== -->
     <div class="d-flex mb-0" style="gap:0; border-bottom: none;">
       <button class="nda-tab-btn" [class.nda-tab-active]="activeFollowupTab === 'followup'"
-              (click)="activeFollowupTab = 'followup'">
+        (click)="activeFollowupTab = 'followup'">
         <i class="fa-solid fa-phone me-1" style="font-size:12px"></i> Followup
       </button>
       <button class="nda-tab-btn" [class.nda-tab-active]="activeFollowupTab === 'history'"
-              (click)="activeFollowupTab = 'history'; loadFollowupHistory()">
+        (click)="activeFollowupTab = 'history'; loadFollowupHistory()">
         <i class="fa-solid fa-clock-rotate-left me-1" style="font-size:12px"></i> Followup History
       </button>
     </div>
 
     <!-- ===== FOLLOWUP TAB ===== -->
-    <div class="card shadow-sm px-4 border-0 py-2"
-         style="border-radius: 0 12px 12px 12px;"
-         *ngIf="activeFollowupTab === 'followup'">
+    <div class="card shadow-sm px-4 border-0 py-2" style="border-radius: 0 12px 12px 12px;"
+      *ngIf="activeFollowupTab === 'followup'">
       <div class="row pt-4">
 
         <!-- Readonly Info -->
@@ -574,8 +555,8 @@
 
         <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="followupRemarks==='Interested'">
           <div class="form-floating-custom" [class.has-value]="expectedConversionDate">
-            <input type="date" class="form-control" [(ngModel)]="expectedConversionDate"
-                   [min]="todayDate" [max]="max60Days" (change)="validateConversionDate()" />
+            <input type="date" class="form-control" [(ngModel)]="expectedConversionDate" [min]="todayDate"
+              [max]="max60Days" (change)="validateConversionDate()" />
             <label>Expected Conversion Date</label>
             <small class="text-danger" *ngIf="conversionDateError" style="font-size: 12px;">
               {{ conversionDateError }}
@@ -641,8 +622,8 @@
 
           <div class="col-xl-3 col-lg-4 col-sm-6">
             <div class="form-floating-custom" [class.has-value]="nextFollowupDate">
-              <input type="date" class="form-control" style="font-size:14px"
-                     [min]="todayDate" [max]="max30Days" [(ngModel)]="nextFollowupDate" (change)="validateNextFollowDate()" />
+              <input type="date" class="form-control" style="font-size:14px" [min]="todayDate" [max]="max30Days"
+                [(ngModel)]="nextFollowupDate" (change)="validateNextFollowDate()" />
               <label>Next Follow-up Date</label>
               <small class="text-danger" *ngIf="nextFollowUpDateError" style="font-size: 12px;">
                 {{ nextFollowUpDateError }}
@@ -652,12 +633,8 @@
 
           <div class="col-xl-3 col-lg-4 col-sm-6">
             <div class="form-floating-custom" [class.has-value]="remarks">
-              <input type="text"
-                     class="form-control"
-                     style="font-size:14px"
-                     maxlength="100"
-                     [(ngModel)]="remarks"
-                     placeholder=" " />
+              <input type="text" class="form-control" style="font-size:14px" maxlength="100" [(ngModel)]="remarks"
+                placeholder=" " />
               <label>Remarks</label>
               <small class="text-danger" *ngIf="remarksError" style="font-size: 12px;">
                 {{ remarksError }}
@@ -680,8 +657,8 @@
           <!-- SH Interview Date -->
           <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="shInterviewDone === 'Yes'">
             <div class="form-floating-custom" [class.has-value]="shInterviewDate">
-              <input type="date" class="form-control" style="font-size:14px"
-                     [max]="todayDate" [(ngModel)]="shInterviewDate" />
+              <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                [(ngModel)]="shInterviewDate" />
               <label>SH Interview Date</label>
             </div>
           </div>
@@ -699,8 +676,7 @@
           </div>
 
           <!-- SH Rejection Remarks -->
-          <div class="col-xl-3 col-lg-4 col-sm-6"
-               *ngIf="shInterviewDone === 'Yes' && shRemarks === 'Rejected'">
+          <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="shInterviewDone === 'Yes' && shRemarks === 'Rejected'">
             <div class="form-floating-custom" [class.has-value]="shRejectionRemarks">
               <input type="text" class="form-control" placeholder="" [(ngModel)]="shRejectionRemarks" />
               <label>SH Rejection Remarks</label>
@@ -723,8 +699,8 @@
 
             <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="hoInterviewDone === 'Yes'">
               <div class="form-floating-custom" [class.has-value]="hoInterviewDate">
-                <input type="date" class="form-control" style="font-size:14px"
-                       [max]="todayDate" [(ngModel)]="hoInterviewDate" />
+                <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                  [(ngModel)]="hoInterviewDate" />
                 <label>HO Interview Date</label>
               </div>
             </div>
@@ -740,8 +716,7 @@
               </div>
             </div>
 
-            <div class="col-xl-3 col-lg-4 col-sm-6"
-                 *ngIf="hoInterviewDone === 'Yes' && hoRemarks === 'Rejected'">
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="hoInterviewDone === 'Yes' && hoRemarks === 'Rejected'">
               <div class="form-floating-custom" [class.has-value]="hoRejectionRemarks">
                 <input type="text" class="form-control" placeholder="" [(ngModel)]="hoRejectionRemarks" />
                 <label>HO Rejection Remarks</label>
@@ -766,8 +741,8 @@
 
               <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="sdReceived === 'Yes'">
                 <div class="form-floating-custom" [class.has-value]="sdReceivingDate">
-                  <input type="date" class="form-control" style="font-size:14px"
-                         [max]="todayDate" [(ngModel)]="sdReceivingDate" />
+                  <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                    [(ngModel)]="sdReceivingDate" />
                   <label>SD Receiving Date</label>
                 </div>
               </div>
@@ -787,8 +762,8 @@
 
               <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="gstStatus === 'Yes'">
                 <div class="form-floating-custom" [class.has-value]="gstRegistrationDate">
-                  <input type="date" class="form-control" style="font-size:14px"
-                         [max]="todayDate" [(ngModel)]="gstRegistrationDate" />
+                  <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                    [(ngModel)]="gstRegistrationDate" />
                   <label>GST Registration Date</label>
                 </div>
               </div>
@@ -808,8 +783,8 @@
 
               <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="fundsReceived === 'Yes'">
                 <div class="form-floating-custom" [class.has-value]="fundTransferDate">
-                  <input type="date" class="form-control" style="font-size:14px"
-                         [max]="todayDate" [(ngModel)]="fundTransferDate" />
+                  <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                    [(ngModel)]="fundTransferDate" />
                   <label>Fund Transfer Date</label>
                 </div>
               </div>
@@ -829,8 +804,8 @@
 
               <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="bgReceived === 'Yes'">
                 <div class="form-floating-custom" [class.has-value]="bgSubmissionDate">
-                  <input type="date" class="form-control" style="font-size:14px"
-                         [max]="todayDate" [(ngModel)]="bgSubmissionDate" />
+                  <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                    [(ngModel)]="bgSubmissionDate" />
                   <label>BG Submission Date</label>
                 </div>
               </div>
@@ -850,8 +825,8 @@
 
               <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="codeOpened === 'Yes'">
                 <div class="form-floating-custom" [class.has-value]="loiDate">
-                  <input type="date" class="form-control" style="font-size:14px"
-                         [max]="todayDate" [(ngModel)]="loiDate" />
+                  <input type="date" class="form-control" style="font-size:14px" [max]="todayDate"
+                    [(ngModel)]="loiDate" />
                   <label>LOI Date</label>
                 </div>
               </div>
@@ -861,10 +836,8 @@
         </ng-container>
 
         <div class="text-center pb-3 col-12 mt-2">
-          <button type="button" class="btn text-white px-4"
-                  [disabled]="!isFormValid()"
-                  (click)="onFollowupSubmit()"
-                  style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+          <button type="button" class="btn text-white px-4" [disabled]="!isFormValid()" (click)="onFollowupSubmit()"
+            style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
             <i class="fa-solid fa-paper-plane me-1"></i> Submit Followup
           </button>
         </div>
@@ -873,9 +846,8 @@
     </div>
     <!-- end followup tab -->
     <!-- ===== FOLLOWUP HISTORY TAB ===== -->
-    <div class="card shadow-sm border-0 py-3 px-3"
-         style="border-radius: 0 12px 12px 12px;"
-         *ngIf="activeFollowupTab === 'history'">
+    <div class="card shadow-sm border-0 py-3 px-3" style="border-radius: 0 12px 12px 12px;"
+      *ngIf="activeFollowupTab === 'history'">
 
       <!-- Loading -->
       <div *ngIf="historyLoading" class="d-flex justify-content-center align-items-center py-4">
@@ -885,7 +857,7 @@
 
       <!-- Empty -->
       <div *ngIf="!historyLoading && followupHistory.length === 0"
-           class="d-flex flex-column align-items-center justify-content-center py-4">
+        class="d-flex flex-column align-items-center justify-content-center py-4">
         <div style="width:48px;height:48px;background:#EBF5FB;border-radius:50%;
                     display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
           <i class="fa-solid fa-clock-rotate-left" style="font-size:20px;color:#4796BD"></i>
@@ -968,7 +940,7 @@
 
 
   <div class="modal fade" id="selectModal" tabindex="-1" [class.show]="showModal"
-       [style.display]="showModal ? 'block' : 'none'" [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
+    [style.display]="showModal ? 'block' : 'none'" [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
     <div class="modal-dialog modal-dialog-top">
       <div class="modal-content">
         <!-- Modal Header -->
@@ -1009,10 +981,8 @@
           <button type="button" class="btn btn-secondary" (click)="closeModal()">
             Cancel
           </button>
-          <button type="button" class="btn text-white px-4"
-                  [disabled]="!selectedValue"
-                  (click)="handleSubmit()"
-                  style="background-color: #4796BD; border-radius: 50px;">
+          <button type="button" class="btn text-white px-4" [disabled]="!selectedValue" (click)="handleSubmit()"
+            style="background-color: #4796BD; border-radius: 50px;">
             Submit
           </button>
         </div>
@@ -1023,4 +993,3 @@
   <!-- Backdrop -->
   <div class="modal-backdrop fade" *ngIf="showModal" [class.show]="showModal"></div>
 </div>
-
