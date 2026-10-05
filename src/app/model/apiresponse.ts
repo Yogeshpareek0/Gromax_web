@@ -1292,3 +1292,30 @@ export interface UploadSlot {
   preview: string | null;
   existingUrl: string | null;
 }
+
+export interface DealerProfile {
+  dealerCode: string;
+  dealerName: string;
+  state: string;
+  city: string;
+  district: string;
+  address: string;
+  dealerMobile: string;
+  dealerEmail: string;
+  activeStatus: string;
+  gstNo: string;
+  panNo: string;
+  dateOfAppointment: string;
+  stateHead: string;
+  stateHeadMobile: string | null;
+  am: string;
+  amMobile: string | null;
+  tm: string;
+  tmMobile: string | null;
+  service_CcmName: string;
+  service_CcmMobile: string | null;
+  digitalSignature: string | null;
+}
+
+export interface InfoItem { label: string; value: string | null; icon: string; link?: string; }
+export interface Contact { role: string; name: string; mobile: string | null; icon: string; }

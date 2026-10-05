@@ -972,4 +972,12 @@ export class AuthService {
     const params = new HttpParams().set('mobileNo', mobileNo);
     return this.http.get(this.baseUrl + 'Api/Home/CheckNDAEnquiryMobile', { params });
   }
+
+  getDealerProfile() {
+    return this.http.get(this.baseUrl + 'Api/Home/getDealerProfile');
+  }
+
+  uploadDigitalSignature(formData: FormData) {
+    return this.http.post(this.baseUrl + 'Api/Home/addDealerSignature', formData);
+  }
 }

@@ -451,7 +451,16 @@
                   </div>
                 </div>
               </li>
-
+              <!-- Profile -->
+              <li class="pt-2 pb-0 border-0">
+                <a class="dropdown-item profile-item d-flex align-items-center gap-2"
+                   href="#" (click)="openProfile($event)">
+                  <div class="profile-icon-wrap">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                  <span>My Profile</span>
+                </a>
+              </li>
               <!-- Logout -->
               <li class="py-2 border-0">
                 <a class="dropdown-item logout-item d-flex align-items-center gap-2"
@@ -473,3 +482,5 @@
     </div>
   </div>
 </div>
+<app-profile [isOpen]="isProfileOpen" (closed)="isProfileOpen = false"></app-profile>
+

@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ProfileComponent } from '../../pages/profile/profile.component';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -8,11 +9,12 @@ import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, CommonModule, ProfileComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css'
 })
 export class MainLayoutComponent implements OnInit {
+  isProfileOpen = false;
   activeRoute: string = '';
   isSidebarOpen = false;
   isSalesOpen: boolean = false;
@@ -343,5 +345,9 @@ export class MainLayoutComponent implements OnInit {
       (x: any) =>
         x.MainMenu === mainMenu
     );
+  }
+  openProfile(event: Event) {
+    event.preventDefault();
+    this.isProfileOpen = true;
   }
 }
