@@ -1,0 +1,127 @@
+<div class="profile-overlay" *ngIf="isOpen" (click)="!uploading && close()">
+  <div class="profile-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+    <button class="close-btn" (click)="close()" [disabled]="uploading" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Loading -->
+    <div class="state-box" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-3 mb-0">Loading profile...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="state-box" *ngIf="!loading && errorMsg">
+      <i class="fa-solid fa-circle-exclamation fa-2x text-danger"></i>
+      <p class="mt-3">{{ errorMsg }}</p>
+      <button class="btn btn-sm btn-primary" (click)="loadProfile()">Retry</button>
+    </div>
+
+    <ng-container *ngIf="!loading && !errorMsg && profile">
+      <!-- Header -->
+      <div class="profile-header">
+        <div class="avatar">{{ initials }}</div>
+        <div class="header-info">
+          <h5 class="mb-1">{{ profile.dealerName }}</h5>
+          <div class="header-meta">
+            <span class="code-chip"><i class="fa-solid fa-hashtag me-1"></i>{{ profile.dealerCode }}</span>
+            <span class="status-chip" [class.inactive]="!isActive">
+              <span class="dot"></span>{{ profile.activeStatus || 'N/A' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-body">
+        <!-- Contact -->
+        <section class="info-section">
+          <h6 class="section-title"><i class="fa-solid fa-address-card me-2"></i>Contact Details</h6>
+          <div class="info-grid">
+            <div class="info-item" *ngFor="let item of contactInfo" [class.full]="item.label === 'Address'">
+              <div class="info-icon"><i class="fa-solid" [ngClass]="item.icon"></i></div>
+              <div class="info-text">
+                <span class="info-label">{{ item.label }}</span>
+                <a *ngIf="item.link; else plain" class="info-value link" [href]="item.link">{{ item.value }}</a>
+                <ng-template #plain><span class="info-value">{{ item.value || '—' }}</span></ng-template>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Business -->
+        <section class="info-section">
+          <h6 class="section-title"><i class="fa-solid fa-briefcase me-2"></i>Business Details</h6>
+          <div class="info-grid three">
+            <div class="info-item" *ngFor="let item of businessInfo">
+              <div class="info-icon"><i class="fa-solid" [ngClass]="item.icon"></i></div>
+              <div class="info-text">
+                <span class="info-label">{{ item.label }}</span>
+                <span class="info-value mono">{{ item.value || '—' }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Hierarchy -->
+        <section class="info-section">
+          <h6 class="section-title"><i class="fa-solid fa-sitemap me-2"></i>Reporting Hierarchy</h6>
+          <div class="contact-grid">
+            <div class="contact-card" *ngFor="let c of hierarchy" [class.vacant]="isVacant(c.name)">
+              <div class="contact-icon"><i class="fa-solid" [ngClass]="c.icon"></i></div>
+              <div class="contact-text">
+                <span class="info-label">{{ c.role }}</span>
+                <span class="info-value" *ngIf="!isVacant(c.name); else vacant">{{ c.name }}</span>
+                <ng-template #vacant><span class="vacant-badge">Vacant</span></ng-template>
+                <a *ngIf="c.mobile" class="contact-mobile" [href]="'tel:' + c.mobile">
+                  <i class="fa-solid fa-phone me-1"></i>{{ c.mobile }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Digital Signature -->
+        <section class="info-section mb-0">
+          <h6 class="section-title"><i class="fa-solid fa-signature me-2"></i>Digital Signature</h6>
+
+          <!-- Signature exists -->
+          <div class="signature-view" *ngIf="signatureSrc; else uploadBlock">
+            <img [src]="signatureSrc" alt="Digital Signature" />
+            <span class="sig-verified"><i class="fa-solid fa-circle-check me-1"></i>Signature on file</span>
+          </div>
+
+          <!-- Signature missing -->
+          <ng-template #uploadBlock>
+            <div class="sig-alert">
+              <i class="fa-solid fa-triangle-exclamation me-2"></i>
+              Your digital signature is not added yet. Please upload it.
+            </div>
+
+            <label *ngIf="!previewUrl" class="upload-zone" [class.dragging]="isDragging"
+                   (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+              <input type="file" accept="image/png, image/jpeg" hidden (change)="onFileSelected($event)" />
+              <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+              <span class="upload-title">Click to upload or drag & drop</span>
+              <span class="upload-hint">PNG / JPG, max {{ maxSizeMB }} MB. White background recommended.</span>
+            </label>
+
+            <div class="signature-preview" *ngIf="previewUrl">
+              <img [src]="previewUrl" alt="Signature preview" />
+              <div class="preview-actions">
+                <button class="btn btn-light btn-sm" (click)="removeSelected()" [disabled]="uploading">
+                  <i class="fa-solid fa-rotate-left me-1"></i>Change
+                </button>
+                <button class="btn btn-primary btn-sm upload-btn" (click)="uploadSignature()" [disabled]="uploading">
+                  <span *ngIf="uploading" class="spinner-border spinner-border-sm me-1"></span>
+                  <i *ngIf="!uploading" class="fa-solid fa-upload me-1"></i>
+                  {{ uploading ? 'Uploading...' : 'Save Signature' }}
+                </button>
+              </div>
+            </div>
+          </ng-template>
+        </section>
+      </div>
+    </ng-container>
+  </div>
+</div>   

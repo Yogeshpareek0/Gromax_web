@@ -220,6 +220,7 @@ export class NdaformComponent implements OnInit {
   showTableView(): void {
     this.showForm = false;
     this.listType = 'NdaList';
+    this.showRemainingFields = false;
     this.resetFilter();
     this.clearForm();
     this.loadNdaList(1);
@@ -1141,23 +1142,22 @@ export class NdaformComponent implements OnInit {
       next: (data: any) => {
 
         if (data?.message?.toLowerCase() === 'success') {
-          
-          if(data.data === true)
-          {
-            this.showRemainingFields = true;
+
+          if (data.data === true) {
+            this.showRemainingFields = false;
             this.toast.warning('This mobile number is already registered.');
           }
-          else{
-            this.showRemainingFields = false;
+          else {
+            this.showRemainingFields = true;
           }
-          
+
         } else {
           this.showRemainingFields = false;
         }
       },
       error: (err: any) => {
         this.showRemainingFields = false;
-       
+
       }
     });
   }
