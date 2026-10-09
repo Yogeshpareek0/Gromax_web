@@ -1,0 +1,255 @@
+:host {
+  --gm-primary: #4796BD;
+  --gm-primary-dk: #3a7fa1;
+  --gm-dark: #215378;
+  --gm-light: #eef7fb;
+  --gm-border: #c8e4f0;
+}
+
+.req {
+  color: #c0392b;
+}
+
+.custom-btn {
+  background-color: var(--gm-primary) !important;
+  color: #fff !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+  .custom-btn:hover {
+    background-color: var(--gm-primary-dk) !important;
+  }
+
+.total-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--gm-light);
+  border: 1px solid var(--gm-primary);
+  color: var(--gm-dark);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ── Table ── */
+.ftr-table-wrapper {
+  max-height: 480px;
+  overflow: auto;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gm-primary) #f1f1f1;
+}
+
+  .ftr-table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .ftr-table-wrapper tbody td {
+    font-size: 12px;
+    padding: 8px 10px;
+    vertical-align: middle;
+  }
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-bg-type: rgba(0, 0, 0, 0.025);
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+  .clickable-row:hover > td {
+    background-color: #dff0f8 !important;
+  }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.badge-done {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+  .badge-done .status-dot {
+    background: #4CAF50;
+  }
+
+.badge-pending {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+  .badge-pending .status-dot {
+    background: #FFC107;
+  }
+
+.btn-view {
+  background: var(--gm-light);
+  border: 1px solid var(--gm-primary);
+  color: var(--gm-dark);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  white-space: nowrap;
+  transition: all .15s;
+}
+
+  .btn-view:hover {
+    background: var(--gm-primary);
+    color: #fff;
+  }
+
+.empty-state {
+  text-align: center;
+  padding: 24px;
+  color: #9ca3af;
+}
+
+  .empty-state i {
+    font-size: 30px;
+    margin-bottom: 6px;
+    color: var(--gm-primary);
+  }
+
+.empty-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gm-dark);
+}
+
+.empty-sub {
+  font-size: 12px;
+  color: #7C93A0;
+}
+
+/* ── Modal ── */
+.gm-modal {
+  border-radius: 12px;
+  overflow: hidden;
+  border: none;
+}
+
+.gm-modal-header {
+  background: var(--gm-dark);
+  color: #fff;
+  padding: 12px 18px;
+}
+
+  .gm-modal-header .modal-title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+.modal-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,.85);
+  margin-top: 2px;
+}
+
+.type-badge {
+  display: inline-block;
+  background: #fff;
+  color: var(--gm-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 4px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+
+.modal-body {
+  background: #F4F9FA;
+  font-size: 13px;
+}
+
+  .modal-body .form-control,
+  .modal-body .form-select {
+    font-size: 13px;
+    border-color: #DCEAF0;
+  }
+
+    .modal-body .form-control:focus,
+    .modal-body .form-select:focus {
+      border-color: var(--gm-primary);
+      box-shadow: 0 0 0 3px rgba(71, 150, 189, 0.15);
+    }
+
+  .modal-body .form-label {
+    font-size: 12px;
+    color: var(--gm-primary);
+    font-weight: 600 !important;
+  }
+
+.readonly-input {
+  background: #EEF4F7 !important;
+  color: #7C93A0 !important;
+  cursor: not-allowed;
+}
+
+.ftr-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px 2px;
+  margin-bottom: 14px;
+  box-shadow: 0 3px 8px rgba(71, 150, 189, 0.1);
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gm-dark);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #EAF3F7;
+}
+
+/* ── Service Grid ── */
+.service-grid {
+  min-width: 520px;
+  margin-bottom: 12px !important;
+}
+
+  .service-grid th {
+    background: var(--gm-light) !important;
+    color: var(--gm-dark);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    border-color: #DCEAF0;
+  }
+
+  .service-grid td {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4B6672;
+    background: #F8FBFC;
+    border-color: #DCEAF0;
+  }
+
+  .service-grid .grid-label {
+    color: var(--gm-primary);
+    background: #fff;
+  }

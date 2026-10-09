@@ -124,7 +124,7 @@ export class MainLayoutComponent implements OnInit {
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry', 'stocktransfer', 'rcstatus',
       'retailpunch', 'exchangestock', 'updateoldenquiry', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
     const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport','jobcardreport'];
-    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist']; // 🔑 naya array
+    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform']; // 🔑 naya array
 
     if (path !== 'dynamicreport') {
       this.activeDashboardId = null;
@@ -188,7 +188,7 @@ export class MainLayoutComponent implements OnInit {
       'stocktransfer', 'rcstatus', 'retailpunch', 'exchangestock', 'updateoldenquiry',
       'updtoldretailedenq', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
     const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport','jobcardreport'];
-    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist'];
+    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform'];
 
     this.isSalesOpen = false;
     this.isBusinessReportsOpen = false;
@@ -266,6 +266,7 @@ export class MainLayoutComponent implements OnInit {
       ndaform: 'NDA Enquiry & Follow Up',
       dynamicreport: 'Report',
       billingrequest: 'Billing Request',
+      circular: 'Circular Management',
       threedaysodenqu: 'Enquiries Due in Next 3 Days',
       pdi: 'Pre-Delivery Inspection',
       ntir: 'New Tractor Inspection Report',
@@ -274,6 +275,7 @@ export class MainLayoutComponent implements OnInit {
       reimbursementservice: 'Reimbursement Service',
       generatedinvoicelist: 'Generated Invoice List',
       Mechanic: 'Mechanic Master',
+      ftrform: 'Raise FTR',
       additemscore: 'Add Item Score'
 
 

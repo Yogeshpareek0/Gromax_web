@@ -1384,3 +1384,62 @@ export interface FinancialYearOption {
   value: string;
   label: string;
 }
+
+export interface FtrOption {
+  label: string;
+  value: any;
+}
+
+export interface FtrTractor {
+  Id: string;
+  TractorSrNumber: string;
+  ChassisNo: string;
+  Model: string;
+  ModelCode: string;
+  DealerName: string;
+  DealerCode: string;
+  DealerAddress: string;
+  InstallationDate: string;
+  DateOfSale: string;
+  DriveType: string;
+  Colour: string;
+  Status: string;
+  CustomerName: string;
+  CustomerAddress: string;
+  MobileNo: string;
+  Village: string;
+  PostOffice: string;
+  District: string;
+  StockMasterId?: string | null;
+}
+
+export interface FtrServiceRows {
+  date: Record<string, string>;
+  hrs: Record<string, string>;
+}
+
+export interface FtrSubmitPayload {
+  sseName: string;
+  dealerCode: string;
+  tractorModelBOMCode: string;
+  tractorSerialNo: string;
+  failureDate: string | null;
+  hoursWorked: number;
+  repairDate: string | null;
+  natureOfWorkDone: string;
+  salesCustomerMasterId: string | null;
+  stockMasterId: string | null;
+  customerName: string;
+  customerAddress: string;
+  mobileNo: string;
+  alternateMobileNo: string;
+  village: string;
+  post: string;
+  district: string;
+  implementTrolleySize: string;
+  customerComplaints: string;
+  problemDefinition: string;
+  stockStatus: 'IN' | 'OUT';
+  createdBy: string;
+  positionName: string;
+}

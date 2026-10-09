@@ -1,0 +1,262 @@
+<div class="container-fluid px-0">
+
+  <!-- Top Filter Panel -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row align-items-end">
+      <div class="col-xl-4 col-lg-5 col-sm-8 mb-3">
+        <label class="form-label fw-medium mb-0">FTR Type</label>
+        <select class="form-select" [(ngModel)]="selectedType" (ngModelChange)="onTypeChange()">
+          <option *ngFor="let o of ftrTypeOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+      </div>
+      <div class="col-auto mb-3">
+        <button class="btn custom-btn py-2 px-3" [disabled]="loading" (click)="refreshList()">
+          <i class="fas fa-rotate-right me-1"></i> Refresh
+        </button>
+      </div>
+      <div class="col mb-3 text-sm-end">
+        <span class="total-chip">
+          <i class="fas fa-tractor me-1"></i> Total : {{ totalItems }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="ftr-table-wrapper mt-3">
+    <table class="table table-bordered table-striped mb-0" style="min-width:1000px;">
+      <thead>
+        <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Tractor Sr. No.</th>
+          <th class="text-nowrap fw-normal">Model</th>
+          <th class="text-nowrap fw-normal">Chassis No.</th>
+          <th class="text-nowrap fw-normal">Dealer</th>
+          <th class="text-nowrap fw-normal">Drive Type</th>
+          <th class="text-nowrap fw-normal" *ngIf="selectedType === 'OUT'">Customer</th>
+          <th class="text-nowrap fw-normal">Status</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of tractorList; let i = index" class="clickable-row" (click)="openForm(item)">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="text-nowrap fw-semibold" style="color:#215378">{{ item.TractorSrNumber }}</td>
+          <td class="text-nowrap">{{ item.Model || '-' }}</td>
+          <td class="text-nowrap">{{ item.ChassisNo || '-' }}</td>
+          <td class="text-nowrap">{{ item.DealerName || '-' }}</td>
+          <td class="text-nowrap">{{ item.DriveType || '-' }}</td>
+          <td class="text-nowrap" *ngIf="selectedType === 'OUT'">{{ item.CustomerName || '-' }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="item.Status === 'Done' ? 'badge-done' : 'badge-pending'">
+              <span class="status-dot"></span>{{ item.Status || 'Pending' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-view" (click)="$event.stopPropagation(); openForm(item)">
+              <i class="fas fa-file-pen me-1"></i> Raise FTR
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="loading">
+          <td [attr.colspan]="selectedType === 'OUT' ? 9 : 8">
+            <div class="empty-state">
+              <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+              <div class="empty-sub">Loading tractors...</div>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="!loading && tractorList.length === 0">
+          <td [attr.colspan]="selectedType === 'OUT' ? 9 : 8">
+            <div class="empty-state">
+              <i class="fas fa-tractor"></i>
+              <div class="empty-title">No Tractors Found</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination *ngIf="totalItems > 0" [totalItems]="totalItems" [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+</div>
+
+<!-- ═══════════ FTR FORM MODAL ═══════════ -->
+<div class="modal fade" id="ftrFormModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content gm-modal">
+
+      <div class="modal-header gm-modal-header">
+        <div>
+          <h5 class="modal-title mb-0">Field Technical Report</h5>
+          <div class="modal-subtitle">
+            {{ selectedTractor?.ChassisNo }} — {{ selectedTractor?.Model }}
+            <span class="type-badge">{{ isInStock ? 'In Stock' : 'Sold' }}</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="closeForm()"></button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedTractor">
+
+        <!-- SSE & Dealer -->
+        <div class="ftr-card">
+          <div class="section-label">SSE &amp; Dealer</div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium mb-0">Name of SSE <span class="req">*</span></label>
+              <input type="text" class="form-control" [(ngModel)]="sseName" placeholder="Enter SSE name"
+                     [class.is-invalid]="submitted && !sseName.trim()">
+              <div class="invalid-feedback">SSE name is required</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium mb-0">Dealer Name &amp; Address</label>
+              <textarea class="form-control readonly-input" rows="2" [value]="dealerNameAddress" readonly></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tractor & Failure -->
+        <div class="ftr-card">
+          <div class="section-label">Tractor &amp; Failure Details</div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Tractor Model (BOM Code)</label>
+              <input class="form-control readonly-input" [value]="selectedTractor.Model || '-'" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Tractor Sl. No. (Chassis No)</label>
+              <input class="form-control readonly-input" [value]="selectedTractor.ChassisNo || '-'" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Date of Sale</label>
+              <input class="form-control readonly-input" [value]="(selectedTractor.DateOfSale | date:'dd-MM-yyyy') || '-'" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Date of Installation</label>
+              <input class="form-control readonly-input" [value]="(selectedTractor.InstallationDate | date:'dd-MM-yyyy') || '-'" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Date of Failure <span class="req">*</span></label>
+              <input type="date" class="form-control" [(ngModel)]="dateOfFailure" [max]="today"
+                     (change)="onFailureDateChange()" [class.is-invalid]="submitted && !dateOfFailure">
+              <div class="invalid-feedback">Failure date is required</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Hours Worked</label>
+              <input type="text" inputmode="decimal" class="form-control" [(ngModel)]="hoursWorked"
+                     (input)="onHoursInput()" placeholder="0">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Date of Repair <span class="req">*</span></label>
+              <input type="date" class="form-control" [(ngModel)]="dateOfRepair" [min]="dateOfFailure"
+                     (change)="onRepairDateChange()" [class.is-invalid]="submitted && !dateOfRepair">
+              <div class="invalid-feedback">Repair date is required</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Nature of Work at Failure <span class="req">*</span></label>
+              <select class="form-select" [(ngModel)]="natureOfWork" [compareWith]="compareOption"
+                      [disabled]="natureOfWorkLoading" [class.is-invalid]="submitted && !natureOfWork">
+                <option [ngValue]="null">{{ natureOfWorkLoading ? 'Loading...' : 'Select' }}</option>
+                <option *ngFor="let o of natureOfWorkOptions" [ngValue]="o">{{ o.label }}</option>
+              </select>
+              <div class="invalid-feedback">Nature of work is required</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Size of Implement / Trolley used</label>
+              <input type="text" class="form-control" [(ngModel)]="implementSize">
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Details (OUT only) -->
+        <div class="ftr-card" *ngIf="!isInStock">
+          <div class="section-label">Customer Details</div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium mb-0">Customer Name &amp; Address</label>
+              <textarea class="form-control readonly-input" rows="2" [value]="customerNameAddress || '-'" readonly></textarea>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label fw-medium mb-0">Mobile Number</label>
+              <input class="form-control readonly-input" [value]="selectedTractor.MobileNo || '-'" readonly>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label fw-medium mb-0">Alternate Mobile Number</label>
+              <input type="text" inputmode="numeric" maxlength="10" class="form-control"
+                     [(ngModel)]="alternateMobileNo" (input)="onAltMobileInput()"
+                     [class.is-invalid]="submitted && alternateMobileNo && alternateMobileNo.length !== 10">
+              <div class="invalid-feedback">Must be 10 digits</div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Village</label>
+              <input class="form-control readonly-input" [value]="selectedTractor.Village || '-'" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">Post Office</label>
+              <input class="form-control readonly-input" [value]="selectedTractor.PostOffice || '-'" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-medium mb-0">District</label>
+              <input class="form-control readonly-input" [value]="selectedTractor.District || '-'" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Details (OUT only) -->
+        <div class="ftr-card" *ngIf="!isInStock">
+          <div class="section-label">Service Details of Particular Chassis No</div>
+          <div *ngIf="serviceRecordLoading" class="empty-sub py-2">
+            <span class="spinner-border spinner-border-sm me-2"></span>Loading service details...
+          </div>
+          <div class="table-responsive" *ngIf="!serviceRecordLoading">
+            <table class="table table-bordered service-grid mb-0">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th *ngFor="let s of serviceStages">{{ s }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="grid-label">Date</td>
+                  <td *ngFor="let s of serviceStages">{{ formatShortDate(serviceRows.date[s]) || '-' }}</td>
+                </tr>
+                <tr>
+                  <td class="grid-label">Hrs.</td>
+                  <td *ngFor="let s of serviceStages">{{ serviceRows.hrs[s] || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Complaint -->
+        <div class="ftr-card">
+          <div class="section-label">Complaint</div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium mb-0">Customer Complaints</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="customerComplaints"></textarea>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-medium mb-0">Sharp Definition of the Problem</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="problemDefinition"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary btn-sm px-3" (click)="closeForm()">Cancel</button>
+        <button class="btn custom-btn btn-sm px-4" [disabled]="submitting" (click)="submitReport()">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          {{ submitting ? 'Submitting...' : 'Submit Report' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

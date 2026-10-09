@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { DealerRequestModel, NtirSubmitPayload, PdiSubmitPayload } from '../model/apiresponse';
+import { DealerRequestModel, FtrSubmitPayload, NtirSubmitPayload, PdiSubmitPayload } from '../model/apiresponse';
 import { __param } from 'tslib';
 
 
@@ -1003,6 +1003,22 @@ export class AuthService {
 
   getMsgSentReport(payload: any) {
     return this.http.post(this.baseUrl + 'Api/Circulars/getMsgSentReport', payload);
+  }
+
+  // ===== FTR (Field Technical Report) =====
+  getChassisDetailsForFTR(stockStatus: string, pageNo: number) {
+    const params = new HttpParams()
+      .set('stockStatus', stockStatus)
+      .set('pageNo', pageNo.toString());
+    return this.http.get(this.baseUrl + 'Api/Services/GetChassisDetailsForFTR', { params });
+  }
+
+  getWorkNature() {
+    return this.http.get(this.baseUrl + 'Api/Services/getWorkNature');
+  }
+
+  addFTR(payload: FtrSubmitPayload) {
+    return this.http.post(this.baseUrl + 'Api/Services/addFTR', payload);
   }
 
 

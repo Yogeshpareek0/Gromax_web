@@ -48,6 +48,7 @@ import { NtirReportComponent } from '../app/pages/ServicePart/ntir-report/ntir-r
 import { ItemScoreComponent } from '../app/pages/ServicePart/item-score/item-score.component';
 import { JobcardreportComponent } from '../app/pages/ServicePart/jobcardreport/jobcardreport.component';
 import { CircularsComponent } from '../app/pages/circulars/circulars.component';
+import { FieldTechnicalReportComponent } from '../app/pages/ServicePart/field-technical-report/field-technical-report.component';
 
 
 
@@ -105,7 +106,8 @@ export const routes: Routes = [
       { path: 'additemscore', component: ItemScoreComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'ItemScore' } },
       { path: 'generatedinvoicelist', component: ReimbersementInvComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'GenerateInvoiceList' } },
       { path: 'jobcardreport', component: JobcardreportComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'JobCardReport' } },
-      { path: 'circular', component: CircularsComponent }
+      { path: 'circular', component: CircularsComponent },
+      { path: 'ftrform', component: FieldTechnicalReportComponent }
 
 
     ]
