@@ -127,8 +127,12 @@ export class ReimbersementInvComponent implements OnInit {
         }
         this.isGenerating = false;
       },
-      error: () => {
-        this.apis.showAlert('error', 'Error', 'An error occurred while generating invoice');
+      error: (err: any) => {
+        console.log("err", err);
+        if (err?.error?.errorCode === "500002")
+          this.apis.showAlert('error', 'Error', err?.error?.message);
+        else
+          this.apis.showAlert('error', 'Error', 'An error occurred while generating invoice');
         this.isGenerating = false;
       }
     });

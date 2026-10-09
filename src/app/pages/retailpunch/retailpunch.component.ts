@@ -637,7 +637,7 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
   }
 
   refillFormFromItem(item: NotRetaildList): void {
- 
+
     const raw = item as any;
     let rawMode = (item.PaymentMode || '').trim();
     let paymentMode = !rawMode ? ((item.LoanAmount ?? 0) > 0 ? 'Loan' : ((item.FinalSellingPrice ?? 0) > 0 ? 'Cash' : ''))
@@ -766,21 +766,21 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
   }
 
   validateForm(): boolean {
+    const _retailed = this.selectedItem?.IsRetailedSales;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     this.formErrors = {} as FormErrors;
     let valid = true;
-    if (!this.retailForm.expectedRetailDate) { this.formErrors['expectedRetailDate'] = 'Expected RetailDate type is required.'; valid = false; };
-    if (!this.retailForm.expectedRetailDate) {
-      this.formErrors['expectedRetailDate'] = 'Expected Retail Date is required.';
-      valid = false;
-    } else {
+    /*if (!this.retailForm.expectedRetailDate) { this.formErrors['expectedRetailDate'] = 'Expected RetailDate type is required.'; valid = false; };*/
+    if (!this.retailForm.expectedRetailDate) { this.formErrors['expectedRetailDate'] = 'Expected Retail Date is required.'; valid = false; }
+    else {
       const expectedDate = new Date(this.retailForm.expectedRetailDate);
       expectedDate.setHours(0, 0, 0, 0);
 
-      if (expectedDate < today) {
-        this.formErrors['expectedRetailDate'] = 'Expected Retail Date cannot be earlier than today.';
+      if (expectedDate < today && _retailed === "No") {
+        /*this.formErrors['expectedRetailDate'] = 'Expected Retail Date cannot be earlier than today.';*/
+        this.formErrors['expectedRetailDate'] = 'Expected Retail Date must be today or a future date.';
         valid = false;
       }
     }
@@ -1003,15 +1003,20 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
     const value = event.target.value;
 
     // Reset errors
-    this.retailForm.expectedRetailDate = null;
+    /* this.retailForm.expectedRetailDate = null;*/
     this.formErrors['expectedRetailDate'] = '';
 
     // ❌ Case 1: Followup < Today
-    if (value && value < this.todayDate) {
-      this.formErrors['expectedRetailDate'] = 'Expected RetailDate type is required.'
+    if (!value) {
+      this.formErrors['expectedRetailDate'] = 'Expected Retail Date is required.';
       return;
     }
 
+    if (value < this.todayDate) {
+      this.formErrors['expectedRetailDate'] =
+        'Expected Retail Date must be today or a future date.';
+      return;
+    }
     // ✅ Assign valid followup date
     this.retailForm.expectedRetailDate = value;
 

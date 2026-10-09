@@ -459,7 +459,7 @@
             <div class="form-floating-custom">
               <input type="text" placeholder=" " inputmode="numeric"
                      [(ngModel)]="row.qty"
-                     (ngModelChange)="row.qty = validateRowField(row, 'qty', $event, filterInteger.bind(this), fieldCharRules['alternateMobileNo'].pattern, 'Sirf number allowed hai')"
+                     (ngModelChange)="row.qty = validateRowField(row, 'qty', $event, filterInteger.bind(this), fieldCharRules['totalAmountPaid'].pattern, 'Only numbers are allowed')"
                      [class.input-error]="hasRowFieldError(row, 'qty')" />
               <label>Qty.</label>
               <div class="field-error" *ngIf="hasRowFieldError(row, 'qty')">{{ getRowFieldError(row, 'qty') }}</div>
@@ -516,7 +516,7 @@
           <div class="form-floating-custom">
             <input type="text" placeholder=" " inputmode="numeric"
                    [(ngModel)]="row.qty"
-                   (ngModelChange)="row.qty = validateRowField(row, 'qty', $event, filterInteger.bind(this), fieldCharRules['alternateMobileNo'].pattern, 'Sirf number allowed hai')"
+                   (ngModelChange)="row.qty = validateRowField(row, 'qty', $event, filterInteger.bind(this), fieldCharRules['totalAmountPaid'].pattern, 'Only numbers are allowed')"
                    [class.input-error]="hasRowFieldError(row, 'qty')" />
             <label>Qty.</label>
             <div class="field-error" *ngIf="hasRowFieldError(row, 'qty')">{{ getRowFieldError(row, 'qty') }}</div>
@@ -524,7 +524,7 @@
           <div class="form-floating-custom">
             <input type="text" placeholder=" " inputmode="decimal" maxlength="8"
                    [(ngModel)]="row.price"
-                   (ngModelChange)="row.price = validateRowField(row, 'price', $event, filterDecimal.bind(this), fieldCharRules['fuel'].pattern, 'Sirf number allowed hai (0-9 aur ek decimal point)')"
+                   (ngModelChange)="row.price = validateRowField(row, 'price', $event, filterDecimal.bind(this), fieldCharRules['totalAmountPaid'].pattern, 'Only numbers are allowed (0-9) with a single decimal point.')"
                    [class.input-error]="hasRowFieldError(row, 'price')" />
             <label>Price (₹)</label>
             <div class="field-error" *ngIf="hasRowFieldError(row, 'price')">{{ getRowFieldError(row, 'price') }}</div>
@@ -581,7 +581,7 @@
         <div class="form-floating-custom">
           <input type="text" placeholder=" " inputmode="decimal"
                  [(ngModel)]="subletRow.costSublet"
-                 (ngModelChange)="subletRow.costSublet = validateRowField(subletRow, 'costSublet', $event, filterDecimal.bind(this), fieldCharRules['fuel'].pattern, 'Sirf number allowed hai (0-9 aur ek decimal point)')"
+                 (ngModelChange)="subletRow.costSublet = validateRowField(subletRow, 'costSublet', $event, filterDecimal.bind(this), fieldCharRules['totalAmountPaid'].pattern, 'Only numbers are allowed (0-9) with a single decimal point.')"
                  [class.input-error]="hasRowFieldError(subletRow, 'costSublet')" />
           <label>Cost sublet (₹)</label>
           <div class="field-error" *ngIf="hasRowFieldError(subletRow, 'costSublet')">{{ getRowFieldError(subletRow, 'costSublet') }}</div>

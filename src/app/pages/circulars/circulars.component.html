@@ -1,0 +1,506 @@
+<div class="container-fluid px-0">
+
+  <!-- Top Filter Panel -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row">
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="circularListPermission">
+        <label class="form-label fw-medium mb-0">Financial Year</label>
+        <select class="form-select" [(ngModel)]="fyFilter" (ngModelChange)="applyFilters()">
+          <option value="">All Financial Years</option>
+          <option *ngFor="let fy of financialYears" [value]="fy.value">{{ fy.label }}</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="circularListPermission">
+        <label class="form-label fw-medium mb-0">Circular Type</label>
+        <select class="form-select" [(ngModel)]="circularType" (ngModelChange)="applyFilters()">
+          <option value="">All Circular Types</option>
+          <option value="Service Circular">Service Circular</option>
+          <option value="Service Information">Service Information</option>
+        </select>
+      </div>
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end ms-auto" *ngIf="addCircular">
+        <button class="btn custom-btn w-100 py-2" (click)="openAddModal()">
+          <i class="fas fa-plus me-1"></i> Add Circular
+        </button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mt-0" *ngIf="circularListPermission">
+      <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="stat-box">
+          <div>
+            <h6 class="fw-normal mb-1">Service Information</h6>
+            <h6 class="fw-normal mb-0">{{ serviceInformationCircularCount }}</h6>
+          </div>
+          <div class="stat-icon"><i class="fas fa-circle-info"></i></div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="stat-box">
+          <div>
+            <h6 class="fw-normal mb-1">Service Information Files</h6>
+            <h6 class="fw-normal mb-0">{{ serviceInformationFilesCount }}</h6>
+          </div>
+          <div class="stat-icon"><i class="fas fa-file-pdf"></i></div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="stat-box">
+          <div>
+            <h6 class="fw-normal mb-1">Service Circulars</h6>
+            <h6 class="fw-normal mb-0">{{ serviceCircularCount }}</h6>
+          </div>
+          <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="stat-box">
+          <div>
+            <h6 class="fw-normal mb-1">Service Circular Files</h6>
+            <h6 class="fw-normal mb-0">{{ serviceCircularFilesCount }}</h6>
+          </div>
+          <div class="stat-icon"><i class="fas fa-folder-open"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3" *ngIf="circularListPermission">
+    <div class="search-wrapper">
+      <div class="input-group custom-search-group">
+        <span class="input-group-text bg-white border-0">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input type="text" class="form-control border-0 shadow-none" placeholder="Search circular name..."
+               [(ngModel)]="searchQuery" (keyup.enter)="applyFilters()">
+        <button class="btn search-btn text-white" type="button" (click)="applyFilters()">Search</button>
+      </div>
+    </div>
+    <button class="btn-clear" *ngIf="searchQuery || fyFilter || circularType" (click)="clearFilters()">
+      <i class="fas fa-times me-1"></i> Clear Filters
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="circular-table-wrapper mt-2" *ngIf="circularListPermission">
+    <table id="circularTable" class="table table-bordered table-striped mb-0" style="min-width:900px;">
+      <thead>
+        <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+          <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
+          <th class="text-nowrap fw-normal">Circular Name &amp; Description</th>
+          <th class="text-nowrap fw-normal">Circular Type</th>
+          <th class="text-nowrap fw-normal">Circular Date</th>
+          <th class="text-nowrap fw-normal">Financial Year</th>
+          <th class="text-nowrap fw-normal">Files</th>
+          <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of circularList; let i = index">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td>
+            <div class="fw-semibold">{{ row.Name }}</div>
+            <small class="text-muted">{{ row.Description }}</small>
+          </td>
+          <td class="text-nowrap">{{ row.CircularType }}</td>
+          <td class="text-nowrap">{{ row.CircularDate | date:'dd-MM-yyyy' }}</td>
+          <td><span class="gm-pill">{{ row.FinancialYear }}</span></td>
+          <td>
+            <span class="file-count"><i class="fas fa-file-pdf"></i> {{ row.TotalFiles }} files</span>
+          </td>
+          <td>
+            <button class="btn-view" (click)="openDetail(row.Name)">
+              <i class="fas fa-eye me-1"></i> View
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="circularList.length === 0">
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <div class="empty-title">No Records Found</div>
+              <div class="empty-sub">Try adjusting your filters</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination *ngIf="totalItems > 0" [totalItems]="totalItems" [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+</div>
+
+<!-- ═══════════ ADD CIRCULAR MODAL ═══════════ -->
+<div class="modal fade" id="addCircularModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" *ngIf="addCircular">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content gm-modal">
+      <div class="modal-header gm-modal-header">
+        <h5 class="modal-title mb-0">Add New Circular</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal('addCircularModal')"></button>
+      </div>
+
+      <div class="modal-body" [formGroup]="circularForm">
+        <div class="section-label">Circular Details</div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Circular Type <span class="req">*</span></label>
+            <select class="form-select" formControlName="circularType" [class.is-invalid]="isInvalid('circularType')">
+              <option value="">Select Circular Type</option>
+              <option value="Service Circular">Service Circular</option>
+              <option value="Service Information">Service Information</option>
+            </select>
+            <div class="invalid-feedback">Circular type is required</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Circular Name <span class="req">*</span></label>
+            <input type="text" class="form-control" formControlName="circularName" placeholder="e.g. Circular 2026"
+                   [class.is-invalid]="isInvalid('circularName')">
+            <div class="invalid-feedback">Circular name is required</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Circular Date <span class="req">*</span></label>
+            <input type="date" class="form-control" formControlName="circularDate" (change)="onDateChange()"
+                   [class.is-invalid]="isInvalid('circularDate')">
+            <div class="invalid-feedback">Date is required</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Financial Year <span class="req">*</span></label>
+            <input type="text" class="form-control readonly-input" formControlName="financialYear" readonly
+                   placeholder="Auto-filled from date" [class.is-invalid]="isInvalid('financialYear')">
+            <div class="invalid-feedback">Financial year is required</div>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label fw-medium mb-0">Description <span class="req">*</span></label>
+            <textarea class="form-control" rows="3" formControlName="description"
+                      placeholder="Brief description of this circular..."
+                      [class.is-invalid]="isInvalid('description')"></textarea>
+            <div class="invalid-feedback">Description is required</div>
+          </div>
+        </div>
+
+        <div class="section-label">Attach Documents <span class="req">*</span></div>
+        <label class="drop-zone" [class.drop-zone-error]="submitted && addFiles.length === 0">
+          <input type="file" accept="application/pdf" multiple hidden (change)="onAddFilesSelect($event)">
+          <i class="fas fa-cloud-arrow-up"></i>
+          <span class="dz-title">Click to select PDF files</span>
+          <span class="dz-sub">You can select multiple files at once</span>
+        </label>
+        <span class="field-error" *ngIf="submitted && addFiles.length === 0">At least one file is required</span>
+
+        <div class="selected-files" *ngIf="addFiles.length">
+          <div class="sf-row" *ngFor="let f of addFiles; let i = index">
+            <i class="fas fa-file-pdf sf-icon"></i>
+            <div class="sf-info">
+              <div class="sf-name" [title]="f.name">{{ f.name }}</div>
+              <div class="sf-size">{{ formatSize(f.size) }}</div>
+            </div>
+            <button type="button" class="sf-remove" (click)="removeAddFile(i)" title="Remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary btn-sm px-3" (click)="closeModal('addCircularModal')">Cancel</button>
+        <button class="btn custom-btn btn-sm px-3" [disabled]="saving" (click)="saveCircular()">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+          Save Circular
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DETAIL / UPDATE MODAL ═══════════ -->
+<div class="modal fade" id="detailCircularModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content gm-modal">
+      <div class="modal-header gm-modal-header">
+        <div>
+          <h5 class="modal-title mb-0">{{ originalCircularName }}</h5>
+          <div class="modal-subtitle">
+            {{ selectedCircular.FinancialYear }} — {{ selectedCircular.CircularDate | date:'dd MMM yyyy' }}
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal('detailCircularModal')"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="section-label">Circular Information</div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Circular Name <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="selectedCircular.Name"
+                   [class.is-invalid]="updateSubmitted && !selectedCircular.Name">
+            <div class="invalid-feedback">Circular name is required</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Circular Date <span class="req">*</span></label>
+            <input type="date" class="form-control" [(ngModel)]="selectedCircular.CircularDate"
+                   (ngModelChange)="onDetailDateChange()"
+                   [class.is-invalid]="updateSubmitted && !selectedCircular.CircularDate">
+            <div class="invalid-feedback">Date is required</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Financial Year</label>
+            <input class="form-control readonly-input" [value]="selectedCircular.FinancialYear" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-medium mb-0">Circular Type <span class="req">*</span></label>
+            <select class="form-select" [(ngModel)]="selectedCircular.CircularType"
+                    [class.is-invalid]="updateSubmitted && !selectedCircular.CircularType">
+              <option value="">Select Type</option>
+              <option value="Service Circular">Service Circular</option>
+              <option value="Service Information">Service Information</option>
+            </select>
+            <div class="invalid-feedback">Circular type is required</div>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label fw-medium mb-0">Description <span class="req">*</span></label>
+            <textarea class="form-control" rows="3" [(ngModel)]="selectedCircular.Description"
+                      [class.is-invalid]="updateSubmitted && !selectedCircular.Description"></textarea>
+            <div class="invalid-feedback">Description is required</div>
+          </div>
+        </div>
+
+        <!-- Attached Documents -->
+        <div class="section-label">Attached Documents</div>
+        <div class="flist">
+          <div class="frow" *ngFor="let file of selectedCircular.Files">
+            <div class="frow-top">
+              <div class="frow-ic"><i class="fas fa-file-pdf"></i></div>
+              <div class="frow-info">
+                <div class="frow-name" [title]="file.PdfName">{{ file.PdfName }}</div>
+                <div class="frow-meta">Document</div>
+              </div>
+
+              <div class="frow-acts">
+                <!--<div class="frow-toggles">
+                  <div class="sent-wrap">
+                    <span class="sent-lbl">Sent to Company</span>
+                    <label class="gm-toggle">
+                      <input type="checkbox" [checked]="file.IsCompanySent === 'YES'"
+                             [disabled]="file.IsCompanySent === 'YES'"
+                             (click)="$event.preventDefault(); onSentToggle(file, 'Company')">
+                      <span class="gm-toggle-track"></span>
+                      <span class="gm-toggle-thumb"></span>
+                    </label>
+                  </div>
+                  <div class="sent-wrap">
+                    <span class="sent-lbl">Sent to DPs</span>
+                    <label class="gm-toggle">
+                      <input type="checkbox" [checked]="file.IsSent === 'YES'"
+                             [disabled]="file.IsSent === 'YES'"
+                             (click)="$event.preventDefault(); onSentToggle(file, 'DPs')">
+                      <span class="gm-toggle-track"></span>
+                      <span class="gm-toggle-thumb"></span>
+                    </label>
+                  </div>
+                </div>-->
+
+                <div class="frow-buttons">
+                  <button class="btn-report" *ngIf="file.IsCompanySent === 'YES'" (click)="viewReport(file, 'Company')">
+                    <i class="fas fa-chart-bar"></i> Com. Report
+                  </button>
+                  <button class="btn-report" *ngIf="file.IsSent === 'YES'" (click)="viewReport(file, 'DPs')">
+                    <i class="fas fa-chart-bar"></i> DP Report
+                  </button>
+                  <button class="btn-report" (click)="openPdf(file)">
+                    <i class="fas fa-eye"></i> View PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!--<div class="frow-sent-bar" *ngIf="file.IsSent === 'YES' || file.IsCompanySent === 'YES'; else notSent">
+              <div class="d-flex flex-wrap gap-3">
+                <span class="sent-ok" *ngIf="file.IsSent === 'YES'">
+                  <i class="fas fa-check"></i> DPs : {{ file.SentDate | date:'dd MMM yyyy, hh:mm a' }}
+                </span>
+                <span class="sent-ok" *ngIf="file.IsCompanySent === 'YES'">
+                  <i class="fas fa-check"></i> Company : {{ file.CompanySentDate | date:'dd MMM yyyy, hh:mm a' }}
+                </span>
+              </div>
+            </div>
+            <ng-template #notSent>
+              <div class="frow-sent-bar">
+                <span class="sent-no">Not yet sent to DPs or Company</span>
+                <span class="badge-pending">Pending</span>
+              </div>
+            </ng-template>-->
+          </div>
+
+          <div class="empty-state py-3" *ngIf="!selectedCircular.Files.length">
+            <div class="empty-sub">No documents attached</div>
+          </div>
+        </div>
+
+        <!-- Add More Documents -->
+        <div class="section-label mt-3">Add More Documents</div>
+        <label class="drop-zone drop-zone-sm">
+          <input type="file" accept="application/pdf" multiple hidden (change)="onStagedFilesSelect($event)">
+          <i class="fas fa-cloud-arrow-up"></i>
+          <span class="dz-title">Click to add PDF files</span>
+        </label>
+
+        <div class="selected-files" *ngIf="stagedFiles.length">
+          <div class="sf-row" *ngFor="let f of stagedFiles; let i = index">
+            <i class="fas fa-file-pdf sf-icon"></i>
+            <div class="sf-info">
+              <div class="sf-name" [title]="f.name">{{ f.name }}</div>
+              <div class="sf-size">{{ formatSize(f.size) }}</div>
+            </div>
+            <button type="button" class="sf-remove" (click)="removeStagedFile(i)" title="Remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary btn-sm px-3" (click)="closeModal('detailCircularModal')">Close</button>
+        <button class="btn custom-btn btn-sm px-3" [disabled]="updating" (click)="updateCircular()">
+          <span *ngIf="updating" class="spinner-border spinner-border-sm me-1"></span>
+          Update Circular
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MESSAGE SENT REPORT MODAL ═══════════ -->
+<div class="modal fade" id="msgSentReportModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content gm-modal">
+      <div class="modal-header gm-modal-header">
+        <div>
+          <h5 class="modal-title mb-0">
+            Message Sent Report <span class="report-type-badge">{{ reportType }}</span>
+          </h5>
+          <div class="modal-subtitle">{{ selectedCircular.Name }} — {{ selectedReportFile?.PdfName }}</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal('msgSentReportModal')"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Info Bar -->
+        <div class="rpt-info-bar">
+          <div class="rpt-item"><div class="rpt-key">Circular</div><div class="rpt-val">{{ selectedCircular.Name }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">File</div><div class="rpt-val">{{ selectedReportFile?.PdfName }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">Date</div><div class="rpt-val">{{ selectedCircular.CircularDate | date:'dd MMM yyyy' }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">FY</div><div class="rpt-val">{{ selectedCircular.FinancialYear }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">Total</div><div class="rpt-val">{{ reportTotalItems }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">Read</div><div class="rpt-val c-read">{{ reportReadCount }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">Delivered</div><div class="rpt-val c-delivered">{{ reportDeliveredCount }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">Sent</div><div class="rpt-val c-sent">{{ reportSentCount }}</div></div>
+          <div class="rpt-item"><div class="rpt-key">Failed</div><div class="rpt-val c-failed">{{ reportFailedCount }}</div></div>
+        </div>
+
+        <!-- DPs Table -->
+        <ng-container *ngIf="reportType === 'DPs'">
+          <div class="rpt-heading mt-3">Dealer-wise Message Sent List <span class="rpt-count">({{ reportTotalItems }} dealers)</span></div>
+          <div class="circular-table-wrapper mt-2">
+            <table class="table table-bordered table-striped mb-0" style="min-width:1000px;">
+              <thead>
+                <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+                  <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">#</th>
+                  <th class="text-nowrap fw-normal">Region</th>
+                  <th class="text-nowrap fw-normal">RSM Service</th>
+                  <th class="text-nowrap fw-normal">RSM Sales</th>
+                  <th class="text-nowrap fw-normal">ASM Service</th>
+                  <th class="text-nowrap fw-normal">ASM Sales</th>
+                  <th class="text-nowrap fw-normal">Dealer Code</th>
+                  <th class="text-nowrap fw-normal">Dealership Name</th>
+                  <th class="text-nowrap fw-normal">DP Name</th>
+                  <th class="text-nowrap fw-normal">Sent Date</th>
+                  <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of pagedReportList; let i = index">
+                  <td>{{ (reportCurrentPage - 1) * reportItemsPerPage + i + 1 }}</td>
+                  <td class="text-nowrap">{{ r.Region }}</td>
+                  <td class="text-nowrap">{{ r.RsmService || '—' }}</td>
+                  <td class="text-nowrap">{{ r.RsmSales || '—' }}</td>
+                  <td class="text-nowrap">{{ r.AsmService || '—' }}</td>
+                  <td class="text-nowrap">{{ r.AsmSales || '—' }}</td>
+                  <td class="text-nowrap fw-semibold">{{ r.DealerCode }}</td>
+                  <td class="text-nowrap">{{ r.DealerName }}</td>
+                  <td class="text-nowrap">{{ r.DpName }}</td>
+                  <td class="text-nowrap">{{ r.SentDate ? (r.SentDate | date:'dd MMM yyyy, hh:mm a') : '—' }}</td>
+                  <td><ng-container *ngTemplateOutlet="statusTpl; context: { $implicit: r.Status }"></ng-container></td>
+                </tr>
+                <tr *ngIf="pagedReportList.length === 0">
+                  <td colspan="11"><div class="empty-state"><i class="fas fa-inbox"></i><div class="empty-title">No Records Found</div></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+
+        <!-- Company Table -->
+        <ng-container *ngIf="reportType === 'Company'">
+          <div class="rpt-heading mt-3">Company-wise Message Sent List (RSM/ASM) <span class="rpt-count">({{ reportTotalItems }} contacts)</span></div>
+          <div class="circular-table-wrapper mt-2">
+            <table class="table table-bordered table-striped mb-0" style="min-width:1000px;">
+              <thead>
+                <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+                  <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">#</th>
+                  <th class="text-nowrap fw-normal">Region</th>
+                  <th class="text-nowrap fw-normal">RSM Name</th>
+                  <th class="text-nowrap fw-normal">RSM Mobile</th>
+                  <th class="text-nowrap fw-normal">RSM Email</th>
+                  <th class="text-nowrap fw-normal">ASM Name</th>
+                  <th class="text-nowrap fw-normal">ASM Mobile</th>
+                  <th class="text-nowrap fw-normal">ASM Email</th>
+                  <th class="text-nowrap fw-normal">Sent Date</th>
+                  <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of pagedReportList; let i = index">
+                  <td>{{ (reportCurrentPage - 1) * reportItemsPerPage + i + 1 }}</td>
+                  <td class="text-nowrap">{{ r.Region }}</td>
+                  <td class="text-nowrap">{{ r.RegionalName || '—' }}</td>
+                  <td class="text-nowrap">{{ r.RegionalMobileNo || '—' }}</td>
+                  <td class="text-nowrap">{{ r.RegionalEmail || '—' }}</td>
+                  <td class="text-nowrap">{{ r.AsmServiceName || '—' }}</td>
+                  <td class="text-nowrap">{{ r.AsmServiceMobileNo || '—' }}</td>
+                  <td class="text-nowrap">{{ r.AsmServiceEmail || '—' }}</td>
+                  <td class="text-nowrap">{{ r.SentDate ? (r.SentDate | date:'dd MMM yyyy, hh:mm a') : '—' }}</td>
+                  <td><ng-container *ngTemplateOutlet="statusTpl; context: { $implicit: r.Status }"></ng-container></td>
+                </tr>
+                <tr *ngIf="pagedReportList.length === 0">
+                  <td colspan="10"><div class="empty-state"><i class="fas fa-inbox"></i><div class="empty-title">No Records Found</div></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+
+        <app-pagination *ngIf="reportTotalItems > 0" [totalItems]="reportTotalItems" [pageSize]="reportItemsPerPage"
+                        [currentPage]="reportCurrentPage" (pageChange)="onReportPageChange($event)"></app-pagination>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary btn-sm px-3" (click)="closeModal('msgSentReportModal')">Close</button>
+        <button class="btn text-white btn-sm px-3" style="background-color:#4796BD;" *ngIf="pagedReportList.length > 0" (click)="exportCSV()">
+          <i class="fas fa-download me-1"></i> Export CSV
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Status badge template -->
+<ng-template #statusTpl let-status>
+  <span *ngIf="status === 'read'" class="ms-badge ms-read"><i class="fas fa-check-double"></i> Read</span>
+  <span *ngIf="status === 'delivered'" class="ms-badge ms-delivered"><i class="fas fa-check-double"></i> Delivered</span>
+  <span *ngIf="status === 'sent'" class="ms-badge ms-sent"><i class="fas fa-check"></i> Sent</span>
+  <span *ngIf="status === 'failed'" class="ms-badge ms-failed"><i class="fas fa-times"></i> Failed</span>
+  <span *ngIf="!status" class="text-muted">—</span>
+</ng-template>

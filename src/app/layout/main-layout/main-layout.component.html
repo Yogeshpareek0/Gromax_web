@@ -139,11 +139,11 @@
             </li>
 
             <!--<li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                [class.active]="activeRoute === 'updtoldretailedenq'"
-                (click)="onNavigate('updtoldretailedenq')">
-              <img src="assets/images/updateenquiry.png" alt="enquiry" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
-              <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Post Retailed Delivery Update</a>
-            </li>-->
+          [class.active]="activeRoute === 'updtoldretailedenq'"
+          (click)="onNavigate('updtoldretailedenq')">
+        <img src="assets/images/updateenquiry.png" alt="enquiry" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
+        <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Post Retailed Delivery Update</a>
+      </li>-->
           </ul>
         </li>
 
@@ -376,18 +376,18 @@
         </li>
 
         <!--<li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            [class.active]="activeRoute === 'ticketgeneration'"
-            (click)="onNavigate('ticketgeneration')">
-          <img src="assets/images/ticket.png" alt="ticket" class="menu-icon me-2" />
-          <a class="nav-link text-white p-0 m-0">Ticket Generation</a>
-        </li>
+      [class.active]="activeRoute === 'ticketgeneration'"
+      (click)="onNavigate('ticketgeneration')">
+    <img src="assets/images/ticket.png" alt="ticket" class="menu-icon me-2" />
+    <a class="nav-link text-white p-0 m-0">Ticket Generation</a>
+  </li>
 
-        <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            [class.active]="activeRoute === 'warrantyclaim'"
-            (click)="onNavigate('warrantyclaim')">
-          <img src="assets/images/warrenty.png" alt="warranty" class="menu-icon me-2" />
-          <a class="nav-link text-white p-0 m-0">Warranty Claim</a>
-        </li>-->
+  <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
+      [class.active]="activeRoute === 'warrantyclaim'"
+      (click)="onNavigate('warrantyclaim')">
+    <img src="assets/images/warrenty.png" alt="warranty" class="menu-icon me-2" />
+    <a class="nav-link text-white p-0 m-0">Warranty Claim</a>
+  </li>-->
 
         <li *ngIf="hasSubMenu('UploadBilling','UploadBilling')"
             class="nav-item d-flex align-items-center px-2 custom-nav-item"
@@ -404,6 +404,15 @@
           <img src="assets/images/billingrequest.png" alt="Billing" class="menu-icon me-2" />
 
           <a class="nav-link text-white p-0 m-0">Billing Request</a>
+        </li>
+
+        <li *ngIf="hasMenu('Circular')"
+            class="nav-item d-flex align-items-center px-2 custom-nav-item"
+            [class.active]="activeRoute === 'circular'"
+            (click)="onNavigate('circular')">
+          <img src="assets/images/billingrequest.png" alt="Circular" class="menu-icon me-2" />
+
+          <a class="nav-link text-white p-0 m-0">Circular Management</a>
         </li>
       </ul>
     </div>
@@ -452,7 +461,7 @@
                 </div>
               </li>
               <!-- Profile -->
-              <li class="pt-2 pb-0 border-0">
+              <li class="pt-2 pb-0 border-0" *ngIf="hasSubMenu('Dashboard','Profile')">
                 <a class="dropdown-item profile-item d-flex align-items-center gap-2"
                    href="#" (click)="openProfile($event)">
                   <div class="profile-icon-wrap">

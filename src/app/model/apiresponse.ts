@@ -1319,3 +1319,68 @@ export interface DealerProfile {
 
 export interface InfoItem { label: string; value: string | null; icon: string; link?: string; }
 export interface Contact { role: string; name: string; mobile: string | null; icon: string; }
+
+
+export interface CircularList {
+  Id?: number;
+  Name: string;
+  Description: string;
+  CircularDate: string;
+  CircularType: string;
+  FinancialYear: string;
+  TotalFiles: number;
+  TotalRecords: number;
+  ServiceCircularCount: number;
+  ServiceCircularFilesCount: number;
+  ServiceInformationCircularCount: number;
+  ServiceInformationFilesCount: number;
+}
+
+export interface CircularFile {
+  Id: number;
+  PdfUrl: string;
+  PdfBase64: string;
+  PdfName: string;
+  IsSent: string;
+  SentDate: string | Date | null;
+  IsCompanySent: string;
+  CompanySentDate: string | Date | null;
+}
+
+export interface CircularDetail {
+  Name: string;
+  Description: string;
+  CircularDate: string;
+  CircularType: string;
+  FinancialYear: string;
+  Files: CircularFile[];
+}
+
+export interface MsgSentReport {
+  Region: string;
+  RsmService?: string;
+  RsmSales?: string;
+  AsmService?: string;
+  AsmSales?: string;
+  DealerCode?: string;
+  DealerName?: string;
+  DpName?: string;
+  RegionalName?: string;
+  RegionalMobileNo?: string;
+  RegionalEmail?: string;
+  AsmServiceName?: string;
+  AsmServiceMobileNo?: string;
+  AsmServiceEmail?: string;
+  SentDate: string | null;
+  Status: string;
+  TotalRecords: number;
+  ReadCount: number;
+  DeliveredCount: number;
+  SentCount: number;
+  FailedCount: number;
+}
+
+export interface FinancialYearOption {
+  value: string;
+  label: string;
+}

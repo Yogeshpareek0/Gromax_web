@@ -980,4 +980,30 @@ export class AuthService {
   uploadDigitalSignature(formData: FormData) {
     return this.http.post(this.baseUrl + 'Api/Home/addDealerSignature', formData);
   }
+
+  getCircularsList(value: any) {
+    return this.http.post(this.baseUrl + 'Api/Circulars/getCircularsList', value);
+  }
+
+  addCircular(formData: FormData) {
+    return this.http.post(this.baseUrl + 'Api/Circulars/addCirculars', formData);
+  }
+
+  getCircularDetail(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Circulars/getCircularDetails', payload);
+  }
+
+  updateCircular(formData: FormData) {
+    return this.http.post(this.baseUrl + 'Api/Circulars/updateCircular', formData);
+  }
+
+  updateCircularSentStatus(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Circulars/updateCircularSentStatus', payload);
+  }
+
+  getMsgSentReport(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Circulars/getMsgSentReport', payload);
+  }
+
+
 }
