@@ -1,0 +1,121 @@
+<div class="container-fluid px-0">
+
+  <!-- Top Filter Panel -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row">
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Duration</label>
+        <select class="form-select" [(ngModel)]="selectedDuration" (ngModelChange)="onDurationChange()">
+          <option *ngFor="let d of durationOptions" [value]="d">{{ d }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="selectedDuration === 'Custom'">
+        <label class="form-label fw-medium mb-0">Start Date</label>
+        <input type="date" class="form-control" [(ngModel)]="startDate" [max]="endDate">
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="selectedDuration === 'Custom'">
+        <label class="form-label fw-medium mb-0">End Date</label>
+        <input type="date" class="form-control" [(ngModel)]="endDate" [min]="startDate">
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">State</label>
+        <select class="form-select" [(ngModel)]="selectedState" [disabled]="stateLoading">
+          <option value="">{{ stateLoading ? 'Loading...' : 'All' }}</option>
+          <option *ngFor="let s of stateList" [value]="s.value">{{ s.label }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3 align-self-end">
+        <div class="d-flex gap-2">
+          <button class="btn custom-btn flex-fill py-2" [disabled]="loading" (click)="onShowReport()">
+            <i class="bi bi-clipboard-data me-1"></i> Show Report
+          </button>
+          <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px"
+                  [disabled]="exporting" (click)="exportToExcel()" title="Export to Excel">
+            <span *ngIf="exporting" class="spinner-border spinner-border-sm"></span>
+            <i *ngIf="!exporting" class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+    <div class="search-wrapper">
+      <div class="input-group custom-search-group">
+        <span class="input-group-text bg-white border-0">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+        </span>
+        <input type="text" class="form-control border-0 shadow-none" placeholder="Search chassis no..."
+               [(ngModel)]="chassisSearch" (keyup.enter)="onShowReport()">
+        <button *ngIf="chassisSearch" class="btn bg-white border-0 text-muted px-2" type="button" (click)="clearSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+        <button class="btn search-btn text-white" type="button" (click)="onShowReport()">Search</button>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="range-chip" *ngIf="appliedRange.start && appliedRange.end">
+        <i class="fas fa-calendar-days me-1"></i>
+        {{ appliedRange.start | date:'dd-MM-yyyy' }} to {{ appliedRange.end | date:'dd-MM-yyyy' }}
+      </span>
+      <span class="total-chip">Total : {{ totalItems }}</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="report-table-wrapper mt-2">
+    <table class="table table-bordered table-striped mb-0">
+      <thead>
+        <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+          <th *ngFor="let col of columns; let first = first; let last = last"
+              class="fw-normal" [class.col-wide]="col.wide"
+              [class.addr-col]="col.key === 'DealerAddress'"
+              [style.border-top-left-radius]="first ? '8px' : null"
+              [style.border-top-right-radius]="last ? '8px' : null">
+            {{ col.label }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of reportRows; let i = index">
+          <td *ngFor="let col of columns" [class.col-wide]="col.wide"
+              [class.fw-semibold]="col.key === 'TractorSerialNo'">
+            <span *ngIf="col.type === 'stock'; else plainCell" class="stock-badge"
+                  [ngClass]="getStockType(row) === 'IN' ? 'badge-in' : 'badge-out'">
+              {{ cellValue(row, col, i) }}
+            </span>
+            <ng-template #plainCell>{{ cellValue(row, col, i) }}</ng-template>
+          </td>
+        </tr>
+
+        <tr *ngIf="loading">
+          <td [attr.colspan]="columns.length">
+            <div class="empty-state">
+              <div class="spinner-border spinner-border-sm mb-2" style="color:#4796BD"></div>
+              <div class="empty-sub">Loading report...</div>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="!loading && reportRows.length === 0">
+          <td [attr.colspan]="columns.length">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <div class="empty-title">No Data Available</div>
+              <div class="empty-sub">Try changing the duration, state or chassis number</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination *ngIf="totalItems > 0" [totalItems]="totalItems" [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+</div>

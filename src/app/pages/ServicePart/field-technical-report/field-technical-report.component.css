@@ -253,3 +253,56 @@
     color: var(--gm-primary);
     background: #fff;
   }
+.badge-in {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+  .badge-in .status-dot {
+    background: #1E88E5;
+  }
+
+.badge-out {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+  .badge-out .status-dot {
+    background: #4CAF50;
+  }
+
+/* ── Chassis Search ── */
+.chassis-search {
+  max-width: 360px;
+}
+
+  .chassis-search .input-group-text {
+    background: var(--gm-light);
+    border-color: var(--gm-border);
+    color: var(--gm-primary);
+  }
+
+  .chassis-search .form-control {
+    font-size: 13px;
+    border-color: var(--gm-border);
+  }
+
+    .chassis-search .form-control:focus {
+      border-color: var(--gm-primary);
+      box-shadow: none;
+    }
+
+  .chassis-search .custom-btn {
+    border-radius: 0 8px 8px 0;
+  }
+
+.btn-clear {
+  background: #fff;
+  border: 1px solid var(--gm-border);
+  border-left: none;
+  color: #9ca3af;
+}
+
+  .btn-clear:hover {
+    color: #c0392b;
+  }

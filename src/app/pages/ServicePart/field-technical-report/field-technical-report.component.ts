@@ -5,7 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { timeout } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { PaginationComponent } from '../../../layout/pagination/pagination.component';
-import { FtrOption, FtrServiceRows, FtrSubmitPayload, FtrTractor } from '../../../model/apiresponse';
+import { FtrOption, FtrRecord, FtrServiceRows, FtrSubmitPayload, FtrTractor, FtrUpdatePayload } from '../../../model/apiresponse';
+import { PermissionService } from '../../../services/userpermission/permission.service'
 
 declare var bootstrap: any;
 
@@ -27,6 +28,10 @@ export class FieldTechnicalReportComponent implements OnInit {
   private readonly LIST_TIMEOUT_MS = 60000;
   private readonly REQUEST_TIMEOUT_MS = 15000;
 
+
+  showRaiseList = false;
+  showFtrList = false;
+
   // ─── List ───
   selectedType: 'IN' | 'OUT' = 'OUT';
   tractorList: FtrTractor[] = [];
@@ -35,6 +40,21 @@ export class FieldTechnicalReportComponent implements OnInit {
   itemsPerPage = 20;
   totalItems = 0;
   private requestId = 0;
+
+
+  stDate = '';
+  enDate = '';
+  chassisNo = '';
+  private appliedChassisNo = '';
+
+
+  ftrList: FtrRecord[] = [];
+  ftrLoading = false;
+  ftrCurrentPage = 1;
+  ftrItemsPerPage = 20;
+  ftrTotalItems = 0;
+  private ftrRequestId = 0;
+
 
   // ─── Form ───
   selectedTractor: FtrTractor | null = null;
@@ -59,11 +79,31 @@ export class FieldTechnicalReportComponent implements OnInit {
   submitting = false;
   today = this.formatDate(new Date());
 
-  constructor(private apis: AuthService, private toastr: ToastrService) { }
+
+  editingFtr: FtrRecord | null = null;
+  get isEditMode(): boolean { return !!this.editingFtr; }
+  get activeLoading(): boolean {
+    return this.showRaiseList ? this.loading : this.ftrLoading;
+  }
+
+  get activeTotal(): number {
+    return this.showRaiseList ? this.totalItems : this.ftrTotalItems;
+  }
+
+  constructor(private apis: AuthService, private toastr: ToastrService, private permission: PermissionService) { }
 
   ngOnInit(): void {
-    this.fetchTractorList(1);
-    this.fetchNatureOfWork();
+    if (this.permission.hasSubmenuPermission('AddFTR'))
+      this.showRaiseList = true;
+    else if (this.permission.hasSubmenuPermission('UpdateFTR'))
+      this.showFtrList = true;
+    const now = new Date();
+    this.stDate = this.formatDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    this.enDate = this.today;
+
+    if (this.showRaiseList) this.fetchTractorList(1);
+    if (this.showFtrList) this.fetchFtrList(1);
+    if (this.showRaiseList || this.showFtrList) this.fetchNatureOfWork();
   }
 
   // ─── HELPERS ────────────────────────────────────────────────
@@ -159,7 +199,7 @@ export class FieldTechnicalReportComponent implements OnInit {
     this.loading = true;
     this.tractorList = [];
 
-    this.apis.getChassisDetailsForFTR(this.selectedType, page)
+    this.apis.getChassisDetailsForFTR(this.selectedType, page, this.stDate, this.enDate, this.appliedChassisNo)
       .pipe(timeout(this.LIST_TIMEOUT_MS))
       .subscribe({
         next: (res: any) => {
@@ -169,7 +209,7 @@ export class FieldTechnicalReportComponent implements OnInit {
           const total = this.extractTotalCount(res);
 
           // Page size auto-detect: page 1 ke rows = server ka page size
-          if (page === 1 && rows.length > 0) this.itemsPerPage = rows.length;
+          if (page === 1 && rows.length > 0 && total !== null && total > rows.length) this.itemsPerPage = rows.length;
 
           this.totalItems = total !== null
             ? total
@@ -179,7 +219,7 @@ export class FieldTechnicalReportComponent implements OnInit {
           this.currentPage = page;
           this.loading = false;
         },
-        error: (err:any) => {
+        error: (err: any) => {
           if (reqId !== this.requestId) return;
           this.loading = false;
           this.tractorList = [];
@@ -194,18 +234,22 @@ export class FieldTechnicalReportComponent implements OnInit {
   }
 
   onTypeChange(): void {
+
     this.totalItems = 0;
     this.currentPage = 1;
-    this.fetchTractorList(1);
+    if (this.showRaiseList)
+      this.fetchTractorList(1);
+    else if (this.showFtrList)
+      this.fetchFtrList(1)
   }
 
   onPageChange(page: number): void {
     this.fetchTractorList(page);
   }
 
-  refreshList(): void {
-    this.fetchTractorList(this.currentPage);
-  }
+  //refreshList(): void {
+  //  this.fetchTractorList(this.currentPage);
+  //}
 
   // ─── NATURE OF WORK ─────────────────────────────────────────
 
@@ -216,6 +260,7 @@ export class FieldTechnicalReportComponent implements OnInit {
         const list = res?.data || [];
         this.natureOfWorkOptions = list.map((e: any) => ({ label: e.natureOfWorkName, value: e.masterId }));
         this.natureOfWorkLoading = false;
+        this.applyNatureFromEditing();
       },
       error: () => {
         this.natureOfWorkLoading = false;
@@ -224,12 +269,19 @@ export class FieldTechnicalReportComponent implements OnInit {
     });
   }
 
+  private applyNatureFromEditing(): void {
+    if (!this.editingFtr || this.natureOfWork) return;
+    const label = (this.editingFtr.NatureOfWorkDone || '').trim().toLowerCase();
+    this.natureOfWork = this.natureOfWorkOptions.find(o => o.label.trim().toLowerCase() === label) || null;
+  }
+
   compareOption = (a: FtrOption | null, b: FtrOption | null) => a?.value === b?.value;
 
   // ─── FORM OPEN ──────────────────────────────────────────────
 
   openForm(item: FtrTractor): void {
     this.resetForm();
+    this.editingFtr = null;
     this.selectedTractor = item;
     this.isInStock = this.selectedType === 'IN';
 
@@ -280,6 +332,7 @@ export class FieldTechnicalReportComponent implements OnInit {
     const el = document.getElementById('ftrFormModal');
     if (el) bootstrap.Modal.getInstance(el)?.hide();
     this.selectedTractor = null;
+    this.editingFtr = null;
     this.resetForm();
   }
 
@@ -327,12 +380,48 @@ export class FieldTechnicalReportComponent implements OnInit {
     }
 
     this.apis.showConfirm(
-      'Verify Before Submission',
-      'Please confirm all details entered in this Field Technical Report are correct. Once submitted, the report will be visible to CCM/HO for action.',
-      'Confirm & Submit',
+      this.isEditMode ? 'Verify Before Update' : 'Verify Before Submission',
+      this.isEditMode
+        ? 'Please confirm the updated details of this Field Technical Report are correct.'
+        : 'Please confirm all details entered in this Field Technical Report are correct. Once submitted, the report will be visible to CCM/HO for action.',
+      this.isEditMode ? 'Confirm & Update' : 'Confirm & Submit',
       'Review Again'
     ).then(r => {
-      if (r.isConfirmed) this.confirmSubmit();
+      if (!r.isConfirmed) return;
+      this.isEditMode ? this.confirmUpdate() : this.confirmSubmit();
+    });
+  }
+  private confirmUpdate(): void {
+    const rec = this.editingFtr;
+    if (!rec) return;
+
+    const payload: FtrUpdatePayload = {
+      id: rec.Id,
+      sseName: this.sseName.trim(),
+      failureDate: this.toISO(this.dateOfFailure),
+      hoursWorked: Number(this.hoursWorked) || 0,
+      repairDate: this.toISO(this.dateOfRepair),
+      natureOfWorkDone: this.natureOfWork?.label ?? '',
+      implementTrolleySize: this.implementSize.trim(),
+      customerComplaints: this.customerComplaints.trim(),
+      problemDefinition: this.problemDefinition.trim(),
+      modifiedBy: sessionStorage.getItem('userName') || '',
+      positionName: sessionStorage.getItem('possitionId') || '',
+      stockStatus: this.isInStock ? 'IN' : 'OUT'
+    };
+
+    this.submitting = true;
+    this.apis.updateFTR(payload).pipe(timeout(this.REQUEST_TIMEOUT_MS)).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.toastr.success('Field Technical Report updated successfully.', 'Updated');
+        this.closeForm();
+        this.fetchFtrList(this.ftrCurrentPage);
+      },
+      error: (err: any) => {
+        this.submitting = false;
+        this.toastr.error(err?.error?.message || 'Failed to update report. Please try again.', 'Error');
+      }
     });
   }
 
@@ -344,7 +433,7 @@ export class FieldTechnicalReportComponent implements OnInit {
     const payload: FtrSubmitPayload = {
       sseName: this.sseName.trim(),
       dealerCode: item.DealerCode || '',
-      tractorModelBOMCode: item.Model || '',
+      tractorModelBOMCode: item.ModelCode || '',
       tractorSerialNo: item.ChassisNo || '',
       failureDate: this.toISO(this.dateOfFailure),
       hoursWorked: Number(this.hoursWorked) || 0,
@@ -374,12 +463,122 @@ export class FieldTechnicalReportComponent implements OnInit {
         this.submitting = false;
         this.toastr.success('Field Technical Report submitted successfully.', 'Submitted');
         this.closeForm();
-        this.refreshList();
+        if (this.showRaiseList) this.fetchTractorList(this.currentPage);
+        if (this.showFtrList) this.fetchFtrList(1);
       },
       error: (err: any) => {
         this.submitting = false;
         this.toastr.error(err?.error?.message || 'Failed to submit report. Please try again.', 'Error');
       }
     });
+  }
+
+  // ─── SUBMITTED FTR LIST ─────────────────────────────────────
+
+  fetchFtrList(page: number = 1): void {
+    if (this.stDate && this.enDate && this.stDate > this.enDate) {
+      this.toastr.warning('From date cannot be after To date.', 'Validation');
+      return;
+    }
+    const reqId = ++this.ftrRequestId;
+    this.ftrLoading = true;
+    this.ftrList = [];
+
+    this.apis.getFTRData(page, this.stDate, this.enDate, this.appliedChassisNo)
+      .pipe(timeout(this.LIST_TIMEOUT_MS))
+      .subscribe({
+        next: (res: any) => {
+          if (reqId !== this.ftrRequestId) return;
+          const rows: FtrRecord[] = Array.isArray(res?.data) ? res.data : [];
+          const total = this.extractTotalCount(res);
+
+          if (page === 1 && rows.length > 0 && total !== null && total > rows.length) this.ftrItemsPerPage = rows.length;
+
+          this.ftrTotalItems = total !== null
+            ? total
+            : (page - 1) * this.ftrItemsPerPage + rows.length + (rows.length >= this.ftrItemsPerPage ? 1 : 0);
+
+          this.ftrList = rows;
+          this.ftrCurrentPage = page;
+          this.ftrLoading = false;
+        },
+        error: (err: any) => {
+          if (reqId !== this.ftrRequestId) return;
+          this.ftrLoading = false;
+          this.ftrList = [];
+          this.toastr.error(
+            err?.name === 'TimeoutError'
+              ? 'Loading is taking too long. Please check your connection and try again.'
+              : (err?.error?.message || 'Failed to load FTR list.'),
+            'Error'
+          );
+        }
+      });
+  }
+
+  onFtrPageChange(page: number): void {
+    this.fetchFtrList(page);
+  }
+
+  isRecordInStock(rec: FtrRecord): boolean {
+    return !!rec.StockMasterId && !rec.SalesCustomerMasterId;
+  }
+
+  openUpdateForm(rec: FtrRecord): void {
+    this.resetForm();
+    this.editingFtr = rec;
+    this.isInStock = this.isRecordInStock(rec);
+
+    this.selectedTractor = {
+      Id: rec.SalesCustomerMasterId || rec.StockMasterId || '',
+      TractorSrNumber: rec.TractorSerialNo,
+      ChassisNo: rec.TractorSerialNo,
+      Model: rec.TractorModelBOMCode,
+      DealerCode: rec.DealerCode,
+      DealerName: rec.DealerName,
+      DealerAddress: rec.DealerAddress,
+      CustomerName: rec.CustomerName,
+      CustomerAddress: rec.CustomerAddress,
+      MobileNo: rec.MobileNo,
+      Village: rec.Village,
+      PostOffice: rec.Post,
+      District: rec.District,
+      StockMasterId: rec.StockMasterId
+    } as FtrTractor;
+
+    this.sseName = rec.SSEName || '';
+    this.dateOfFailure = (rec.FailureDate || '').substring(0, 10);
+    this.dateOfRepair = (rec.RepairDate || '').substring(0, 10);
+    this.hoursWorked = rec.HoursWorked != null ? String(rec.HoursWorked) : '';
+    this.implementSize = rec.ImplementTrolleySize || '';
+    this.customerComplaints = rec.CustomerComplaints || '';
+    this.problemDefinition = rec.ProblemDefinition || '';
+
+    if (this.natureOfWorkOptions.length) this.applyNatureFromEditing();
+    else if (!this.natureOfWorkLoading) this.fetchNatureOfWork();
+
+    const el = document.getElementById('ftrFormModal');
+    if (el) bootstrap.Modal.getOrCreateInstance(el).show();
+
+    if (!this.isInStock && rec.SalesCustomerMasterId) this.loadServiceTimeline(rec.SalesCustomerMasterId);
+  }
+
+  onSearch(): void {
+    if (!this.stDate || !this.enDate) {
+      this.toastr.warning('Please select Start and End date.', 'Validation');
+      return;
+    }
+    if (this.stDate > this.enDate) {
+      this.toastr.warning('Start date cannot be after End date.', 'Validation');
+      return;
+    }
+    this.appliedChassisNo = (this.chassisNo || '').trim();
+    if (this.showRaiseList) { this.currentPage = 1; this.fetchTractorList(1); }
+    if (this.showFtrList) { this.ftrCurrentPage = 1; this.fetchFtrList(1); }
+  }
+
+  clearChassis(): void {
+    this.chassisNo = '';
+    this.onSearch();
   }
 }

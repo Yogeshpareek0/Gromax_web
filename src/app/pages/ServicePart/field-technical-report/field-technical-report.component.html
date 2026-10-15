@@ -1,87 +1,182 @@
-<div class="container-fluid px-0">
+<div class="container-fluid px-0" *ngIf="showRaiseList || showFtrList">
 
-  <!-- Top Filter Panel -->
+  <!-- ═══════════ COMMON FILTER PANEL ═══════════ -->
   <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
     <div class="row align-items-end">
-      <div class="col-xl-4 col-lg-5 col-sm-8 mb-3">
+      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showRaiseList">
         <label class="form-label fw-medium mb-0">FTR Type</label>
         <select class="form-select" [(ngModel)]="selectedType" (ngModelChange)="onTypeChange()">
           <option *ngFor="let o of ftrTypeOptions" [value]="o.value">{{ o.label }}</option>
         </select>
       </div>
+      <div class="col-xl-2 col-lg-3 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Start Date</label>
+        <input type="date" class="form-control" [(ngModel)]="stDate" [max]="enDate || today">
+      </div>
+      <div class="col-xl-2 col-lg-3 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">End Date</label>
+        <input type="date" class="form-control" [(ngModel)]="enDate" [min]="stDate" [max]="today">
+      </div>
       <div class="col-auto mb-3">
-        <button class="btn custom-btn py-2 px-3" [disabled]="loading" (click)="refreshList()">
-          <i class="fas fa-rotate-right me-1"></i> Refresh
+        <button class="btn custom-btn py-2 px-3" [disabled]="activeLoading" (click)="onSearch()">
+          <i class="fas fa-magnifying-glass me-1"></i> Search
         </button>
       </div>
       <div class="col mb-3 text-sm-end">
         <span class="total-chip">
-          <i class="fas fa-tractor me-1"></i> Total : {{ totalItems }}
+          <i class="fas me-1" [ngClass]="showRaiseList ? 'fa-tractor' : 'fa-file-lines'"></i>
+          {{ showRaiseList ? 'Total' : 'Submitted FTR' }} : {{ activeTotal }}
         </span>
       </div>
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="ftr-table-wrapper mt-3">
-    <table class="table table-bordered table-striped mb-0" style="min-width:1000px;">
-      <thead>
-        <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
-          <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
-          <th class="text-nowrap fw-normal">Tractor Sr. No.</th>
-          <th class="text-nowrap fw-normal">Model</th>
-          <th class="text-nowrap fw-normal">Chassis No.</th>
-          <th class="text-nowrap fw-normal">Dealer</th>
-          <th class="text-nowrap fw-normal">Drive Type</th>
-          <th class="text-nowrap fw-normal" *ngIf="selectedType === 'OUT'">Customer</th>
-          <th class="text-nowrap fw-normal">Status</th>
-          <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of tractorList; let i = index" class="clickable-row" (click)="openForm(item)">
-          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
-          <td class="text-nowrap fw-semibold" style="color:#215378">{{ item.TractorSrNumber }}</td>
-          <td class="text-nowrap">{{ item.Model || '-' }}</td>
-          <td class="text-nowrap">{{ item.ChassisNo || '-' }}</td>
-          <td class="text-nowrap">{{ item.DealerName || '-' }}</td>
-          <td class="text-nowrap">{{ item.DriveType || '-' }}</td>
-          <td class="text-nowrap" *ngIf="selectedType === 'OUT'">{{ item.CustomerName || '-' }}</td>
-          <td>
-            <span class="status-badge" [ngClass]="item.Status === 'Done' ? 'badge-done' : 'badge-pending'">
-              <span class="status-dot"></span>{{ item.Status || 'Pending' }}
-            </span>
-          </td>
-          <td>
-            <button class="btn-view" (click)="$event.stopPropagation(); openForm(item)">
-              <i class="fas fa-file-pen me-1"></i> Raise FTR
-            </button>
-          </td>
-        </tr>
-
-        <tr *ngIf="loading">
-          <td [attr.colspan]="selectedType === 'OUT' ? 9 : 8">
-            <div class="empty-state">
-              <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
-              <div class="empty-sub">Loading tractors...</div>
-            </div>
-          </td>
-        </tr>
-
-        <tr *ngIf="!loading && tractorList.length === 0">
-          <td [attr.colspan]="selectedType === 'OUT' ? 9 : 8">
-            <div class="empty-state">
-              <i class="fas fa-tractor"></i>
-              <div class="empty-title">No Tractors Found</div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- ═══════════ CHASSIS SEARCH ═══════════ -->
+  <div class="d-flex justify-content-start mt-3">
+    <div class="input-group chassis-search">
+      <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+      <input type="text" class="form-control" placeholder="Search Chassis No."
+             [(ngModel)]="chassisNo" (keyup.enter)="onSearch()">
+      <button *ngIf="chassisNo" class="btn btn-clear" type="button" (click)="clearChassis()" title="Clear">
+        <i class="fas fa-xmark"></i>
+      </button>
+      <button class="btn custom-btn px-3" type="button" [disabled]="activeLoading" (click)="onSearch()">
+        <i class="fas fa-magnifying-glass"></i>
+      </button>
+    </div>
   </div>
 
-  <app-pagination *ngIf="totalItems > 0" [totalItems]="totalItems" [pageSize]="itemsPerPage"
-                  [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+  <!-- ═══════════ RAISE FTR LIST ═══════════ -->
+  <ng-container *ngIf="showRaiseList">
+    <div class="ftr-table-wrapper mt-2">
+      <table class="table table-bordered table-striped mb-0" style="min-width:1000px;">
+        <thead>
+          <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Tractor Sr. No.</th>
+            <th class="text-nowrap fw-normal">Model</th>
+            <th class="text-nowrap fw-normal">Chassis No.</th>
+            <th class="text-nowrap fw-normal">Dealer</th>
+            <th class="text-nowrap fw-normal">Drive Type</th>
+            <th class="text-nowrap fw-normal" *ngIf="selectedType === 'OUT'">Customer</th>
+            <th class="text-nowrap fw-normal">Status</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of tractorList; let i = index" class="clickable-row" (click)="openForm(item)">
+            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td class="text-nowrap fw-semibold" style="color:#215378">{{ item.TractorSrNumber }}</td>
+            <td class="text-nowrap">{{ item.Model || '-' }}</td>
+            <td class="text-nowrap">{{ item.ChassisNo || '-' }}</td>
+            <td class="text-nowrap">{{ item.DealerName || '-' }}</td>
+            <td class="text-nowrap">{{ item.DriveType || '-' }}</td>
+            <td class="text-nowrap" *ngIf="selectedType === 'OUT'">{{ item.CustomerName || '-' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="item.Status === 'Done' ? 'badge-done' : 'badge-pending'">
+                <span class="status-dot"></span>{{ item.Status || 'Pending' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-view" (click)="$event.stopPropagation(); openForm(item)">
+                <i class="fas fa-file-pen me-1"></i> Raise FTR
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="loading">
+            <td [attr.colspan]="selectedType === 'OUT' ? 9 : 8">
+              <div class="empty-state">
+                <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+                <div class="empty-sub">Loading tractors...</div>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!loading && tractorList.length === 0">
+            <td [attr.colspan]="selectedType === 'OUT' ? 9 : 8">
+              <div class="empty-state">
+                <i class="fas fa-tractor"></i>
+                <div class="empty-title">No Tractors Found</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination *ngIf="totalItems > 0" [totalItems]="totalItems" [pageSize]="itemsPerPage"
+                    [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+  </ng-container>
+
+  <!-- ═══════════ SUBMITTED FTR LIST ═══════════ -->
+  <ng-container *ngIf="showFtrList">
+    <div class="ftr-table-wrapper mt-2">
+      <table class="table table-bordered table-striped mb-0" style="min-width:1200px;">
+        <thead>
+          <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Chassis No.</th>
+            <th class="text-nowrap fw-normal">Model</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">SSE Name</th>
+            <th class="text-nowrap fw-normal">Failure Date</th>
+            <th class="text-nowrap fw-normal">Repair Date</th>
+            <th class="text-nowrap fw-normal">Hours</th>
+            <th class="text-nowrap fw-normal">Nature of Work</th>
+            <th class="text-nowrap fw-normal">Stock</th>
+            <th class="text-nowrap fw-normal">Customer</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of ftrList; let i = index" class="clickable-row" (click)="openUpdateForm(r)">
+            <td>{{ (ftrCurrentPage - 1) * ftrItemsPerPage + i + 1 }}</td>
+            <td class="text-nowrap fw-semibold" style="color:#215378">{{ r.TractorSerialNo || '-' }}</td>
+            <td class="text-nowrap">{{ r.TractorModelBOMCode || '-' }}</td>
+            <td class="text-nowrap">{{ r.DealerCode || '-' }}</td>
+            <td class="text-nowrap">{{ r.SSEName || '-' }}</td>
+            <td class="text-nowrap">{{ (r.FailureDate | date:'dd-MM-yyyy') || '-' }}</td>
+            <td class="text-nowrap">{{ (r.RepairDate | date:'dd-MM-yyyy') || '-' }}</td>
+            <td>{{ r.HoursWorked}}</td>
+            <td class="text-nowrap">{{ r.NatureOfWorkDone || '-' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="isRecordInStock(r) ? 'badge-in' : 'badge-out'">
+                <span class="status-dot"></span>{{ isRecordInStock(r) ? 'In Stock' : 'Sold' }}
+              </span>
+            </td>
+            <td class="text-nowrap">{{ r.CustomerName || '-' }}</td>
+            <td>
+              <button class="btn-view" (click)="$event.stopPropagation(); openUpdateForm(r)">
+                <i class="fas fa-pen-to-square me-1"></i> Update
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="ftrLoading">
+            <td colspan="12">
+              <div class="empty-state">
+                <div class="spinner-border spinner-border-sm text-primary mb-2"></div>
+                <div class="empty-sub">Loading reports...</div>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!ftrLoading && ftrList.length === 0">
+            <td colspan="12">
+              <div class="empty-state">
+                <i class="fas fa-file-circle-xmark"></i>
+                <div class="empty-title">No FTR Found</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination *ngIf="ftrTotalItems > 0" [totalItems]="ftrTotalItems" [pageSize]="ftrItemsPerPage"
+                    [currentPage]="ftrCurrentPage" (pageChange)="onFtrPageChange($event)"></app-pagination>
+  </ng-container>
 </div>
 
 <!-- ═══════════ FTR FORM MODAL ═══════════ -->
@@ -91,7 +186,7 @@
 
       <div class="modal-header gm-modal-header">
         <div>
-          <h5 class="modal-title mb-0">Field Technical Report</h5>
+          <h5 class="modal-title mb-0">{{ isEditMode ? 'Update Field Technical Report' : 'Field Technical Report' }}</h5>
           <div class="modal-subtitle">
             {{ selectedTractor?.ChassisNo }} — {{ selectedTractor?.Model }}
             <span class="type-badge">{{ isInStock ? 'In Stock' : 'Sold' }}</span>
@@ -187,7 +282,7 @@
             <div class="col-md-3 mb-3">
               <label class="form-label fw-medium mb-0">Alternate Mobile Number</label>
               <input type="text" inputmode="numeric" maxlength="10" class="form-control"
-                     [(ngModel)]="alternateMobileNo" (input)="onAltMobileInput()"
+                     [(ngModel)]="alternateMobileNo" (input)="onAltMobileInput()" [disabled]="isEditMode"
                      [class.is-invalid]="submitted && alternateMobileNo && alternateMobileNo.length !== 10">
               <div class="invalid-feedback">Must be 10 digits</div>
             </div>
@@ -254,7 +349,7 @@
         <button class="btn btn-outline-secondary btn-sm px-3" (click)="closeForm()">Cancel</button>
         <button class="btn custom-btn btn-sm px-4" [disabled]="submitting" (click)="submitReport()">
           <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
-          {{ submitting ? 'Submitting...' : 'Submit Report' }}
+          {{ submitting ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update Report' : 'Submit Report') }}
         </button>
       </div>
     </div>

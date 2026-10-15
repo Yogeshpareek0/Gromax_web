@@ -49,6 +49,7 @@ import { ItemScoreComponent } from '../app/pages/ServicePart/item-score/item-sco
 import { JobcardreportComponent } from '../app/pages/ServicePart/jobcardreport/jobcardreport.component';
 import { CircularsComponent } from '../app/pages/circulars/circulars.component';
 import { FieldTechnicalReportComponent } from '../app/pages/ServicePart/field-technical-report/field-technical-report.component';
+import { FtrReportComponent } from '../app/pages/ServicePart/ftr-report/ftr-report.component';
 
 
 
@@ -107,7 +108,8 @@ export const routes: Routes = [
       { path: 'generatedinvoicelist', component: ReimbersementInvComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'GenerateInvoiceList' } },
       { path: 'jobcardreport', component: JobcardreportComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'JobCardReport' } },
       { path: 'circular', component: CircularsComponent },
-      { path: 'ftrform', component: FieldTechnicalReportComponent }
+      { path: 'ftrform', component: FieldTechnicalReportComponent },
+      { path: 'ftrreport', component: FtrReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'FtrReport' } }
 
 
     ]

@@ -139,11 +139,11 @@
             </li>
 
             <!--<li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-          [class.active]="activeRoute === 'updtoldretailedenq'"
-          (click)="onNavigate('updtoldretailedenq')">
-        <img src="assets/images/updateenquiry.png" alt="enquiry" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
-        <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Post Retailed Delivery Update</a>
-      </li>-->
+                [class.active]="activeRoute === 'updtoldretailedenq'"
+                (click)="onNavigate('updtoldretailedenq')">
+              <img src="assets/images/updateenquiry.png" alt="enquiry" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
+              <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Post Retailed Delivery Update</a>
+            </li>-->
           </ul>
         </li>
 
@@ -250,7 +250,7 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','AddFTR')"
+                *ngIf="hasSubMenu('Service','AddFTR')||hasSubMenu('Service','UpdateFTR')"
                 [class.active]="activeRoute === 'ftrform'"
                 (click)="onNavigate('ftrform')">
               <img src="assets/images/mechanic.png" alt="ftrform" class="menu-icon me-2" />
@@ -331,6 +331,13 @@
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">JobCard Report</span>
             </li>
+            <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
+                *ngIf="hasSubMenu('Reports','FtrReport')"
+                [class.active]="activeRoute === 'ftrreport'"
+                (click)="onNavigate('ftrreport')">
+              <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
+              <span class="text-white report-name" style="font-size:13px;">FTR Report</span>
+            </li>
           </ul>
 
         </li>
@@ -389,18 +396,18 @@
         </li>
 
         <!--<li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-      [class.active]="activeRoute === 'ticketgeneration'"
-      (click)="onNavigate('ticketgeneration')">
-    <img src="assets/images/ticket.png" alt="ticket" class="menu-icon me-2" />
-    <a class="nav-link text-white p-0 m-0">Ticket Generation</a>
-  </li>
+            [class.active]="activeRoute === 'ticketgeneration'"
+            (click)="onNavigate('ticketgeneration')">
+          <img src="assets/images/ticket.png" alt="ticket" class="menu-icon me-2" />
+          <a class="nav-link text-white p-0 m-0">Ticket Generation</a>
+        </li>
 
-  <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-      [class.active]="activeRoute === 'warrantyclaim'"
-      (click)="onNavigate('warrantyclaim')">
-    <img src="assets/images/warrenty.png" alt="warranty" class="menu-icon me-2" />
-    <a class="nav-link text-white p-0 m-0">Warranty Claim</a>
-  </li>-->
+        <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
+            [class.active]="activeRoute === 'warrantyclaim'"
+            (click)="onNavigate('warrantyclaim')">
+          <img src="assets/images/warrenty.png" alt="warranty" class="menu-icon me-2" />
+          <a class="nav-link text-white p-0 m-0">Warranty Claim</a>
+        </li>-->
 
         <li *ngIf="hasSubMenu('UploadBilling','UploadBilling')"
             class="nav-item d-flex align-items-center px-2 custom-nav-item"

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { DealerRequestModel, FtrSubmitPayload, NtirSubmitPayload, PdiSubmitPayload } from '../model/apiresponse';
+import { DealerRequestModel, FtrReportRequest, FtrSubmitPayload, FtrUpdatePayload, NtirSubmitPayload, PdiSubmitPayload } from '../model/apiresponse';
 import { __param } from 'tslib';
 
 
@@ -1006,10 +1006,13 @@ export class AuthService {
   }
 
   // ===== FTR (Field Technical Report) =====
-  getChassisDetailsForFTR(stockStatus: string, pageNo: number) {
+  getChassisDetailsForFTR(stockStatus: string, pageNo: number, stDate: string, enDate: string, chassisNo: string = '') {
     const params = new HttpParams()
       .set('stockStatus', stockStatus)
-      .set('pageNo', pageNo.toString());
+      .set('pageNo', pageNo.toString())
+      .set('stDate', stDate)
+      .set('enDate', enDate)
+      .set('chassisNo', chassisNo);
     return this.http.get(this.baseUrl + 'Api/Services/GetChassisDetailsForFTR', { params });
   }
 
@@ -1020,6 +1023,31 @@ export class AuthService {
   addFTR(payload: FtrSubmitPayload) {
     return this.http.post(this.baseUrl + 'Api/Services/addFTR', payload);
   }
+  getFTRData(pageNo: number, stDate: string, enDate: string, chassisNo: string = '') {
+    const params = new HttpParams()
+      .set('pageNo', pageNo.toString())
+      .set('stDate', stDate)
+      .set('enDate', enDate)
+      .set('chassisNo', chassisNo);
 
+    return this.http.get(this.baseUrl + 'Api/Services/getFTRData', { params });
+  }
 
+  updateFTR(payload: FtrUpdatePayload) {
+    return this.http.post(this.baseUrl + 'Api/Services/updateFTR', payload);
+  }
+
+  getFTRReport(req: FtrReportRequest) {
+    let params = new HttpParams()
+      .set('pageNo', req.pageNo.toString())
+      .set('stDate', req.stDate)
+      .set('enDate', req.enDate)
+      .set('isDownload', String(req.isDownload));
+
+    if (req.stateId) params = params.set('stateId', req.stateId);
+    if (req.chassisNo) params = params.set('chassisNo', req.chassisNo);
+    if (req.duration) params = params.set('duration', req.duration);
+
+    return this.http.get(this.baseUrl + 'Api/Services/getFTRData', { params });
+  }
 }

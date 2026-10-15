@@ -1443,3 +1443,86 @@ export interface FtrSubmitPayload {
   createdBy: string;
   positionName: string;
 }
+
+export interface FtrRecord {
+  Id: string;
+  SSEName: string;
+  DealerCode: string;
+  DealerName: string;
+  DealerAddress: string;
+  TractorModelBOMCode: string;
+  TractorSerialNo: string;
+  FailureDate: string;
+  HoursWorked: number;
+  RepairDate: string;
+  NatureOfWorkDone: string;
+  SalesCustomerMasterId: string | null;
+  StockMasterId: string | null;
+  CustomerName: string;
+  CustomerAddress: string;
+  MobileNo: string;
+  Village: string;
+  Post: string;
+  District: string;
+  ImplementTrolleySize: string;
+  CustomerComplaints: string;
+  ProblemDefinition: string;
+  TotalCount: number;
+}
+
+export interface FtrUpdatePayload {
+  id: string;
+  sseName: string;
+  failureDate: string | null;
+  hoursWorked: number;
+  repairDate: string | null;
+  natureOfWorkDone: string;
+  implementTrolleySize: string;
+  customerComplaints: string;
+  problemDefinition: string;
+  modifiedBy: string;
+  positionName: string;
+  stockStatus: string;
+}
+export interface FtrReportRow {
+  Id: string;
+  SSEName: string;
+  DealerCode: string;
+  DealerName: string;
+  DealerAddress: string;
+  TractorModelBOMCode: string;
+  TractorSerialNo: string;
+  FailureDate: string | null;
+  HoursWorked: number | null;
+  RepairDate: string | null;
+  NatureOfWorkDone: string;
+  SalesCustomerMasterId: string | null;
+  StockMasterId: string | null;
+  CustomerName: string | null;
+  CustomerAddress: string | null;
+  MobileNo: string | null;
+  Village: string | null;
+  Post: string | null;
+  District: string | null;
+  ImplementTrolleySize: string;
+  CustomerComplaints: string;
+  ProblemDefinition: string;
+  TotalCount: number;
+}
+
+export interface FtrReportColumn {
+  key: keyof FtrReportRow | 'srNo' | 'stockType';
+  label: string;
+  type?: 'date' | 'stock';
+  wide?: boolean;
+}
+
+export interface FtrReportRequest {
+  pageNo: number;
+  duration: string;
+  stDate: string;
+  enDate: string;
+  stateId: string;
+  chassisNo: string;
+  isDownload: boolean;
+}

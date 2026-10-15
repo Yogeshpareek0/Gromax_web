@@ -1,0 +1,164 @@
+:host {
+  --gm-primary: #4796BD;
+  --gm-primary-dk: #3a7fa1;
+  --gm-dark: #215378;
+  --gm-light: #eef7fb;
+}
+
+.custom-btn {
+  background-color: var(--gm-primary) !important;
+  color: #fff !important;
+  border-radius: 8px;
+  border: none !important;
+}
+
+  .custom-btn:hover {
+    background-color: var(--gm-primary-dk) !important;
+  }
+
+/* ── Search ── */
+.search-wrapper {
+  max-width: 380px;
+  width: 100%;
+}
+
+.custom-search-group {
+  border: 1px solid var(--gm-primary);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.search-btn {
+  background-color: var(--gm-primary);
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 0;
+}
+
+  .search-btn:hover {
+    background-color: var(--gm-primary-dk);
+  }
+
+/* ── Chips ── */
+.range-chip,
+.total-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.range-chip {
+  background: var(--gm-light);
+  border: 1px solid #c8e4f0;
+  color: var(--gm-dark);
+}
+
+.total-chip {
+  background: var(--gm-primary);
+  color: #fff;
+}
+
+/* ── Table ── */
+.report-table-wrapper {
+  max-height: 480px;
+  overflow: auto;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gm-primary) #f1f1f1;
+}
+
+  .report-table-wrapper table {
+    min-width: 2800px;
+  }
+
+  .report-table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    font-size: 13px;
+    padding: 10px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .report-table-wrapper tbody td {
+    font-size: 12px;
+    padding: 8px 10px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .report-table-wrapper .col-wide {
+    white-space: normal;
+    min-width: 200px;
+    max-width: 280px;
+  }
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-bg-type: rgba(0, 0, 0, 0.025);
+}
+
+.report-table-wrapper tbody tr:hover > td {
+  background-color: #dff0f8 !important;
+}
+
+/* ── Stock badge ── */
+.stock-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.badge-in {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.badge-out {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+/* ── Empty ── */
+.empty-state {
+  text-align: center;
+  padding: 28px;
+  color: #9ca3af;
+}
+
+  .empty-state i {
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: var(--gm-primary);
+  }
+
+.empty-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gm-dark);
+}
+
+.empty-sub {
+  font-size: 12px;
+  color: #7C93A0;
+}
+.report-table-wrapper th.col-wide,
+.report-table-wrapper td.col-wide {
+  white-space: normal !important;
+  width: 260px;
+  min-width: 260px;
+}
+
+.wrap-text {
+  width: 260px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+}
