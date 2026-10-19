@@ -146,7 +146,7 @@
             <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
             <th class="text-nowrap fw-normal">Item</th>
             <th class="text-nowrap fw-normal">Max Score</th>
-            <th class="text-nowrap fw-normal">Score</th>
+            <th class="text-nowrap fw-normal">Answer</th>
             <th class="text-nowrap fw-normal">Photo</th>
             <th class="text-nowrap fw-normal">Status</th>
             <th class="text-nowrap fw-normal" style="border-top-right-radius: 8px;">Action</th>
@@ -163,14 +163,22 @@
           </tr>
           <tr *ngFor="let item of groupItems; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ item.groupItem }}</td>
-            <td>{{ item.maxScore ?? '-' }}</td>
-            <td>{{ getPoint(item)?.score ?? '-' }}</td>
             <td>
-              <span *ngIf="isPhotoSectionEnabled(item)" class="is-badge is-badge-info">
-                {{ getPoint(item)?.images?.length || 0 }}/{{ getMinPhoto(item) }} Req
+              {{ item.groupItem }}
+              <div *ngIf="item.cat" class="is-item-desc">{{ item.cat }}</div>
+            </td>
+            <td>{{ item.maxScore ?? '-' }}</td>
+            <td>{{ getAnswerLabel(item) }}</td>
+            <td>
+              <span *ngIf="getSavedRequiredPhoto(item) > 0" class="is-badge is-badge-info">
+                {{ getPoint(item)?.images?.length || 0 }}/{{ getSavedRequiredPhoto(item) }} Req
               </span>
-              <span *ngIf="!isPhotoSectionEnabled(item)" class="is-badge is-badge-muted">N/A</span>
+              <span *ngIf="getSavedRequiredPhoto(item) === 0 && isPendingYes(item)" class="is-badge is-badge-warning">
+                Photo if Yes
+              </span>
+              <span *ngIf="getSavedRequiredPhoto(item) === 0 && !isPendingYes(item)" class="is-badge is-badge-muted">
+                N/A
+              </span>
             </td>
             <td>
               <span *ngIf="getPoint(item)" class="is-badge is-badge-success">
@@ -180,8 +188,10 @@
             </td>
             <td>
               <button type="button" class="btn btn-sm is-action-btn" (click)="openScoreModal(item)">
-                <i class="fa-solid" [ngClass]="getPoint(item) ? 'fa-pen' : 'fa-star'" style="font-size:9px"></i>
-                {{ getPoint(item) ? 'Edit' : 'Fill Score' }}
+                <i class="fa-solid"
+                   [ngClass]="getPoint(item) ? 'fa-pen' : (isPrefilled(item) ? 'fa-camera' : 'fa-star')"
+                   style="font-size:9px"></i>
+                {{ getPoint(item) ? 'Edit' : 'Fill'}}
               </button>
             </td>
           </tr>
@@ -190,7 +200,7 @@
     </div>
   </ng-container>
 
-  <!-- ==================== SCORE + PHOTO MODAL ==================== -->
+  <!-- ==================== INPUT / YES-NO + PHOTO MODAL ==================== -->
   <div class="modal fade" tabindex="-1" [class.show]="showModal"
        [style.display]="showModal ? 'block' : 'none'"
        [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
@@ -203,20 +213,43 @@
         </div>
 
         <div class="modal-body">
-          <!-- Score -->
-          <div *ngIf="getAllowedScores(modalItem).length > 0">
-            <div class="is-section-label">Select Score <span class="text-muted">(Max {{ modalItem.maxScore ?? '-' }})</span></div>
+
+          <!-- Description -->
+          <div class="is-desc-box" *ngIf="modalItem.cat">
+            <div class="is-desc-label">Description</div>
+            <div class="is-desc-text">{{ modalItem.cat }}</div>
+          </div>
+
+          <!-- isInput = 1 → Input -->
+          <div *ngIf="isInputType(modalItem)">
+            <div class="is-section-label">
+              Enter Value<span *ngIf="modalItem.units"> ({{ modalItem.units }})</span>
+            </div>
+            <input type="text"
+                   class="is-input-box"
+                   inputmode="decimal"
+                   maxlength="7"
+                   placeholder="Type here"
+                   [disabled]="isPrefilled(modalItem)"
+                   [value]="tempAnswer ?? ''"
+                   (input)="onAnswerInput($event)" />
+          </div>
+
+          <!-- isInput = 0 → Yes / No -->
+          <div *ngIf="!isInputType(modalItem)">
+            <div class="is-section-label">Select Answer</div>
             <div class="is-score-wrap">
-              <button type="button" *ngFor="let s of getAllowedScores(modalItem)"
-                      class="is-score-chip" [class.selected]="tempScore === s"
-                      (click)="selectScore(s)">
-                {{ s }}
+              <button type="button" *ngFor="let opt of yesNoOptions"
+                      class="is-score-chip" [class.selected]="tempAnswer === opt.value"
+                      [disabled]="isPrefilled(modalItem)"
+                      (click)="selectYesNo(opt.value)">
+                {{ opt.label }}
               </button>
             </div>
           </div>
 
-          <!-- Photos -->
-          <div class="mt-4" *ngIf="isPhotoSectionEnabled(modalItem)">
+          <!-- Photos: input me hamesha, Yes/No me sirf Yes par (minPhoto > 0 ho to) -->
+          <div class="mt-4" *ngIf="isModalPhotoEnabled">
             <div class="is-section-label">
               Photo (min {{ getMinPhoto(modalItem) }}, max {{ getMaxPhoto(modalItem) }})
             </div>
@@ -238,7 +271,7 @@
               </div>
             </div>
             <div class="is-photo-hint">
-              {{ uploadedCount }}/{{ getMinPhoto(modalItem) }} required photo(s) added
+              {{ uploadedCount }}/{{ modalRequiredPhoto }} required photo(s) added
             </div>
           </div>
 

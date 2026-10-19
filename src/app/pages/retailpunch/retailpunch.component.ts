@@ -784,6 +784,10 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
         valid = false;
       }
     }
+    if (this.retailForm.Remarks.length > 200) {
+      this.formErrors['Remarks'] = 'Remarks cannot exceed 200 characters.';
+      valid = false;
+    }
     if (!this.retailForm.ProspectType) { this.formErrors['ProspectType'] = 'Prospect type is required.'; valid = false; }
     if (!this.retailForm.PaymentMode) { this.formErrors['PaymentMode'] = 'Payment type is required.'; valid = false; }
     if (this.retailForm.PaymentMode === 'Loan') {
@@ -856,7 +860,8 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
       FinalPriceExchange: isExchange ? this.retailForm.DealExchTracAmt : null,
       ExchangeStockEntry: isExchange ? this.retailForm.exchangeStockEntry : '',
       ExchangeStockEntryValue: isExchange ? this.retailForm.exchangeStockEntryValue : '',
-      expectedRetailDate: this.retailForm.expectedRetailDate
+      expectedRetailDate: this.retailForm.expectedRetailDate,
+      remarks: this.retailForm.Remarks
     };
     this.isSubmitting = true;
     this.apis.updateRetailSale(payload).subscribe({

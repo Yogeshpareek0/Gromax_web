@@ -1,0 +1,113 @@
+<div class="container-fluid px-0">
+
+  <!-- Top Filter Panel -->
+  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+    <div class="row">
+      <div class="col-xl-4 col-lg-4 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Dealer</label>
+        <select class="form-select" [(ngModel)]="selectedDealer" [disabled]="dealerLoading">
+          <option [ngValue]="null">{{ dealerLoading ? 'Loading...' : 'All' }}</option>
+          <option *ngFor="let d of dealerList" [ngValue]="d.DealerCode">{{ d.DealerName }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-2 col-lg-3 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Year</label>
+        <select class="form-select" [(ngModel)]="selectedYear">
+          <option *ngFor="let y of yearOptions" [ngValue]="y">{{ y }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-sm-6 mb-3">
+        <label class="form-label fw-medium mb-0">Half Year</label>
+        <select class="form-select" [(ngModel)]="selectedHalfYear">
+          <option *ngFor="let h of halfYearOptions" [ngValue]="h.value">{{ h.label }}</option>
+        </select>
+      </div>
+
+      <div class="col-xl-3 col-lg-2 col-sm-6 mb-3 align-self-end">
+        <div class="d-flex gap-2">
+          <button class="btn custom-btn flex-fill py-2" [disabled]="loading" (click)="onShowReport()">
+            <i class="bi bi-clipboard-data me-1"></i> Show Report
+          </button>
+          <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px"
+                  [disabled]="exporting || loading" (click)="exportToExcel()" title="Export to Excel">
+            <span *ngIf="exporting" class="spinner-border spinner-border-sm"></span>
+            <i *ngIf="!exporting" class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mt-3">
+    <span class="range-chip">
+      <i class="fas fa-calendar-days me-1"></i> {{ halfYearLabel }} {{ selectedYear }}
+    </span>
+    <span class="range-chip" *ngIf="maxTotal > 0">Max Score : {{ maxTotal }}</span>
+    <span class="total-chip">Total : {{ allRows.length }}</span>
+  </div>
+
+  <!-- Table -->
+  <div class="report-table-wrapper mt-2">
+    <table class="table table-bordered table-striped mb-0">
+      <thead>
+        <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+          <th class="fw-normal" style="border-top-left-radius:8px;">Sr No</th>
+          <th class="fw-normal">State</th>
+          <th class="fw-normal">Dealer Code</th>
+          <th class="fw-normal">Dealer Name</th>
+          <th class="fw-normal">Location</th>
+          <th *ngFor="let c of scoreColumns" class="fw-normal text-center">
+            {{ c.label }}
+            <div class="max-sub" *ngIf="c.max">Max {{ c.max }}</div>
+          </th>
+          <th class="fw-normal text-center" *ngIf="scoreColumns.length">Total Score</th>
+          <th class="fw-normal text-center">Max Score</th>
+          <th class="fw-normal text-center" style="border-top-right-radius:8px;">Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of pagedRows; let i = index">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td>{{ row.StateName || '-' }}</td>
+          <td class="fw-semibold" style="color:#215378">{{ row.DealerCode || '-' }}</td>
+          <td>{{ row.DealerName || '-' }}</td>
+          <td>{{ row.Location || '-' }}</td>
+          <td *ngFor="let c of scoreColumns" class="text-center"
+              [class.zero-score]="scoreValue(row, c.key) === 0">
+            {{ scoreValue(row, c.key) }}
+          </td>
+          <td class="text-center fw-semibold" *ngIf="scoreColumns.length">{{ getTotal(row) }}</td>
+          <td class="text-center">{{ getMaxScore(row) }}</td>
+          <td class="text-center">
+            <span class="pct-badge" [ngClass]="percentClass(row)">{{ getPercent(row) | number:'1.0-2' }}%</span>
+          </td>
+        </tr>
+
+        <tr *ngIf="loading">
+          <td [attr.colspan]="scoreColumns.length + 8">
+            <div class="empty-state">
+              <div class="spinner-border spinner-border-sm mb-2" style="color:#4796BD"></div>
+              <div class="empty-sub">Loading report...</div>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="!loading && allRows.length === 0">
+          <td [attr.colspan]="scoreColumns.length + 8">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <div class="empty-title">No Data Available</div>
+              <div class="empty-sub">Try changing the dealer, year or half year</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination *ngIf="allRows.length > itemsPerPage" [totalItems]="allRows.length" [pageSize]="itemsPerPage"
+                  [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+</div>

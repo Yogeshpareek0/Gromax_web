@@ -4,9 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { DraftPoint, ItemScoreDraft, ItemScorePhotoSlot, GroupStatus } from '../../../model/apiresponse';
 
-
-
-
 const DRAFT_KEY = 'itemScoreDraft';
 
 @Component({
@@ -32,6 +29,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   groupNames: string[] = [];
   groupStatusMap: { [group: string]: GroupStatus | undefined } = {};
   groupLoading: boolean = false;
+  catType: any = null;
 
   // Group items
   selectedGroup: string = '';
@@ -40,12 +38,17 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   // Draft (web replacement of SQLite)
   draft: ItemScoreDraft | null = null;
 
-  // Score modal
+  // Modal
   showModal: boolean = false;
   modalItem: any = null;
-  tempScore: number | null = null;
+  tempAnswer: string | null = null;   // isInput=1 → typed value, isInput=0 → '1' (Yes) / '0' (No)
   tempSlots: ItemScorePhotoSlot[] = [];
   activeSlotIndex: number = -1;
+
+  yesNoOptions = [
+    { label: 'Yes', value: '1' },
+    { label: 'No', value: '0' }
+  ];
 
   submitting: boolean = false;
 
@@ -174,15 +177,19 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   // ===================== GROUPS =====================
 
   loadItems(): void {
+    if (!this.selectedDealer?.DealerCode) return;
+
     this.groupLoading = true;
     this.allItems = [];
     this.groupNames = [];
+    this.catType = null;
 
-    this.apis.getReimbursementList().subscribe({
+    this.apis.getReimbursementList(this.selectedDealer.DealerCode).subscribe({
       next: (res: any) => {
         this.groupLoading = false;
         if (this.isOk(res)) {
           this.allItems = res.data || [];
+          this.catType = this.allItems[0]?.catType ?? null;
           this.groupNames = [...new Set(this.allItems.map(x => x.groupName).filter(Boolean))] as string[];
           this.refreshGroupStatus();
         } else {
@@ -200,7 +207,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     const map: { [group: string]: GroupStatus } = {};
     this.groupNames.forEach(g => {
       const items = this.allItems.filter(x => x.groupName === g);
-      const done = items.filter(x => !!this.draft?.points[String(x.id)]).length;
+      const done = items.filter(x => !!this.getPoint(x)).length;
       map[g] = { total: items.length, done, complete: items.length > 0 && done === items.length };
     });
     this.groupStatusMap = map;
@@ -232,13 +239,17 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
 
   // ===================== ITEM HELPERS =====================
 
-  getAllowedScores(item: any): number[] {
-    if (!item?.allowedScores) return [];
-    return String(item.allowedScores)
-      .split(',')
-      .map(s => s.trim())
-      .filter(s => s.length > 0)
-      .map(Number);
+  isInputType(item: any): boolean {
+    return Number(item?.isInput) === 1;
+  }
+
+  isPrefilled(item: any): boolean {
+    const v = item?.filledValue;
+    return v !== null && v !== undefined && String(v).trim() !== '';
+  }
+
+  private getFilledValue(item: any): string {
+    return String(item?.filledValue).trim();
   }
 
   getMinPhoto(item: any): number {
@@ -251,22 +262,63 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return max > 0 ? max : min;
   }
 
-  isPhotoSectionEnabled(item: any): boolean {
-    return this.getMinPhoto(item) > 0;
+  // Input wale item me hamesha, Yes/No wale me sirf Yes ('1') par photo required
+  getRequiredPhoto(item: any, answer: string | null | undefined): number {
+    const min = this.getMinPhoto(item);
+    if (min === 0) return 0;
+    return this.isInputType(item) || String(answer) === '1' ? min : 0;
+  }
+
+  // Row ka answer: prefilled ho to API ki value, warna draft ki
+  getItemAnswer(item: any): string | null {
+    if (this.isPrefilled(item)) return this.getFilledValue(item);
+    return this.draft?.points[String(item?.id)]?.score ?? null;
   }
 
   getPoint(item: any): DraftPoint | null {
-    return this.draft?.points[String(item?.id)] || null;
+    const saved = this.draft?.points[String(item?.id)] || null;
+
+    if (this.isPrefilled(item)) {
+      const filled = this.getFilledValue(item);
+      if (saved) return { ...saved, score: filled };
+      // Photo required nahi hai to seedha done, warna photo lagne tak pending
+      if (this.getRequiredPhoto(item, filled) === 0) {
+        return { groupName: item.groupName, score: filled, images: [] };
+      }
+      return null;
+    }
+    return saved;
   }
 
-  // ===================== SCORE MODAL =====================
+  // List view helpers
+  getSavedRequiredPhoto(item: any): number {
+    return this.getRequiredPhoto(item, this.getItemAnswer(item));
+  }
+
+  isPendingYes(item: any): boolean {
+    return !this.isPrefilled(item) && !this.isInputType(item) && this.getMinPhoto(item) > 0 && !this.getPoint(item);
+  }
+
+  getAnswerLabel(item: any): string {
+    const ans = this.getItemAnswer(item);
+    if (ans === null || ans === undefined || ans === '') return '-';
+    if (this.isInputType(item)) {
+      return `${ans}${item.units ? ' ' + item.units : ''}`;
+    }
+    return String(ans) === '1' ? 'Yes' : 'No';
+  }
+
+  // ===================== MODAL =====================
 
   openScoreModal(item: any): void {
     const point = this.getPoint(item);
     this.modalItem = item;
-    this.tempScore = point ? point.score : null;
+    this.tempAnswer = this.isPrefilled(item)
+      ? this.getFilledValue(item)
+      : (point ? String(point.score) : null);
 
-    const max = this.isPhotoSectionEnabled(item) ? this.getMaxPhoto(item) : 0;
+    // Slots hamesha bana do (minPhoto > 0 ho to) — Yes/No me 'Yes' select hote hi dikh jayenge
+    const max = this.getMinPhoto(item) > 0 ? this.getMaxPhoto(item) : 0;
     this.tempSlots = Array.from({ length: max }, (_, i) => ({
       preview: point?.images?.[i] || null,
       serverUrl: point?.images?.[i] || null,
@@ -281,7 +333,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     this.revokeTempPreviews();
     this.showModal = false;
     this.modalItem = null;
-    this.tempScore = null;
+    this.tempAnswer = null;
     this.tempSlots = [];
     this.activeSlotIndex = -1;
     document.body.style.overflow = 'auto';
@@ -293,8 +345,27 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectScore(score: number): void {
-    this.tempScore = score;
+  // isInput = 1 → sirf number aur '.', max 7 char
+  onAnswerInput(event: Event): void {
+    if (this.isPrefilled(this.modalItem)) return;
+    const el = event.target as HTMLInputElement;
+    const value = el.value.replace(/[^0-9.]/g, '').slice(0, 7);
+    el.value = value;
+    this.tempAnswer = value;
+  }
+
+  // isInput = 0 → '1' / '0'
+  selectYesNo(value: string): void {
+    if (this.isPrefilled(this.modalItem)) return;
+    this.tempAnswer = value;
+  }
+
+  get modalRequiredPhoto(): number {
+    return this.modalItem ? this.getRequiredPhoto(this.modalItem, this.tempAnswer) : 0;
+  }
+
+  get isModalPhotoEnabled(): boolean {
+    return this.modalRequiredPhoto > 0;
   }
 
   get uploadedCount(): number {
@@ -305,11 +376,16 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return this.tempSlots.some(s => s.uploading);
   }
 
+  isAnswered(): boolean {
+    if (!this.modalItem || this.tempAnswer === null || this.tempAnswer === undefined) return false;
+    return this.isInputType(this.modalItem) ? String(this.tempAnswer).trim().length > 0 : true;
+  }
+
   canMarkDone(): boolean {
     if (!this.modalItem) return false;
-    const min = this.getMinPhoto(this.modalItem);
-    const photoOk = min === 0 || this.uploadedCount >= min;
-    return this.tempScore !== null && photoOk && !this.anySlotUploading;
+    const required = this.modalRequiredPhoto;
+    const photoOk = required === 0 || this.uploadedCount >= required;
+    return this.isAnswered() && photoOk && !this.anySlotUploading;
   }
 
   // ===================== PHOTO =====================
@@ -364,8 +440,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
         this.apis.showAlert('error', 'Upload Failed', 'Could not upload photo. Please try again.');
       }
     });
-
-
   }
 
   private extractUploadUrl(res: any): string | null {
@@ -392,16 +466,22 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   // ===================== DONE (save to draft) =====================
 
   onDone(): void {
-
     if (!this.canMarkDone() || !this.draft) return;
 
-    const images = this.tempSlots
-      .map(s => s.serverUrl)
-      .filter((u): u is string => !!u);
+    // Photo section hidden ho (Yes/No me 'No') to koi photo save nahi hogi
+    const images = this.isModalPhotoEnabled
+      ? this.tempSlots.map(s => s.serverUrl).filter((u): u is string => !!u)
+      : [];
+
+    const score = this.isPrefilled(this.modalItem)
+      ? this.getFilledValue(this.modalItem)
+      : this.isInputType(this.modalItem)
+        ? String(this.tempAnswer).trim()
+        : String(this.tempAnswer);
 
     this.draft.points[String(this.modalItem.id)] = {
       groupName: this.selectedGroup,
-      score: this.tempScore as number,
+      score,
       images
     };
     this.writeDraft();
@@ -414,8 +494,10 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   submitAll(): void {
     if (!this.draft || !this.allGroupsComplete || this.submitting) return;
 
-    const validIds = new Set(this.allItems.map(x => String(x.id)));
-    const entries = Object.entries(this.draft.points).filter(([id]) => validIds.has(id));
+    // Draft + prefilled dono items (getPoint se)
+    const entries: [string, DraftPoint][] = this.allItems
+      .map(item => [String(item.id), this.getPoint(item)] as [string, DraftPoint | null])
+      .filter((e): e is [string, DraftPoint] => !!e[1]);
 
     if (entries.length === 0) {
       this.apis.showAlert('warning', 'Warning!', 'No scores found to submit.');
@@ -425,6 +507,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     const payload = {
       dealerCode: this.draft.dealerCode,
       date: new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).replace(' ', 'T'),
+      CateType: this.catType,
       points: entries.map(([pointId, p]) => ({
         pointId,
         groupName: p.groupName,

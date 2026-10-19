@@ -1264,7 +1264,7 @@ export interface NTIRResponse {
 
 export interface DraftPoint {
   groupName: string;
-  score: number;
+  score: string;
   images: string[];
 }
 
@@ -1525,4 +1525,30 @@ export interface FtrReportRequest {
   stateId: string;
   chassisNo: string;
   isDownload: boolean;
+}
+
+
+export interface ItemScoreReportRow {
+  StateName: string;
+  DealerCode: string;
+  DealerName: string;
+  Location: string;
+  TotalGetScore: number;
+  MaxScore: number;
+  Percentage: number;
+  [scoreKey: string]: string | number | null;   // Admin-45, Envir-150 ... dynamic
+}
+
+export interface ItemScoreColumn {
+  key: string;    
+  label: string;
+  max: number;   
+}
+
+export interface DealerOption {
+  DealerCode: string;
+  DealerName: string;
+  Location?: string;
+  StateName?: string;
+  StateNameShort?: string;
 }

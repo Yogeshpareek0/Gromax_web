@@ -915,8 +915,9 @@ export class AuthService {
   }
 
   // ===== Item Score (Reimbursement) =====
-  getReimbursementList() {
-    return this.http.get(this.baseUrl + 'Api/Services/getReimbursementList');
+  getReimbursementList(dealerCode: string) {
+    const params = new HttpParams().set('dealerCode', dealerCode);
+    return this.http.get(this.baseUrl + 'Api/Services/getReimbursementList', { params });
   }
 
   uploadItemScoreImage(formData: FormData, fileName: string) {
@@ -1049,5 +1050,16 @@ export class AuthService {
     if (req.duration) params = params.set('duration', req.duration);
 
     return this.http.get(this.baseUrl + 'Api/Services/getFTRData', { params });
+  }
+
+  // ===== Item Score Report =====
+  getItemScoreReport(halfYearType: number, year: number, dealerCode: string | null) {
+    let params = new HttpParams()
+      .set('halfYearType', halfYearType.toString())
+      .set('year', year.toString());
+
+    if (dealerCode) params = params.set('dealerCode', dealerCode);   // All = param nahi jaayega (null)
+
+    return this.http.get(this.baseUrl + 'Api/Services/getItem-ScoreReport', { params });
   }
 }

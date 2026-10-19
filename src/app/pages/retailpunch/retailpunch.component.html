@@ -554,6 +554,19 @@
                          [min]="todayDate" [(ngModel)]="retailForm.expectedRetailDate" (change)="expeRetailChange($event)" />
                   <div *ngIf="formErrors['expectedRetailDate']" class="text-danger small mt-1">{{ formErrors['expectedRetailDate'] }}</div>
                 </div>
+
+
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                  <label class="form-label fw-medium mb-1">
+                    Remark <span class="text-muted">(Maximum 200 characters)</span>
+                  </label>
+                  <textarea class="form-control"
+                            style="font-size:14px"
+                            maxlength="200"
+                            rows="2"
+                            [(ngModel)]="retailForm.Remarks"></textarea>
+                  <div *ngIf="formErrors['Remarks']" class="text-danger small mt-1">{{ formErrors['Remarks'] }}</div>
+                </div>
               </div>
             </div>
           </div>

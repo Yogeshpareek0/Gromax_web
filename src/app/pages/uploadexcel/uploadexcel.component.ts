@@ -2516,43 +2516,80 @@ export class UploadexcelComponent implements OnInit {
     this.availableMonths = [previousMonthObj, currentMonthObj];
   }
   // dinesh
+  //onMonthChange(): void {
+  //  debugger;
+  //  if (!this.selectedMonth) return;
+  //  // Industry ke liye year manually select karna hai, auto-set mat karo
+  //  if (this.selectedUploadId === 5) return;
+
+  //  const selectedMonth = Number(this.selectedMonth);
+  //  const today = new Date();
+
+  //  const currentMonth = today.getMonth() + 1;
+  //  const currentYear = today.getFullYear();
+
+  //  let resolvedYear = currentYear;
+
+  //  // ================= BDRC =================
+  //  if (this.selectedUploadId === 3) {
+  //    if (currentMonth === 1 && selectedMonth === 12) {
+  //      resolvedYear = currentYear - 1;
+  //    } else {
+  //      resolvedYear = currentYear;
+  //    }
+
+  //    this.selectedYear = resolvedYear;
+  //    this.years = [resolvedYear];
+  //    return;
+  //  }
+
+  //  // ================= OTHER REPORTS =================
+  //  if (currentMonth === 1 && selectedMonth === 12) {
+  //    resolvedYear = currentYear - 1;
+  //  } else {
+  //    resolvedYear = currentYear;
+  //  }
+
+  //  this.selectedYear = resolvedYear;
+  //  this.years = [resolvedYear];
+
+  //  if (this.selectedMonth && this.selectedYear && this.selectedUploadId === 10) {
+  //    this.downloadFileName = 'outlook';
+  //    this.getOutlookReportFormatData();
+  //  }
+  //}
+
   onMonthChange(): void {
+    debugger;
     if (!this.selectedMonth) return;
     // Industry ke liye year manually select karna hai, auto-set mat karo
     if (this.selectedUploadId === 5) return;
 
     const selectedMonth = Number(this.selectedMonth);
     const today = new Date();
-
     const currentMonth = today.getMonth() + 1;
     const currentYear = today.getFullYear();
 
-    let resolvedYear = currentYear;
+    // Previous month (Jan me Dec -> pichla saal)
+    const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+    const prevMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
-    // ================= BDRC =================
-    if (this.selectedUploadId === 3) {
-      if (currentMonth === 1 && selectedMonth === 12) {
-        resolvedYear = currentYear - 1;
-      } else {
-        resolvedYear = currentYear;
-      }
+    // FY start year (Apr–Mar)
+    const fyStartYear = currentMonth >= 4 ? currentYear : currentYear - 1;
 
-      this.selectedYear = resolvedYear;
-      this.years = [resolvedYear];
-      return;
-    }
-
-    // ================= OTHER REPORTS =================
-    if (currentMonth === 1 && selectedMonth === 12) {
-      resolvedYear = currentYear - 1;
+    let resolvedYear: number;
+    if (selectedMonth === prevMonth) {
+      resolvedYear = prevMonthYear;          // e.g. April 2027 me March -> 2027 nahi, prev month ka actual year
+    } else if (selectedMonth >= 4) {
+      resolvedYear = fyStartYear;            // Apr–Dec -> FY start year
     } else {
-      resolvedYear = currentYear;
+      resolvedYear = fyStartYear + 1;        // Jan–Mar -> FY end year
     }
 
     this.selectedYear = resolvedYear;
     this.years = [resolvedYear];
 
-    if (this.selectedMonth && this.selectedYear && this.selectedUploadId === 10) {
+    if (this.selectedUploadId === 10) {
       this.downloadFileName = 'outlook';
       this.getOutlookReportFormatData();
     }
