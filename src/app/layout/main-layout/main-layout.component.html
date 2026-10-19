@@ -338,6 +338,13 @@
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">FTR Report</span>
             </li>
+            <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
+                *ngIf="hasSubMenu('Reports','ItemScoreReport')"
+                [class.active]="activeRoute === 'itemscorereport'"
+                (click)="onNavigate('itemscorereport')">
+              <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
+              <span class="text-white report-name" style="font-size:13px;">Item-Score Report</span>
+            </li>
           </ul>
 
         </li>

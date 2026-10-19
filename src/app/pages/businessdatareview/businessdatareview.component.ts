@@ -1040,13 +1040,34 @@ export class BusinessdatareviewComponent implements OnInit {
     }
   }
 
+  //onMonthChange(): void {
+  //  if (!this.selectedMonth || this.selectedUploadId === 5) return;
+  //  const today = new Date();
+  //  const currentMonth = today.getMonth() + 1;
+  //  const currentYear = today.getFullYear();
+  //  let resolvedYear = currentYear;
+  //  if (currentMonth === 1 && Number(this.selectedMonth) === 12) resolvedYear = currentYear - 1;
+  //  this.selectedYear = resolvedYear;
+  //  this.years = [resolvedYear];
+  //}
+
   onMonthChange(): void {
     if (!this.selectedMonth || this.selectedUploadId === 5) return;
+
     const today = new Date();
     const currentMonth = today.getMonth() + 1;
     const currentYear = today.getFullYear();
+
+    const selectedMonth = Number(this.selectedMonth);
+
     let resolvedYear = currentYear;
-    if (currentMonth === 1 && Number(this.selectedMonth) === 12) resolvedYear = currentYear - 1;
+
+    if (selectedMonth >= 1 && selectedMonth <= 3) {
+      resolvedYear = currentYear + 1;
+    } else if (selectedMonth >= 4) {
+      resolvedYear = currentYear;
+    }
+
     this.selectedYear = resolvedYear;
     this.years = [resolvedYear];
   }
