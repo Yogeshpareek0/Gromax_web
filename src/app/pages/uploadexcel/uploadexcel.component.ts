@@ -88,6 +88,11 @@ export class UploadexcelComponent implements OnInit {
     { name: 'Hitch', value: 3000 }
   ];
 
+
+  private readonly SPARE_PARTS_SHEET = 'Spare Parts';
+  private readonly SPARE_PARTS_HEADERS = ['Item Code', 'Item Name', 'Qty'];
+  private readonly SPARE_PARTS_MAX_ROWS = 1000;
+
   selectedAccessory: Accessory[] = [];
 
   hpRangeList: string[] = Object.keys(this.hpRangeMap);
@@ -191,6 +196,8 @@ export class UploadexcelComponent implements OnInit {
   isCommitResultMode = false;
   commitResultRows: any[] = [];
   commitResultColumns: string[] = [];
+
+  sparePartsData: any[] = [];
   constructor(private apis: AuthService) { }
 
   ngOnInit(): void {
@@ -278,7 +285,7 @@ export class UploadexcelComponent implements OnInit {
     this.selectedUploadName = selectedItem?.UploadName || '';
     this.resetFileSelection();
 
-    if (this.selectedUploadId === 1 || this.selectedUploadId === 11 || this.selectedUploadId === 12) {
+    if (this.selectedUploadId === 1 || this.selectedUploadId === 11 || this.selectedUploadId === 12 || this.selectedUploadId === 13) {
       this.showMonthYearDropdowns = false;
       this.setFinancialYearMonthYear();
     } else {
@@ -508,6 +515,7 @@ export class UploadexcelComponent implements OnInit {
       7: () => this.handleAccountEntryUpload(),
       10: () => this.handleOutlookUploadExcel(),
       11: () => this.handleRevisedBdrcUploadExcel(),
+      13: () => this.handleSparePartsUpload(), 
     };
 
     const handler = uploadHandlers[this.selectedUploadId!];
@@ -4062,7 +4070,163 @@ export class UploadexcelComponent implements OnInit {
     });
   }
 
+  async downloadSparePartsExcel(): Promise<void> {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const ws = workbook.addWorksheet(this.SPARE_PARTS_SHEET);
 
+      ws.columns = [
+        { width: 22 }, // Item Code
+        { width: 45 }, // Item Name
+        { width: 12 }  // Qty
+      ];
+
+      // Header row - locked (user change nahi kar payega)
+      this.SPARE_PARTS_HEADERS.forEach((h, i) => {
+        const cell = ws.getCell(1, i + 1);
+        cell.value = h;
+        this.applyCellStyle(cell, { bold: true, border: true, locked: true, bgColor: this.COLORS.PRIMARY_HEADER });
+      });
+      ws.getRow(1).height = 18;
+
+      // Blank editable rows (no border)
+      for (let r = 2; r <= this.SPARE_PARTS_MAX_ROWS + 1; r++) {
+        // Item Code
+        const codeCell = ws.getCell(r, 1);
+        this.applyCellStyle(codeCell, { locked: false });
+        codeCell.numFmt = '@';
+        codeCell.alignment = { horizontal: 'left', vertical: 'middle' };
+
+        // Item Name
+        const nameCell = ws.getCell(r, 2);
+        this.applyCellStyle(nameCell, { locked: false });
+        nameCell.alignment = { horizontal: 'left', vertical: 'middle' };
+
+        // Qty
+        const qtyCell = ws.getCell(r, 3);
+        this.applyCellStyle(qtyCell, { locked: false, numFmt: '0' });
+        qtyCell.dataValidation = {
+          type: 'whole',
+          operator: 'greaterThan',
+          formulae: [0],
+          allowBlank: true,
+          showErrorMessage: true,
+          errorStyle: 'stop',
+          errorTitle: 'Invalid Input',
+          error: 'Only positive whole numbers are allowed!',
+          showInputMessage: true,
+          promptTitle: 'Enter Qty',
+          prompt: 'Enter a positive whole number'
+        };
+      }
+
+      ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+      await this.protectAndSaveWorkbook(workbook, `SparePartsEntry_${new Date().getTime()}.xlsx`, true);
+    } catch (error) {
+      this.apis.showAlert('error', 'Error', 'Failed to generate Excel file.');
+    }
+  }
+
+  async handleSparePartsUpload(): Promise<void> {
+    const transformedData = await this.transformSparePartsData();
+    if (!transformedData) return;
+
+    const apiHeaders = ['ItemCode', 'ItemName', 'Qty'];
+    await this.sendTransformedData(transformedData, apiHeaders, 'Spare Parts', 'spare_parts_transformed.xlsx');
+  }
+
+  private async transformSparePartsData(): Promise<any[] | null> {
+    try {
+      const workbook = await this.loadWorkbook(this.selectedFile!);
+      const ws = workbook.getWorksheet(this.SPARE_PARTS_SHEET);
+      if (!ws) {
+        this.apis.showAlert('error', 'Error', `Invalid format. Sheet "${this.SPARE_PARTS_SHEET}" not found. Please download the format again.`);
+        return null;
+      }
+
+      // Header check - column name change hue to reject
+      const headerRow = ws.getRow(1);
+      const headerMismatch = this.SPARE_PARTS_HEADERS.some(
+        (h, i) => String(headerRow.getCell(i + 1).value ?? '').trim().toLowerCase() !== h.toLowerCase()
+      );
+      if (headerMismatch) {
+        this.apis.showAlert('error', 'Invalid Format', `Column names must be: ${this.SPARE_PARTS_HEADERS.join(', ')}. Please download the format again.`);
+        return null;
+      }
+
+      const records: any[] = [];
+      const invalidQtyRows: string[] = [];
+      const missingCodeRows: string[] = [];
+
+      ws.eachRow((row, rowNumber) => {
+        if (rowNumber < 2) return;
+
+        const itemCode = this.getCellText(row.getCell(1));
+        const itemName = this.getCellText(row.getCell(2));
+
+        let raw: any = row.getCell(3).value;
+        if (raw && typeof raw === 'object' && 'result' in raw) raw = raw.result;
+        const qtyText = raw === null || raw === undefined ? '' : String(raw).trim();
+
+        // Poori row khali → skip
+        if (!itemCode && !itemName && !qtyText) return;
+
+        // Qty blank → skip
+        if (!qtyText) return;
+
+        const qty = Number(qtyText);
+
+        // Sirf positive integer
+        if (isNaN(qty) || !Number.isInteger(qty) || qty < 0) {
+          invalidQtyRows.push(`Row ${rowNumber}`);
+          return;
+        }
+
+        // 0 → skip
+        if (qty === 0) return;
+
+        // Qty hai to Item Code required
+        if (!itemCode) {
+          missingCodeRows.push(`Row ${rowNumber}`);
+          return;
+        }
+
+        records.push({ ItemCode: itemCode, ItemName: itemName, Qty: qty });
+      });
+
+      if (invalidQtyRows.length > 0) {
+        this.apis.showAlert('error', 'Invalid Qty', `Qty must be a positive whole number at: ${invalidQtyRows.join(', ')}`);
+        return null;
+      }
+
+      if (missingCodeRows.length > 0) {
+        this.apis.showAlert('error', 'Missing Item Code', `Item Code is required at: ${missingCodeRows.join(', ')}`);
+        return null;
+      }
+
+      if (records.length === 0) {
+        this.apis.showAlert('warning', 'No Data', 'Please enter at least one item with Qty greater than 0.');
+        return null;
+      }
+
+      return records;
+    } catch (error) {
+      this.apis.showAlert('error', 'Error', 'Failed to process Spare Parts Excel file.');
+      return null;
+    }
+  }
+
+  private getCellText(cell: ExcelJS.Cell): string {
+    let v: any = cell.value;
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'object') {
+      if ('result' in v) v = v.result;
+      else if ('richText' in v) v = (v.richText as any[]).map(t => t.text).join('');
+      else if ('text' in v) v = v.text;
+    }
+    return String(v ?? '').trim();
+  }
 
 }
 

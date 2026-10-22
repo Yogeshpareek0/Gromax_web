@@ -232,6 +232,14 @@
               </div>
             </div>
           </div>
+
+          <div *ngIf="selectedUploadId === 13" class="mb-3">
+            <button type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="downloadSparePartsExcel()">
+              <i class="fas fa-download me-1"></i> Download Format
+            </button>
+          </div>
         </div>
       </div>
 
