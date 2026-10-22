@@ -99,32 +99,150 @@ input[type="date"] {
   color: #2c3e50;
 }
 
-.toast {
-  /*padding: 0px 0px !important;*/
-  margin: 8px !important;
+/* ===== TOASTR GLOBAL ===== */
+.toast-top-center {
+  top: 16px !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.toast-container .ngx-toastr {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
   border-radius: 8px !important;
+  padding: 12px 16px !important;
   min-height: auto !important;
+  width: auto !important;
+  min-width: 280px !important;
+  max-width: 360px !important;
+  font-size: 13px !important;
+  font-family: Arial, sans-serif !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-left: 4px solid transparent !important;
 }
 
-.toast-title {
+/* ===== BORDER LEFT PER TYPE ===== */
+.toast-container .toast-success {
+  border-left-color: #16a34a !important;
+  background-image: none !important;
+}
+
+.toast-container .toast-error {
+  border-left-color: #dc2626 !important;
+  background-image: none !important;
+}
+
+.toast-container .toast-warning {
+  border-left-color: #d97706 !important;
+  background-image: none !important;
+}
+
+.toast-container .toast-info {
+  border-left-color: #1E90C8 !important;
+  background-image: none !important;
+}
+
+/* ===== ICON CIRCLE PER TYPE ===== */
+.toast-container .ngx-toastr::before {
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   font-size: 12px !important;
-  font-weight: 500 !important;
+  font-weight: bold !important;
+  margin-right: 10px !important;
+  color: white !important;
+  flex-shrink: 0 !important;
 }
 
-.toast-message {
-  font-size: 12px !important;
-  line-height: 15px !important;
+.toast-container .toast-success::before {
+  content: '✔';
+  background: #16a34a !important;
 }
 
-.toast-success {
-  background: linear-gradient( -178.2deg, #316f8e, #2c6785 ) !important;
-  /*clip-path: polygon( 0 0, 97% 0, 100% 15%, 100% 100%, 5% 100%, 0 90% );*/
+.toast-container .toast-error::before {
+  content: '\2715';
+  background: #dc2626 !important;
 }
 
-/*.toast-info {
-  background: linear-gradient( -178.2deg, #316f8e, #2c6785 ) !important;
+.toast-container .toast-warning::before {
+  content: '⚠';
+  background: #d97706 !important;
 }
-*/
+
+.toast-container .toast-info::before {
+  content: 'ℹ';
+  background: #1E90C8 !important;
+}
+
+/* ===== TITLE HIDE ===== */
+.toast-container .ngx-toastr .toast-title {
+  display: none !important;
+}
+
+/* ===== MESSAGE ===== */
+.toast-container .ngx-toastr .toast-message {
+  color: #1a1a1a !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  flex: 1 !important;
+  padding-left: 6px;
+}
+
+/* ===== PROGRESS BAR ANIMATION FIX ===== */
+.toast-container .ngx-toastr .toast-progress {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 3px !important;
+  opacity: 1 !important;
+}
+
+.toast-container .ngx-toastr:hover .toast-progress {
+  animation-play-state: paused !important;
+}
+
+/* Right to Left effect - transform se */
+.toast-container .toast-success .toast-progress {
+  background-color: #16a34a !important;
+}
+
+.toast-container .toast-error .toast-progress {
+  background-color: #dc2626 !important;
+}
+
+.toast-container .toast-warning .toast-progress {
+  background-color: #d97706 !important;
+}
+
+.toast-container .toast-info .toast-progress {
+  background-color: #1E90C8 !important;
+}
+
+@media (max-width: 480px) {
+  .toast-top-center {
+    top: 10px !important;
+    padding: 0 12px !important;
+  }
+
+  .toast-container .ngx-toastr {
+    min-width: unset !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    font-size: 12px !important;
+    padding: 10px 12px !important;
+  }
+
+}
+
 .swal2-confirm {
   background-color: #215378 !important;
 }

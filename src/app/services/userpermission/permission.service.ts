@@ -32,12 +32,12 @@ export class PermissionService {
     );
   }
 
-  hasSubmenuPermission(subMenu: string): boolean {
-    return this.menuList.some(
-      (x: any) =>
-        x.SubMenu === subMenu
-    );
-  }
+    hasSubmenuPermission(subMenu: string): boolean {
+      return this.menuList.some(
+        (x: any) =>
+          x.SubMenu === subMenu
+      );
+    }
 
   dealerAccess(): boolean {
     const positionId = sessionStorage.getItem('possitionId');

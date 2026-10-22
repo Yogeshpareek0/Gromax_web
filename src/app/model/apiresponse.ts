@@ -1552,3 +1552,68 @@ export interface DealerOption {
   StateName?: string;
   StateNameShort?: string;
 }
+
+export interface SparePartOrder {
+  id: string;
+  material: string;
+  desc: string;
+  hsnCode: string;
+  gstRate: number;
+  mrp: number;
+  ndp: number;
+  zpmr: number;
+  zs00: number;
+  qty: number;
+}
+
+export interface SparePartOrderList {
+  orderId: string;
+  orderNo: string;
+  orderDate: string;
+  dealerCode: string;
+  orderStatus: string;
+  totalQty: number;
+  totalAmount: number;
+  paymentStatus: string;
+  paidAmount: number;
+  balanceAmount: number;
+  createdBy: string;
+  createdDate: string;
+  totalGSTAmount: number;
+  isInvoicing: boolean;
+  isDelivered: boolean;
+}
+
+export interface SparePartOrderDetail {
+  orderDetailId: string;
+  orderId: string;
+  sparePartId: number;
+  quantity: number;
+  rate: number;
+  discountAmount: number;
+  taxAmount: number;
+  lineTotal: number;
+  createdDate: string;
+  isDeleted: boolean;
+  gstRate: number;
+  totalTaxableAmount: number;
+  ndp: number;
+  desc: string;
+  material: string;
+  currentQty: number;
+}
+
+export interface InvoiceDetail {
+  invoiceNumber: string;
+  invoiceDate: string;
+
+  taxableAmount: number;
+  taxAmount: number;
+  totalAmount: number;
+
+  invoiceFileName: string;
+  invoiceFileUrl: string;
+
+  // Existing docket
+  docketNumber: string;
+}
