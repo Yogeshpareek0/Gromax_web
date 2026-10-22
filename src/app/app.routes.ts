@@ -51,6 +51,8 @@ import { CircularsComponent } from '../app/pages/circulars/circulars.component';
 import { FieldTechnicalReportComponent } from '../app/pages/ServicePart/field-technical-report/field-technical-report.component';
 import { FtrReportComponent } from '../app/pages/ServicePart/ftr-report/ftr-report.component';
 import { ItemScoreReportComponent } from '../app/pages/ServicePart/item-score-report/item-score-report.component';
+import { SparepartorderComponent } from './pages/ServicePart/sparepartorder/sparepartorder.component';
+import { UpdatesparepartorderComponent } from './pages/ServicePart/updatesparepartorder/updatesparepartorder.component';
 
 
 
@@ -111,8 +113,9 @@ export const routes: Routes = [
       { path: 'circular', component: CircularsComponent },
       { path: 'ftrform', component: FieldTechnicalReportComponent },
       { path: 'ftrreport', component: FtrReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'FtrReport' } },
-      { path: 'itemscorereport', component: ItemScoreReportComponent }
-
+      { path: 'itemscorereport', component: ItemScoreReportComponent },
+      { path: 'sparepartorder', component: SparepartorderComponent },
+      { path: 'updatesparepartorder', component: UpdatesparepartorderComponent }
 
     ]
 

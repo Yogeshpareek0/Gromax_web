@@ -115,6 +115,7 @@ export class AuthService {
     sessionStorage.clear();
     /*localStorage.clear();*/
     this.clearAllCookies();
+    localStorage.removeItem('sparepart_order_draft_v1');
     /*window.location.href = window.location.origin;*/
 
     history.pushState(null, '', location.href);
@@ -710,8 +711,9 @@ export class AuthService {
   }
 
   getSpareParts() {
-    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSpareParts');
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsPagination');
   }
+
   addJobCard(payload: any) {
     return this.http.post(this.baseUrl + 'Api/Services/addJobCard', payload);
   }
@@ -1061,5 +1063,53 @@ export class AuthService {
     if (dealerCode) params = params.set('dealerCode', dealerCode);   // All = param nahi jaayega (null)
 
     return this.http.get(this.baseUrl + 'Api/Services/getItem-ScoreReport', { params });
+  }
+
+  getSparePartsPagination(pageNumber: number, pageSize: number, partCodeOrName: string = '', category: string = '') {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber)
+      .set('pageSize', pageSize)
+      .set('partCodeOrName', partCodeOrName)
+      .set('category', category);
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsPagination', { params });
+  }
+
+  getCategory() {
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsOrderDropdown');
+  }
+
+  saveSparePartsOrder(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/saveSparePartsOrder', payload);
+  }
+
+  getSparePartsOrders(pageNumber: number, pageSize: number) {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber)
+      .set('pageSize', pageSize);
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsOrders', { params });
+  }
+
+  getSparePartsOrderDetails(OrderId: string) {
+    const params = new HttpParams()
+      .set('OrderId', OrderId);
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsOrderDetails', { params });
+  }
+
+  updateSparePartsOrderPayment(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/updateSparePartsOrderPayment', payload);
+  }
+
+  updateSparePartsOrderItem(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/updateSparePartsOrderItem', payload);
+  }
+
+  updateInvoice(formData: FormData): Observable<any> {
+    return this.http.post<any>(this.baseUrl + 'Api/Services/createSpareOrderInvoice', formData);
+  }
+
+  GetSpareOrderInvoice(OrderId: string) {
+    const params = new HttpParams()
+      .set('OrderId', OrderId);
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/GetSpareOrderInvoice', { params });
   }
 }

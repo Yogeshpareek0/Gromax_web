@@ -1,0 +1,317 @@
+<div class="np-root">
+
+  <!-- ══════ CART (LEFT) ══════ -->
+  <aside class="np-cart">
+    <form #orderForm="ngForm" class="np-cart-form" (ngSubmit)="submitOrder()" novalidate>
+
+      <div class="np-cart-head">
+        <div>
+          <p class="np-cart-title">Order Details</p>
+          <span class="np-cart-sub">{{ cart.length }} item(s) · {{ totals.qty }} qty</span>
+        </div>
+        <button type="button" class="np-link-btn" *ngIf="cart.length" (click)="clearCart()" [disabled]="submitting">
+          Clear All
+        </button>
+      </div>
+
+      <div class="np-table-wrap">
+        <table class="np-table" *ngIf="cart.length; else emptyCart">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Part</th>
+              <th class="c">Qty</th>
+              <th class="r">Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of cart; let i = index; trackBy: trackById">
+              <td class="np-t-idx">{{ i + 1 }}</td>
+              <td>
+                <p class="np-t-name" [title]="it.desc">{{ it.desc }}</p>
+                <span class="np-t-meta">{{ it.material }} · {{ fmt(it.ndp) }} + {{ it.gstRate }}%</span>
+              </td>
+              <td class="c">
+                <div class="np-stepper np-stepper--sm">
+                  <button type="button" (click)="changeCartQty(it, -1)"
+                    [disabled]="it.qty <= 1 || submitting">−</button>
+                  <input type="number" [name]="'qty_' + it.id" [(ngModel)]="it.qty" min="1" [max]="maxQty"
+                    [disabled]="submitting" (blur)="commitCartQty(it)"
+                    (keydown.enter)="$event.preventDefault(); commitCartQty(it)" />
+                  <button type="button" (click)="changeCartQty(it, 1)"
+                    [disabled]="it.qty >= maxQty || submitting">+</button>
+                </div>
+              </td>
+              <td class="r np-t-amt">{{ fmt(lineTotal(it)) }}</td>
+              <td class="c">
+                <button type="button" class="np-del" title="Remove" (click)="removeItem(it)" [disabled]="submitting">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                    <path d="M10 11v6M14 11v6" />
+                    <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ng-template #emptyCart>
+          <div class="np-cart-empty">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            <p>Cart is empty</p>
+            <span>Add spare parts from the list</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="np-cart-foot" *ngIf="cart.length">
+        <div class="np-sum-row"><span>Sub Total (NDP)</span><span>{{ fmt(totals.subTotal) }}</span></div>
+        <div class="np-sum-row"><span>GST</span><span>{{ fmt(totals.gstTotal) }}</span></div>
+        <div class="np-sum-row np-sum-grand"><span>Grand Total</span><span>{{ fmt(totals.grandTotal) }}</span></div>
+
+        <textarea class="np-remarks" name="remarks" rows="2" maxlength="500" placeholder="Remarks (optional)"
+          [(ngModel)]="remarks" (ngModelChange)="onRemarksChange()" [disabled]="submitting"></textarea>
+
+        <button type="submit" class="np-submit" [disabled]="submitting || !cart.length">
+          <span class="np-spin" *ngIf="submitting"></span>
+          Submit Order
+        </button>
+      </div>
+    </form>
+  </aside>
+
+  <!-- ══════ PRODUCTS (RIGHT) ══════ -->
+  <section class="np-main">
+
+    <div class="np-toolbar">
+
+      <div class="row g-3 align-items-center mb-3">
+        <!-- Search -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <input class="form-control" type="text" [(ngModel)]="searchText" placeholder="Search by Code or Name" />
+        </div>
+
+        <!-- Category -->
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <select class="form-select form-control-custom" [(ngModel)]="selectedCategory">
+            <option value="">All Categories</option>
+            <option *ngFor="let c of categories" [value]="c.dropDownName">{{ c.dropDownName }}</option>
+
+          </select>
+        </div>
+
+        <!-- Search Button -->
+        <div class="col-xl-4 col-lg-4 col-sm-12">
+          <button type="button" class="np-search-btn me-2" (click)="searchProducts()">
+
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+
+            Search
+          </button>
+          <button type="button" class="np-search-btn" (click)="clearSearch()" title="Clear">
+            Clear
+          </button>
+        </div>
+
+        <!-- Count -->
+        <div class="col-xl-2 col-lg-12 col-sm-12 text-xl-end">
+          <span class="np-count">
+            {{ totalItems }} parts
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="np-grid-wrap">
+      <!-- Empty -->
+      <div class="np-empty" *ngIf="!allProducts.length">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        <p>No spare parts found</p>
+      </div>
+
+      <!-- Cards -->
+      <div class="np-grid" *ngIf="allProducts.length">
+        <div class="np-card" *ngFor="let p of allProducts; trackBy: trackById" [class.np-card--added]="inCart(p.id)">
+
+          <div class="np-card-top">
+            <span class="np-code" [title]="p.material">{{ p.material }}</span>
+            <span class="np-check" *ngIf="inCart(p.id)">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+          </div>
+
+          <p class="np-name" [title]="p.desc">{{ p.desc }}</p>
+
+          <div class="np-prices">
+            <div class="np-pr"><span class="lbl">NDP</span><span class="val val--main">{{ fmt(p.ndp) }}</span></div>
+            <div class="np-pr"><span class="lbl">GST</span><span class="val">{{ fmt(gstAmt(p)) }}</span></div>
+            <div class="np-pr"><span class="lbl">GST %</span><span class="val"><span class="np-chip">{{ p.gstRate
+                  }}%</span></span></div>
+          </div>
+
+          <div class="np-stepper">
+            <button type="button" (click)="changeCardQty(p, -1)" [disabled]="p.qty <= 1">−</button>
+            <input type="number" [(ngModel)]="p.qty" min="1" [max]="maxQty" (blur)="commitCardQty(p)"
+              (keydown.enter)="commitCardQty(p)" />
+            <button type="button" (click)="changeCardQty(p, 1)" [disabled]="p.qty >= maxQty">+</button>
+          </div>
+
+          <button type="button" class="np-add" [class.np-add--added]="inCart(p.id)" (click)="addToCart(p)">
+            {{ inCart(p.id) ? 'Added — Update' : 'Add to Cart' }}
+          </button>
+        </div>
+
+      </div>
+      <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"></app-pagination>
+    </div>
+  </section>
+</div>
+
+
+<!-- ================= PAYMENT MODAL ================= -->
+<div class="modal fade" [class.show]="showPaymentModal" [style.display]="showPaymentModal ? 'block' : 'none'"
+  tabindex="-1" role="dialog" aria-modal="true" *ngIf="showPaymentModal">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-size: 18px;">
+          Submit Spare Part Order
+        </h5>
+
+        <button type="button" class="btn-close" [disabled]="submitting" (click)="closePaymentModal()">
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Order Summary -->
+        <div class="alert alert-light border mb-4">
+          <div class="side-row"><span>Total Items</span><b>{{ cart.length }}</b></div>
+          <div class="side-row"><span>Total Quantity</span><b>{{ totals.qty }}</b></div>
+          <div class="side-row text-danger fw-bold"><span>Grand Total</span><b>{{ fmt(totals.grandTotal) }}</b></div>
+        </div>
+
+        <!-- Payment Checkbox -->
+        <div class="form-check">
+
+          <input class="form-check-input" type="checkbox" id="paymentRequired" [checked]="paymentStatus === 1"
+            (change)="paymentStatus = $any($event.target).checked ? 1 : 0" name="paymentRequired" />
+          <label class="form-check-label fw-semibold fs-6"  for="paymentRequired">
+            Payment Required
+          </label>
+        </div>
+
+        <!-- PAYMENT DETAILS -->
+        <div *ngIf="paymentStatus === 1">
+
+          <div class="row g-3">
+
+            <!-- Payment Amount -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Payment Amount <span class="text-danger">*</span>
+              </label>
+
+              <input class="form-control" name="paymentAmount" [(ngModel)]="paymentAmount"
+                [required]="paymentStatus === 1" readonly />
+
+              <small class="text-danger"> {{ Amounterror }} </small>
+            </div>
+
+            <!-- Payment Mode -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Payment Mode <span class="text-danger">*</span>
+              </label>
+
+              <select class="form-select" name="paymentMode" [(ngModel)]="paymentMode" [required]="paymentStatus === 1">
+                <option value="" disabled>Select Payment Mode</option>
+                <option *ngFor="let c of paymentModesOption" [value]="c.dropDownName">{{ c.dropDownName }}</option>
+              </select>
+
+              <small class="text-danger">{{ PaymentModeerror }}</small>
+            </div>
+
+            <!-- Transaction ID -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Transaction ID
+              </label>
+
+              <input type="text" class="form-control" name="transactionId" [(ngModel)]="transactionId" maxlength="100"
+                placeholder="Enter transaction ID" />
+            </div>
+
+            <!-- Reference No -->
+            <div class="col-md-6">
+              <label class="form-label">
+                Reference No
+              </label>
+
+              <input type="text" class="form-control" name="referenceNo" [(ngModel)]="referenceNo" maxlength="100"
+                placeholder="Enter reference number" />
+            </div>
+
+            <!-- Payment Remarks -->
+            <div class="col-12">
+              <label class="form-label">
+                Payment Remarks
+              </label>
+
+              <textarea class="form-control" name="paymentRemarks" [(ngModel)]="paymentRemarks" rows="8" maxlength="500"
+                placeholder="Enter payment remarks">
+              </textarea>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" style="height: 36px !important;" [disabled]="submitting" (click)="closePaymentModal()">
+          Cancel
+        </button>
+
+        <button type="button" class="np-search-btn" [disabled]="submitting ||
+            (paymentStatus === 1 && (!paymentAmount || paymentAmount <= 0 || !paymentMode))
+          " (click)="confirmSubmitOrder()">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="submitting">
+          </span>
+
+          {{ submitting ? 'Submitting...' : 'Submit Order' }}
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showPaymentModal">
+</div>

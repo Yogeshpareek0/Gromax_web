@@ -124,7 +124,7 @@ export class MainLayoutComponent implements OnInit {
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry', 'stocktransfer', 'rcstatus',
       'retailpunch', 'exchangestock', 'updateoldenquiry', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
     const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport', 'jobcardreport', 'ftrreport','itemscorereport'];
-    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform']; // 🔑 naya array
+    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform','updatesparepartorder','sparepartorder']; // 🔑 naya array
 
     if (path !== 'dynamicreport') {
       this.activeDashboardId = null;
@@ -188,7 +188,7 @@ export class MainLayoutComponent implements OnInit {
       'stocktransfer', 'rcstatus', 'retailpunch', 'exchangestock', 'updateoldenquiry',
       'updtoldretailedenq', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
     const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport', 'jobcardreport', 'ftrreport', 'itemscorereport'];
-    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform'];
+    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform','updatesparepartorder','sparepartorder'];
 
     this.isSalesOpen = false;
     this.isBusinessReportsOpen = false;
@@ -278,6 +278,9 @@ export class MainLayoutComponent implements OnInit {
       generatedinvoicelist: 'Generated Invoice List',
       Mechanic: 'Mechanic Master',
       ftrform: 'Raise FTR',
+      sparepartorder: 'Order Spare Part',
+      updatesparepartorder: 'Update Spare Part Order',
+
       additemscore: 'Add Item Score'
 
 
