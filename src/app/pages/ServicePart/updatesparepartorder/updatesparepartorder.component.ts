@@ -20,6 +20,9 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
 
   @ViewChild('orderModalEl') orderModalEl!: ElementRef;
   @ViewChild('invoiceModalEl') invoiceModalEl!: ElementRef;
+  @ViewChild('invoiceFileInput') invoiceFileInput?: ElementRef<HTMLInputElement>;
+
+
 
 
   readonly MAX_QTY = 9999;
@@ -76,9 +79,34 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
   private invoiceModal: any;
   private onModalHidden = () => this.handleModalHidden();
 
+  today = new Date().toISOString().split('T')[0];
+
+
+  stateList: any[] = [];
+  dealerList: any[] = [];
+  selectedState: string = 'All';
+  selectedDealership: string = 'All';
+  selectedDuration: string = 'this Month';
+  orderIdSearch: string = '';
+
+  customStartMonth: number = new Date().getMonth() + 1;
+  customStartYear: number = new Date().getFullYear();
+  customEndMonth: number = new Date().getMonth() + 1;
+  customEndYear: number = new Date().getFullYear();
+
+  months = [
+    { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
+    { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
+    { value: 7, label: 'July' }, { value: 8, label: 'August' }, { value: 9, label: 'September' },
+    { value: 10, label: 'October' }, { value: 11, label: 'November' }, { value: 12, label: 'December' }
+  ];
+
+  years: number[] = Array.from({ length: 12 }, (_, i) => new Date().getFullYear() - i);
+
   constructor(private apis: AuthService, private permission: PermissionService, private toast: ToastrService) { }
 
   ngOnInit(): void {
+    this.getStateList();
     this.getOrders(1);
   }
 
@@ -98,21 +126,30 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
   // ================= MAIN LIST =================
 
   getOrders(page: number): void {
+    const { startDate, endDate } = this.getDateRange();
 
-    this.apis.getSparePartsOrders(page, this.itemsPerPage).subscribe({
+    const filters = {
+      DealerCode: this.selectedDealership || 'All',
+      StateName: this.selectedState || 'All',
+      Duration: this.selectedDuration,
+      StDate: startDate,
+      EnDate: endDate,
+      OrderNo: (this.orderIdSearch || '').trim()
+    };
+
+    this.apis.getSparePartsOrders(page, this.itemsPerPage, filters).subscribe({
       next: (res: any) => {
-
         if (res?.statusCode === 200 && res?.message?.toLowerCase() === 'success') {
           this.orderList = res.data?.data || [];
           this.totalItems = res.data?.totalRecords || 0;
           this.currentPage = page;
+          console.log(this.orderList);
         } else {
           this.resetList();
           this.toast.error(res?.message || 'Failed fetching orders.');
         }
       },
       error: (err: any) => {
-
         this.resetList();
         this.toast.error(err?.error?.message || 'Something went wrong while fetching orders.');
       }
@@ -183,9 +220,24 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
         if (res?.statusCode === 200) {
 
           this.orderItems = res?.data || [];
+          this.invoice.taxableAmount = this.orderItems.reduce(
+            (sum: number, item: any) => sum + Number(item.totalTaxableAmount ?? 0),
+            0
+          );
+
+          this.invoice.taxAmount = this.orderItems.reduce(
+            (sum: number, item: any) => sum + Number(item.taxAmount ?? 0),
+            0
+          );
+
+          this.invoice.totalAmount = this.orderItems.reduce(
+            (sum: number, item: any) => sum + Number(item.totalAmount ?? 0),
+            0
+          );
           this.origQtyMap.clear();
 
           this.orderItems.forEach(x => this.origQtyMap.set(x.orderDetailId, x.quantity));
+
 
         } else {
           this.orderItems = [];
@@ -487,12 +539,17 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     this.selectedOrder = order;
     this.getOrderItems(order.orderId);
 
-    if(this.selectedOrder.isInvoicing){
+    this.resetInvoiceModal();
+
+    if (this.selectedOrder.isInvoicing) {
       this.getInvoiceDetails(this.selectedOrder?.orderId);
     }
 
     // Reset selected file
     this.selectedInvoiceFile = null;
+    if (this.invoiceFileInput?.nativeElement) {
+      this.invoiceFileInput.nativeElement.value = '';
+    }
 
     // Delivery
     this.isDelivery = !!order?.docketNumber;
@@ -520,14 +577,21 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
   }
 
   private resetInvoiceModal(): void {
-    this.invoice = { invoiceNumber: '', invoiceDate: '', taxableAmount: 0, taxAmount: 0,
-      totalAmount: 0,invoiceFileName: '', invoiceFileUrl: '', docketNumber: ''
+    this.invoice = {
+      invoiceNumber: '', invoiceDate: '', taxableAmount: 0, taxAmount: 0,
+      totalAmount: 0, invoiceFileName: '', invoiceFileUrl: '', docketNumber: ''
     };
+    /* this.selectedInvoiceFile = null;*/
     this.isDelivery = false;
     this.selectedInvoiceFile = null;
     this.invoiceTouched = false;
     this.docketTouched = false;
     this.isInvoiceSubmitting = false;
+
+
+    if (this.invoiceFileInput?.nativeElement) {
+      this.invoiceFileInput.nativeElement.value = '';
+    }
   }
 
   validateInvoice(): boolean {
@@ -542,6 +606,11 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
 
     if (!this.invoice.invoiceDate?.trim()) {
       this.toast.warning('Invoice date is required.');
+      return false;
+    }
+
+    if (this.invoice.invoiceDate?.trim() > this.today) {
+      this.toast.warning('Invoice date cannot be a future date.');
       return false;
     }
 
@@ -597,7 +666,7 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     formData.append('IsDelivery', this.selectedOrder?.isDelivered);
     formData.append('IsInvoicing', this.selectedOrder?.isInvoicing);
     formData.append('DocketNumber', this.isDelivery ? this.invoice.docketNumber.trim() : '');
-    if (this.selectedInvoiceFile) {formData.append('PDF', this.selectedInvoiceFile, this.selectedInvoiceFile.name);}
+    if (this.selectedInvoiceFile) { formData.append('PDF', this.selectedInvoiceFile, this.selectedInvoiceFile.name); }
 
     this.isInvoiceSubmitting = true;
 
@@ -674,16 +743,18 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
 
           this.invoice.invoiceNumber = data.invoiceNumber || '';
           this.invoice.taxableAmount = Number(data.taxableAmount ?? 0);
-          this.invoice.invoiceDate = data.invoiceDate || ''
+          this.invoice.invoiceDate = data.invoiceDate
+            ? data.invoiceDate.split('T')[0]
+            : '';
           this.invoice.taxAmount = Number(data.taxAmount ?? 0);
           this.invoice.totalAmount = Number(data.totalAmount ?? 0);
           this.invoice.docketNumber = data.docketNumber || '';
           this.invoice.invoiceFileUrl = data.pdfUrl || '';
           this.invoice.invoiceFileName = this.selectedInvoiceFile?.name || 'Invoice PDF';
           this.isDelivery = !!this.invoice.docketNumber;
-          
+
         } else {
-          
+
           this.toast.error(res?.message);
         }
       },
@@ -691,5 +762,118 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
         this.toast.error(err?.error?.message || 'Something went wrong while fetching Invoice.');
       }
     });
+  }
+
+  // ================= FILTER METHODS =================
+
+  getStateList(): void {
+    this.apis.getStateListReport().subscribe({
+      next: (res: any) => {
+        if (res?.message?.toLowerCase() === 'success' && Array.isArray(res.data)) {
+          this.stateList = res.data;
+          this.getDealersByState('All');
+        } else {
+          this.toast.error('Failed fetching state list.');
+        }
+      },
+      error: () => this.toast.error('Something went wrong while fetching state list.')
+    });
+  }
+
+  getDealersByState(stateName: string): void {
+    this.apis.getDealerAccByState({ stateName }).subscribe({
+      next: (res: any) => {
+        this.dealerList = (res?.statusCode === 200 && Array.isArray(res.data)) ? res.data : [];
+      },
+      error: () => {
+        this.dealerList = [];
+        this.toast.error('Something went wrong while fetching dealers.');
+      }
+    });
+  }
+
+  onStateChange(): void {
+    this.selectedDealership = 'All';
+    this.dealerList = [];
+    if (this.selectedState) this.getDealersByState(this.selectedState);
+  }
+
+  onDurationChange(): void {
+    if (this.selectedDuration !== 'custom') return;
+    const now = new Date();
+    this.customStartMonth = now.getMonth() + 1;
+    this.customStartYear = now.getFullYear();
+    this.customEndMonth = now.getMonth() + 1;
+    this.customEndYear = now.getFullYear();
+  }
+
+  getDateRange(): { startDate: string; endDate: string } {
+    const now = new Date();
+    const cm = now.getMonth();
+    const cy = now.getFullYear();
+    let startDate: Date;
+    let endDate: Date;
+
+    switch (this.selectedDuration) {
+      case 'this Month':
+        startDate = new Date(cy, cm, 1);
+        endDate = new Date(cy, cm + 1, 0);
+        break;
+      case 'this Quarter': {
+        const qStart = Math.floor(cm / 3) * 3;
+        startDate = new Date(cy, qStart, 1);
+        endDate = new Date(cy, qStart + 3, 0);
+        break;
+      }
+      case 'this FY': {
+        const fyStartYear = cm >= 3 ? cy : cy - 1;
+        startDate = new Date(fyStartYear, 3, 1);
+        endDate = new Date(fyStartYear + 1, 2, 31);
+        break;
+      }
+      case 'last Quarter': {
+        const lqStart = Math.floor(cm / 3) * 3 - 3;
+        if (lqStart < 0) {
+          startDate = new Date(cy - 1, 9, 1);
+          endDate = new Date(cy - 1, 12, 0);
+        } else {
+          startDate = new Date(cy, lqStart, 1);
+          endDate = new Date(cy, lqStart + 3, 0);
+        }
+        break;
+      }
+      case 'custom':
+        startDate = new Date(this.customStartYear, this.customStartMonth - 1, 1);
+        endDate = new Date(this.customEndYear, this.customEndMonth, 0);
+        break;
+      default:
+        startDate = new Date(cy, cm, 1);
+        endDate = new Date(cy, cm + 1, 0);
+    }
+    return { startDate: this.formatDate(startDate), endDate: this.formatDate(endDate) };
+  }
+
+  private formatDate(date: Date): string {
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${date.getFullYear()}-${m}-${d}`;
+  }
+
+  onSearch(): void {
+    this.getOrders(1);
+  }
+
+  clearFilters(): void {
+    const now = new Date();
+    this.selectedDuration = 'this Month';
+    this.selectedState = 'All';
+    this.selectedDealership = 'All';
+    this.orderIdSearch = '';
+    this.customStartMonth = now.getMonth() + 1;
+    this.customStartYear = now.getFullYear();
+    this.customEndMonth = now.getMonth() + 1;
+    this.customEndYear = now.getFullYear();
+    this.getDealersByState('All');
+    this.getOrders(1);
   }
 }

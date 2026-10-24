@@ -35,12 +35,16 @@
               <td class="c">
                 <div class="np-stepper np-stepper--sm">
                   <button type="button" (click)="changeCartQty(it, -1)"
-                    [disabled]="it.qty <= 1 || submitting">−</button>
+                          [disabled]="it.qty <= 1 || submitting">
+                    −
+                  </button>
                   <input type="number" [name]="'qty_' + it.id" [(ngModel)]="it.qty" min="1" [max]="maxQty"
-                    [disabled]="submitting" (blur)="commitCartQty(it)"
-                    (keydown.enter)="$event.preventDefault(); commitCartQty(it)" />
+                         [disabled]="submitting" (blur)="commitCartQty(it)"
+                         (keydown.enter)="$event.preventDefault(); commitCartQty(it)" />
                   <button type="button" (click)="changeCartQty(it, 1)"
-                    [disabled]="it.qty >= maxQty || submitting">+</button>
+                          [disabled]="it.qty >= maxQty || submitting">
+                    +
+                  </button>
                 </div>
               </td>
               <td class="r np-t-amt">{{ fmt(lineTotal(it)) }}</td>
@@ -77,7 +81,7 @@
         <div class="np-sum-row np-sum-grand"><span>Grand Total</span><span>{{ fmt(totals.grandTotal) }}</span></div>
 
         <textarea class="np-remarks" name="remarks" rows="2" maxlength="500" placeholder="Remarks (optional)"
-          [(ngModel)]="remarks" (ngModelChange)="onRemarksChange()" [disabled]="submitting"></textarea>
+                  [(ngModel)]="remarks" (ngModelChange)="onRemarksChange()" [disabled]="submitting"></textarea>
 
         <button type="submit" class="np-submit" [disabled]="submitting || !cart.length">
           <span class="np-spin" *ngIf="submitting"></span>
@@ -162,25 +166,24 @@
           <div class="np-prices">
             <div class="np-pr"><span class="lbl">NDP</span><span class="val val--main">{{ fmt(p.ndp) }}</span></div>
             <div class="np-pr"><span class="lbl">GST</span><span class="val">{{ fmt(gstAmt(p)) }}</span></div>
-            <div class="np-pr"><span class="lbl">GST %</span><span class="val"><span class="np-chip">{{ p.gstRate
-                  }}%</span></span></div>
+            <div class="np-pr"><span class="lbl">GST %</span><span class="val"><span class="np-chip">{{ p.gstRate}}%</span></span></div>
           </div>
 
           <div class="np-stepper">
-            <button type="button" (click)="changeCardQty(p, -1)" [disabled]="p.qty <= 1">−</button>
+            <button type="button" (click)="changeCardQty(p, -1)" [disabled]="inCart(p.id)||p.qty <= 1">−</button>
             <input type="number" [(ngModel)]="p.qty" min="1" [max]="maxQty" (blur)="commitCardQty(p)"
-              (keydown.enter)="commitCardQty(p)" />
-            <button type="button" (click)="changeCardQty(p, 1)" [disabled]="p.qty >= maxQty">+</button>
+                   (keydown.enter)="commitCardQty(p)" [disabled]="inCart(p.id)" />
+            <button type="button" (click)="changeCardQty(p, 1)" [disabled]="inCart(p.id)||p.qty >= maxQty">+</button>
           </div>
 
-          <button type="button" class="np-add" [class.np-add--added]="inCart(p.id)" (click)="addToCart(p)">
-            {{ inCart(p.id) ? 'Added — Update' : 'Add to Cart' }}
+          <button type="button" class="np-add" [class.np-add--added]="inCart(p.id)" [disabled]="inCart(p.id)" (click)="addToCart(p)">
+            {{ inCart(p.id) ? 'Added' : 'Add to Cart' }}
           </button>
         </div>
 
       </div>
       <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage"
-        (pageChange)="onPageChange($event)"></app-pagination>
+                      (pageChange)="onPageChange($event)"></app-pagination>
     </div>
   </section>
 </div>
@@ -188,7 +191,7 @@
 
 <!-- ================= PAYMENT MODAL ================= -->
 <div class="modal fade" [class.show]="showPaymentModal" [style.display]="showPaymentModal ? 'block' : 'none'"
-  tabindex="-1" role="dialog" aria-modal="true" *ngIf="showPaymentModal">
+     tabindex="-1" role="dialog" aria-modal="true" *ngIf="showPaymentModal">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
 
@@ -216,8 +219,8 @@
         <div class="form-check">
 
           <input class="form-check-input" type="checkbox" id="paymentRequired" [checked]="paymentStatus === 1"
-            (change)="paymentStatus = $any($event.target).checked ? 1 : 0" name="paymentRequired" />
-          <label class="form-check-label fw-semibold fs-6"  for="paymentRequired">
+                 (change)="paymentStatus = $any($event.target).checked ? 1 : 0" name="paymentRequired" />
+          <label class="form-check-label fw-semibold fs-6" for="paymentRequired">
             Payment Required
           </label>
         </div>
@@ -234,7 +237,7 @@
               </label>
 
               <input class="form-control" name="paymentAmount" [(ngModel)]="paymentAmount"
-                [required]="paymentStatus === 1" readonly />
+                     [required]="paymentStatus === 1" readonly />
 
               <small class="text-danger"> {{ Amounterror }} </small>
             </div>
@@ -260,7 +263,7 @@
               </label>
 
               <input type="text" class="form-control" name="transactionId" [(ngModel)]="transactionId" maxlength="100"
-                placeholder="Enter transaction ID" />
+                     placeholder="Enter transaction ID" />
             </div>
 
             <!-- Reference No -->
@@ -270,7 +273,7 @@
               </label>
 
               <input type="text" class="form-control" name="referenceNo" [(ngModel)]="referenceNo" maxlength="100"
-                placeholder="Enter reference number" />
+                     placeholder="Enter reference number" />
             </div>
 
             <!-- Payment Remarks -->
@@ -280,7 +283,7 @@
               </label>
 
               <textarea class="form-control" name="paymentRemarks" [(ngModel)]="paymentRemarks" rows="8" maxlength="500"
-                placeholder="Enter payment remarks">
+                        placeholder="Enter payment remarks">
               </textarea>
             </div>
 
@@ -297,9 +300,9 @@
           Cancel
         </button>
 
-        <button type="button" class="np-search-btn" [disabled]="submitting ||
-            (paymentStatus === 1 && (!paymentAmount || paymentAmount <= 0 || !paymentMode))
-          " (click)="confirmSubmitOrder()">
+        <button type="button" class="np-search-btn"
+                [disabled]="submitting || (paymentStatus === 1 && (!paymentAmount || paymentAmount <= 0 || !paymentMode))"
+                (click)="confirmSubmitOrder()">
           <span class="spinner-border spinner-border-sm me-2" *ngIf="submitting">
           </span>
 

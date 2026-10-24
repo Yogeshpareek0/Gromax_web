@@ -114,7 +114,7 @@ export const routes: Routes = [
       { path: 'ftrform', component: FieldTechnicalReportComponent },
       { path: 'ftrreport', component: FtrReportComponent, canActivate: [menuGuard], data: { menuGroup: 'Reports', subMenu: 'FtrReport' } },
       { path: 'itemscorereport', component: ItemScoreReportComponent },
-      { path: 'sparepartorder', component: SparepartorderComponent },
+      { path: 'sparepartorder', component: SparepartorderComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'OrderSparePart' } },
       { path: 'updatesparepartorder', component: UpdatesparepartorderComponent }
 
     ]

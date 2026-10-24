@@ -4177,8 +4177,13 @@ export class UploadexcelComponent implements OnInit {
 
         const qty = Number(qtyText);
 
-        // Sirf positive integer
-        if (isNaN(qty) || !Number.isInteger(qty) || qty < 0) {
+        // Positive number (decimal allowed)
+        //if (isNaN(qty) || !isFinite(qty) || qty < 0) {
+        //  invalidQtyRows.push(`Row ${rowNumber}`);
+        //  return;
+        //}
+
+        if (isNaN(qty) || !isFinite(qty) || qty < 0 || !/^\d+(\.\d{1,2})?$/.test(qtyText)) {
           invalidQtyRows.push(`Row ${rowNumber}`);
           return;
         }
@@ -4196,7 +4201,11 @@ export class UploadexcelComponent implements OnInit {
       });
 
       if (invalidQtyRows.length > 0) {
-        this.apis.showAlert('error', 'Invalid Qty', `Qty must be a positive whole number at: ${invalidQtyRows.join(', ')}`);
+        this.apis.showAlert(
+          'error',
+          'Invalid Qty',
+          `Qty must be a valid number greater than or equal to 0, with a maximum of 2 decimal places at: ${invalidQtyRows.join(', ')}`
+        );
         return null;
       }
 

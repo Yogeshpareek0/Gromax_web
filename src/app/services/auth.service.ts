@@ -1082,10 +1082,19 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'Api/Services/saveSparePartsOrder', payload);
   }
 
-  getSparePartsOrders(pageNumber: number, pageSize: number) {
-    const params = new HttpParams()
+  getSparePartsOrders(pageNumber: number, pageSize: number, filters?: any) {
+    let params = new HttpParams()
       .set('pageNumber', pageNumber)
       .set('pageSize', pageSize);
+
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const val = filters[key];
+        if (val !== null && val !== undefined && val !== '') {
+          params = params.set(key, val);
+        }
+      });
+    }
     return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsOrders', { params });
   }
 
