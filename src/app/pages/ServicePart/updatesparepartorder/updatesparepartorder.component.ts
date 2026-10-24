@@ -64,6 +64,13 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     docketNumber: ''
   };
 
+  kpiCards = [
+    { title: 'TOTAL ORDER', count: 0, value: 0, icon: 'fa-solid fa-store', colorClass: 'kpi-blue' },
+    { title: 'PAYMENT PENDING', count: 0, value: 0, icon: 'fa-solid fa-wallet', colorClass: 'kpi-orange' },
+    { title: 'INVOICE PENDING', count: 0, value: 0, icon: 'fa-solid fa-file-invoice', colorClass: 'kpi-purple' },
+    { title: 'DELIVERY PENDING', count: 0, value: 0, icon: 'fa-solid fa-truck', colorClass: 'kpi-green' }
+  ];
+
   // Frontend checkbox
   isDelivery = false;
 
@@ -73,6 +80,10 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
   // UI state
   invoiceTouched = false;
   docketTouched = false;
+  InvoiceView = false;
+  AddDeliveryView = false;
+  InvoiceViewButton = false;
+
 
   isInvoiceSubmitting = false;
   private orderModal: any;
@@ -143,7 +154,14 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
           this.orderList = res.data?.data || [];
           this.totalItems = res.data?.totalRecords || 0;
           this.currentPage = page;
-          console.log(this.orderList);
+          this.kpiCards[0].count = res.data?.totalRecords ?? 0;
+          this.kpiCards[0].value = res.data?.totalRecordsValue ?? 0;
+          this.kpiCards[1].count = res.data?.totalPendingPayment ?? 0;
+          this.kpiCards[1].value = res.data?.totalPendingPaymentValue ?? 0;
+          this.kpiCards[2].count = res.data?.totalPendingInvoice ?? 0;
+          this.kpiCards[2].value = res.data?.totalPendingInvoiceValue ?? 0;
+          this.kpiCards[3].count = res.data?.totalPendingDelivered ?? 0;
+          this.kpiCards[3].value = res.data?.totalPendingDeliveredValue ?? 0;
         } else {
           this.resetList();
           this.toast.error(res?.message || 'Failed fetching orders.');
@@ -169,8 +187,39 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     return (order?.paymentStatus || '').toLowerCase() !== 'paid' && this.permission.hasSubmenuPermission('UpdateOrderedSparePartDealer');
   }
 
-  canInvoicing(order: any): boolean {
-    return (order?.paymentStatus || '').toLowerCase() === 'paid' && !(order?.isInvoicing === true && order?.isDelivered === true) && this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO');
+
+
+
+  canInvoiceView(order: any): boolean {
+    return (
+      (this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO') && order?.isPaymentSuccess) ||
+      (
+        this.permission.hasSubmenuPermission('UpdateOrderedSparePartDealer') && order?.isInvoicing
+      )
+    );
+  }
+
+  AddDeliveryDetailsView(order: any): boolean {
+    return (
+      (this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO') && order?.isPaymentSuccess) ||
+      (
+        this.permission.hasSubmenuPermission('UpdateOrderedSparePartDealer') && order?.isDelivered
+      )
+    );
+  }
+
+  canInvoiceViewButton(order: any): boolean {
+    return (
+      this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO') && !order.isDelivered && order?.isPaymentSuccess);
+  }
+
+  onRowClick(order: any): void {
+    // 1. only Dealer: Payment pending / unpaid
+    if (this.canUpdate(order)) {
+      this.openUpdateModal(order);
+      return;
+    }
+    this.openInvoiceModal(order);
   }
 
   statusClass(status: any): string {
@@ -256,6 +305,7 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     return this.origQtyMap.get(it.orderDetailId) ?? Number(it.quantity) ?? 0;
   }
 
+
   lineAmount(it: any, useSaved = false): number {
     const q = useSaved ? this.savedQty(it) : Number(it.quantity) || 0;
     const price = Number(it.ndp || it.rate) || 0;
@@ -263,12 +313,45 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     return this.round2(price * q * (1 + gst / 100));
   }
 
+  totalTaxableChangedAmount(it: any, useSaved = false): number {
+    const q = useSaved ? this.savedQty(it) : Number(it.quantity) || 0;
+    const price = Number(it.ndp || it.rate) || 0;
+    return this.round2(price * q);
+  }
+  totalTaxChangedAmount(it: any, useSaved = false): number {
+    const q = useSaved ? this.savedQty(it) : Number(it.quantity) || 0;
+    const price = Number(it.ndp || it.rate) || 0;
+    const gst = Number(it.gstRate) || 0;
+    return this.round2(price * q * (gst / 100));
+  }
+
   get itemsTotalQty(): number {
     return this.orderItems.reduce((s, it) => s + this.savedQty(it), 0);
   }
 
+  get itemsTotalTaxable(): number {
+    return this.orderItems.reduce(
+      (sum, item) => sum + (Number(item.totalTaxableAmount) || 0),
+      0
+    );
+  }
+
+
+  get itemsTotalTax(): number {
+    return this.orderItems.reduce(
+      (sum, item) => sum + (Number(item.taxAmount) || 0),
+      0
+    );
+  }
+
   get itemsGrandTotal(): number {
     return this.round2(this.orderItems.reduce((s, it) => s + this.lineAmount(it, true), 0));
+  }
+  get itemsTaxable(): number {
+    return this.round2(this.orderItems.reduce((s, it) => s + this.totalTaxableChangedAmount(it, true), 0));
+  }
+  get itemsTax(): number {
+    return this.round2(this.orderItems.reduce((s, it) => s + this.totalTaxChangedAmount(it, true), 0));
   }
 
   get payableAmount(): number {
@@ -534,7 +617,11 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
 
   openInvoiceModal(order: any): void {
 
-    if (!this.canInvoicing(order)) { return; }
+    // if (!this.canInvoiceView(order)&&!this.canInvoicing(order)) { return; }
+    this.InvoiceView = this.canInvoiceView(order);
+    this.InvoiceViewButton = this.canInvoiceViewButton(order);
+    this.AddDeliveryView = this.AddDeliveryDetailsView(order);
+
 
     this.selectedOrder = order;
     this.getOrderItems(order.orderId);
@@ -750,7 +837,7 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
           this.invoice.totalAmount = Number(data.totalAmount ?? 0);
           this.invoice.docketNumber = data.docketNumber || '';
           this.invoice.invoiceFileUrl = data.pdfUrl || '';
-          this.invoice.invoiceFileName = this.selectedInvoiceFile?.name || 'Invoice PDF';
+          this.invoice.invoiceFileName = this.selectedInvoiceFile?.name || 'View Invoice';
           this.isDelivery = !!this.invoice.docketNumber;
 
         } else {
@@ -875,5 +962,12 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
     this.customEndYear = now.getFullYear();
     this.getDealersByState('All');
     this.getOrders(1);
+  }
+  canInvoicing(order: any): boolean {
+    return (
+      (order?.paymentStatus || '').toLowerCase() === 'paid' &&
+      !(order?.isInvoicing === true && order?.isDelivered === true) &&
+      this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO')
+    );
   }
 }

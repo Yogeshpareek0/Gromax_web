@@ -1,460 +1,563 @@
 <div class="container-fluid px-0">
 
-  <!-- Table -->
-  <div class="enquiry-table-wrapper mt-2">
-    <!-- Filter Row -->
     <div class="card shadow-sm px-3 border-0 pb-2 pt-3 mb-2" style="border-radius: 12px;">
-      <div class="row align-items-end g-2 mb-2">
+        <div class="row align-items-end g-2 mb-2">
 
-        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
-          <label class="form-label fw-medium mb-1" style="font-size:13px;">Duration</label>
-          <select class="form-select form-select-sm" [(ngModel)]="selectedDuration" (change)="onDurationChange()">
-            <option value="this Month">This Month</option>
-            <option value="this Quarter">This Quarter</option>
-            <option value="last Quarter">Last Quarter</option>
-            <option value="this FY">This FY</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-
-        <ng-container *ngIf="selectedDuration === 'custom'">
-          <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
-            <label class="form-label fw-medium mb-1" style="font-size:13px;">Start Month</label>
-            <div class="d-flex gap-1">
-              <select class="form-select form-select-sm" [(ngModel)]="customStartMonth">
-                <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
-              </select>
-              <select class="form-select form-select-sm" [(ngModel)]="customStartYear" style="max-width: 90px;">
-                <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
-              </select>
+            <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+                <label class="form-label fw-medium mb-1" style="font-size:13px;">Duration</label>
+                <select class="form-select form-select-sm" [(ngModel)]="selectedDuration" (change)="onDurationChange()">
+                    <option value="this Month">This Month</option>
+                    <option value="this Quarter">This Quarter</option>
+                    <option value="last Quarter">Last Quarter</option>
+                    <option value="this FY">This FY</option>
+                    <option value="custom">Custom</option>
+                </select>
             </div>
-          </div>
-          <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
-            <label class="form-label fw-medium mb-1" style="font-size:13px;">End Month</label>
-            <div class="d-flex gap-1">
-              <select class="form-select form-select-sm" [(ngModel)]="customEndMonth">
-                <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
-              </select>
-              <select class="form-select form-select-sm" [(ngModel)]="customEndYear" style="max-width: 90px;">
-                <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
-              </select>
+
+            <ng-container *ngIf="selectedDuration === 'custom'">
+                <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+                    <label class="form-label fw-medium mb-1" style="font-size:13px;">Start Month</label>
+                    <div class="d-flex gap-1">
+                        <select class="form-select form-select-sm" [(ngModel)]="customStartMonth">
+                            <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+                        </select>
+                        <select class="form-select form-select-sm" [(ngModel)]="customStartYear"
+                            style="max-width: 90px;">
+                            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+                    <label class="form-label fw-medium mb-1" style="font-size:13px;">End Month</label>
+                    <div class="d-flex gap-1">
+                        <select class="form-select form-select-sm" [(ngModel)]="customEndMonth">
+                            <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+                        </select>
+                        <select class="form-select form-select-sm" [(ngModel)]="customEndYear" style="max-width: 90px;">
+                            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+                        </select>
+                    </div>
+                </div>
+            </ng-container>
+
+            <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+                <label class="form-label fw-medium mb-1" style="font-size:13px;">State Name</label>
+                <select class="form-select form-select-sm" [(ngModel)]="selectedState" (change)="onStateChange()">
+                    <option *ngFor="let s of stateList" [value]="s">{{ s }}</option>
+                </select>
             </div>
-          </div>
-        </ng-container>
 
-        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
-          <label class="form-label fw-medium mb-1" style="font-size:13px;">State Name</label>
-          <select class="form-select form-select-sm" [(ngModel)]="selectedState" (change)="onStateChange()">
-            <option *ngFor="let s of stateList" [value]="s">{{ s }}</option>
-          </select>
-        </div>
+            <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+                <label class="form-label fw-medium mb-1" style="font-size:13px;">Dealership Name</label>
+                <select class="form-select form-select-sm" [(ngModel)]="selectedDealership">
+                    <option value="All">All Dealerships</option>
+                    <option *ngFor="let d of dealerList" [value]="d.DealerCode">
+                        {{ d.DealerName }} ({{ d.DealerCode }})
+                    </option>
+                </select>
+            </div>
 
-        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
-          <label class="form-label fw-medium mb-1" style="font-size:13px;">Dealership Name</label>
-          <select class="form-select form-select-sm" [(ngModel)]="selectedDealership">
-            <option value="All">All Dealerships</option>
-            <option *ngFor="let d of dealerList" [value]="d.DealerCode">
-              {{ d.DealerName }} ({{ d.DealerCode }})
-            </option>
-          </select>
-        </div>
+            <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+                <label class="form-label fw-medium mb-1" style="font-size:13px;">Order No</label>
+                <input type="text" class="form-control form-control-sm" placeholder="Enter order no"
+                    [(ngModel)]="orderIdSearch" (keyup.enter)="onSearch()" maxlength="50" />
+            </div>
 
-        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
-          <label class="form-label fw-medium mb-1" style="font-size:13px;">Order No</label>
-          <input type="text" class="form-control form-control-sm" placeholder="Enter order no"
-                 [(ngModel)]="orderIdSearch" (keyup.enter)="onSearch()" maxlength="50" />
-        </div>
+            <div class="col-xl-1 col-lg-2 col-sm-3 col-6">
+                <button class="btn w-100 custom-btn py-2" (click)="onSearch()" style="font-size:13px;">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                </button>
+            </div>
 
-        <div class="col-xl-1 col-lg-2 col-sm-3 col-6">
-          <button class="btn w-100 custom-btn py-2" (click)="onSearch()" style="font-size:13px;">
-            <i class="fa-solid fa-magnifying-glass me-1"></i> Search
-          </button>
+            <div class="col-xl-1 col-lg-2 col-sm-3 col-6">
+                <button class="btn w-100 btn-clear py-2" (click)="clearFilters()" style="font-size:13px;">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Clear
+                </button>
+            </div>
         </div>
-
-        <div class="col-xl-1 col-lg-2 col-sm-3 col-6">
-          <button class="btn w-100 btn-clear py-2" (click)="clearFilters()" style="font-size:13px;">
-            <i class="fa-solid fa-rotate-left me-1"></i> Clear
-          </button>
-        </div>
-      </div>
     </div>
-    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1000px;">
-      <thead>
-        <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
-          <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
-          <th class="text-nowrap fw-normal">Order No</th>
-          <th class="text-nowrap fw-normal">Order Date</th>
-          <th class="text-nowrap fw-normal">Dealer Code</th>
-          <th class="text-nowrap fw-normal">Total Qty</th>
-          <th class="text-nowrap fw-normal">GST Amount</th>
-          <th class="text-nowrap fw-normal">Total Amount</th>
-          <th class="text-nowrap fw-normal">Paid Amount</th>
-          <th class="text-nowrap fw-normal">Balance</th>
-          <!--<th class="text-nowrap fw-normal">Order Status</th>-->
-          <th class="text-nowrap fw-normal">Payment Status</th>
-          <th class="text-nowrap fw-normal text-center" style="border-top-right-radius: 6px;">Action</th>
-        </tr>
-      </thead>
-      <tbody style="font-size: 14px;">
+
+    <div class="row g-3 kpi-row mt-2">
+        <div class="col-xl-3 col-lg-6 col-md-6" *ngFor="let card of kpiCards">
+            <div class="kpi-card">
+                <div class="kpi-icon-box" [ngClass]="card.colorClass"><i [class]="card.icon  + ' fs-6'"></i> </div>
+                <div class="kpi-content">
+                    <div class="kpi-title"> {{ card.title }} </div>
+                    <div class="kpi-count" [ngClass]="card.colorClass + '-text'"> {{ card.count }} </div>
+                    <div class="kpi-value"> Total : ₹ {{ card.value }} </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="enquiry-table-wrapper">
+        <!-- Filter Row -->
+
+        <table id="enquiryTable" class="table table-bordered" style="min-width: 2400px;">
+            <thead>
+                <!-- ===== GROUP HEADER ===== -->
+                <tr class="grp-header-row">
+                    <th rowspan="2" class="text-nowrap fw-normal grp-sno align-middle"
+                        style="border-top-left-radius: 8px;">S.No.</th>
+                    <th colspan="8" class="text-center grp-head grp-order">
+                        <i class="fa-solid fa-box me-1"></i> Order Details
+                    </th>
+                    <th colspan="5" class="text-center grp-head grp-payment">
+                        <i class="fa-solid fa-indian-rupee-sign me-1"></i> Payment Details
+                    </th>
+                    <th colspan="9" class="text-center grp-head grp-invoice">
+                        <i class="fa-solid fa-file-invoice me-1"></i> Invoice Details
+                    </th>
+
+                    <th colspan="2" class="text-center grp-head grp-delivery">
+                        <i class="fa-solid fa-truck me-1"></i> Delivery Details
+                    </th>
+
+                    <th rowspan="2" class="text-nowrap fw-normal text-center grp-sno align-middle"
+                        style="border-top-right-radius: 6px;">Action</th>
+                </tr>
+
+                <!-- ===== SUB HEADER ===== -->
+                <tr class="sub-header-row">
+                    <!-- Order -->
+                    <th class="sub-order">Order No</th>
+                    <th class="sub-order">Order Date</th>
+                    <th class="sub-order">Dealer Code</th>
+                    <th class="sub-order">Order Status</th>
+                    <th class="sub-order">Total Qty</th>
+                    <th class="sub-order">Taxable Amt</th>
+                    <th class="sub-order">GST Amt</th>
+                    <th class="sub-order">Total Amt</th>
+
+                    <!-- Payment -->
+
+                    <th class="sub-payment">Paid Amt</th>
+                    <th class="sub-payment">Balance</th>
+                    <th class="sub-payment">Payment Status</th>
+                    <th class="sub-payment">Payment Date</th>
+                    <th class="sub-payment">Payment Mode</th>
+
+                    <!-- Invoice -->
+                    <th class="sub-invoice">Invoice No</th>
+                    <th class="sub-invoice">Invoice Date</th>
+                    <th class="sub-invoice">Taxable Amt</th>
+                    <th class="sub-invoice">Tax Amt</th>
+                    <th class="sub-invoice">Total Amt</th>
+                    <th class="sub-invoice">Reference No</th>
+                    <th class="sub-invoice">Transaction ID</th>
+                    <th class="sub-invoice">Remarks</th>
+                    <th class="sub-invoice">Invoice PDF</th>
+
+                    <!-- Delivery -->
+                    <th class="sub-delivery">Docket No</th>
+                    <th class="sub-delivery">Delivery Date</th>
+
+                </tr>
+            </thead>
+
+            <tbody style="font-size: 14px;">
+                <ng-container>
+                    <tr *ngFor="let o of orderList; let i = index; trackBy: trackByOrder" (click)="onRowClick(o)"
+                        class="order-row" title="Click to view order details">
+
+                        <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+
+                        <!-- ================= ORDER (always visible) ================= -->
+                        <td class="text-nowrap fw-semibold order-no-cell">{{ o.orderNo || '-' }}</td>
+                        <td class="text-nowrap">{{ o.orderDate ? (o.orderDate | date:'dd-MM-yyyy') : '-' }}</td>
+                        <td class="text-nowrap">{{ o.dealerCode || '-' }}</td>
+                        <td class="text-nowrap">
+                            <span class="st-badge" [ngClass]="statusClass(o.orderStatus)">{{ o.orderStatus || '-'
+                                }}</span>
+                        </td>
+                        <td class="text-nowrap">{{ o.totalQty }}</td>
+
+                        <!-- ================= PAYMENT ================= -->
+                        <ng-container *ngIf="o.isPaymentSuccess; else paymentPending">
+                            <td class="text-nowrap">₹ {{ (o.totalAmount - o.totalGSTAmount) | number:'1.2-2' }}</td>
+                            <td class="text-nowrap">₹ {{ o.totalGSTAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap fw-semibold">₹ {{ o.totalAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap">₹ {{ o.paidAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap">₹ {{ o.balanceAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap">
+                                <span class="st-badge" [ngClass]="statusClass(o.paymentStatus)">{{ o.paymentStatus ||
+                                    '-' }}</span>
+                            </td>
+                            <td class="text-nowrap">{{ o.paymentDate ? (o.paymentDate | date:'dd-MM-yyyy') : '-' }}</td>
+                            <td class="text-nowrap">{{ o.paymentMode || '-' }}</td>
+                        </ng-container>
+                        <ng-template #paymentPending>
+                            <td colspan="8" class="pending-cell">
+                                <span class="pending-chip"><i class="fa-regular fa-clock me-1"></i> Payment
+                                    Pending</span>
+                            </td>
+                        </ng-template>
+
+                        <!-- ================= INVOICE ================= -->
+                        <ng-container *ngIf="o.isInvoicing; else invoicePending">
+                            <td class="text-nowrap fw-semibold">{{ o.invoiceNumber || '-' }}</td>
+                            <td class="text-nowrap">{{ o.invoiceDate ? (o.invoiceDate | date:'dd-MM-yyyy') : '-' }}</td>
+                            <td class="text-nowrap">₹ {{ o.invTaxableAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap">₹ {{ o.invTaxAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap fw-semibold">₹ {{ o.invTotalAmount | number:'1.2-2' }}</td>
+                            <td class="text-nowrap">{{ o.referenceNo || '-' }}</td>
+                            <td class="text-nowrap">{{ o.transactionId || '-' }}</td>
+                            <td class="remarks-cell" [title]="o.remarks || ''">{{ o.remarks || '-' }}</td>
+                            <td class="text-nowrap text-center">
+                                <a *ngIf="o.pdfUrl; else noPdf" [href]="o.pdfUrl" target="_blank" class="pdf-link"
+                                    (click)="$event.stopPropagation()" title="View Invoice">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </a>
+                                <ng-template #noPdf><span class="text-muted">-</span></ng-template>
+                            </td>
+                        </ng-container>
+
+                        <!-- ================= DELIVERY ================= -->
+                        <ng-container *ngIf="o.isDelivered; else deliveryPending">
+                            <td class="text-nowrap">{{ o.docketNumber || '-' }}</td>
+                            <td class="text-nowrap">{{ o.deliveryDate ? (o.deliveryDate | date:'dd-MM-yyyy') : '-' }}
+                            </td>
+                        </ng-container>
+                        <ng-template #deliveryPending>
+                            <td colspan="2" class="pending-cell">
+                                <span class="pending-chip"><i class="fa-regular fa-clock me-1"></i> Delivery
+                                    Pending</span>
+                            </td>
+                        </ng-template>
 
 
-        <ng-container>
-          <tr *ngFor="let o of orderList; let i = index; trackBy: trackByOrder">
-            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
-            <td class="text-nowrap fw-semibold" style="color:#215378;">{{ o.orderNo || '-' }}</td>
-            <td class="text-nowrap">{{ o.orderDate ? (o.orderDate | date:'dd-MM-yyyy') : '-' }}</td>
-            <td class="text-nowrap">{{ o.dealerCode || '-' }}</td>
-            <td class="text-nowrap">{{ o.totalQty }}</td>
-            <td class="text-nowrap">₹ {{ o.totalGSTAmount }}</td>
-            <td class="text-nowrap fw-semibold">₹ {{ o.totalAmount }}</td>
-            <td class="text-nowrap">₹ {{ o.paidAmount }}</td>
-            <td class="text-nowrap">₹ {{ o.balanceAmount }}</td>
-            <!--<td class="text-nowrap"><span class="st-badge" [ngClass]="statusClass(o.orderStatus)">{{
-                  o.orderStatus || '-' }}</span></td>-->
-            <td class="text-nowrap">
-              <span class="st-badge" [ngClass]="statusClass(o.paymentStatus)">
-                {{
-                                o.paymentStatus || '-'
-                }}
-              </span>
-            </td>
-            <td class="text-nowrap text-center">
-              <!-- UPDATE Order -->
-              <button *ngIf="canUpdate(o)" type="button" class="action-icon-btn action-update"
-                      (click)="openUpdateModal(o)" title="Update">
+                        <ng-template #invoicePending>
+                            <td colspan="9" class="pending-cell">
+                                <span class="pending-chip"><i class="fa-regular fa-clock me-1"></i> Invoice Details
+                                    Pending</span>
+                            </td>
+                        </ng-template>
 
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span class="action-text">Update</span>
-              </button>
+                        <!-- ================= ACTION ================= -->
+                        <td class="text-nowrap text-center">
+                            <button *ngIf="canUpdate(o)" type="button" class="action-icon-btn action-cancel"
+                                (click)="$event.stopPropagation(); selectedOrder = o; askCancelOrder()"
+                                [disabled]="isCancelling" title="Cancel Order">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                            <span *ngIf="!canUpdate(o) && !canInvoicing(o)" class="text-muted">-</span>
+                        </td>
+                    </tr>
 
-              <!-- UPDATE Invoice -->
-              <button *ngIf="canInvoicing(o)" type="button" class="action-icon-btn action-update"
-                      (click)="openInvoiceModal(o)" title="Update">
+                    <tr *ngIf="orderList.length === 0">
+                        <td colspan="26" class="text-center text-muted py-4">No records found.</td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
 
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span class="action-text">Update</span>
-              </button>
-
-
-              <!-- CANCEL -->
-              <button *ngIf="canUpdate(o)" type="button" class="action-icon-btn action-cancel"
-                      (click)="selectedOrder = o; askCancelOrder()" [disabled]="isCancelling"
-                      title="Cancel Order">
-
-                <i class="fa-solid fa-trash-can"></i>
-                <span class="action-text">Cancel Order</span>
-              </button>
-              <!-- NO ACTION -->
-              <span *ngIf="!canUpdate(o) && !canInvoicing(o)" class="text-muted">
-                -
-              </span>
-            </td>
-          </tr>
-          <tr *ngIf="orderList.length === 0">
-            <td colspan="13" class="text-center text-muted py-4">No records found.</td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
-  </div>
-
-  <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage"
-                  (pageChange)="onPageChange($event)">
-  </app-pagination>
+    <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)">
+    </app-pagination>
 </div>
 
 <!-- ================= ORDER UPDATE MODAL ================= -->
 <div class="modal fade" #orderModalEl tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content order-modal">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content order-modal">
 
-      <div class="modal-header">
-        <div>
-          <h6 class="modal-title mb-1 fw-semibold" style="font-size:.9rem !important">Update Order — {{ selectedOrder?.orderNo }}</h6>
-          <div class="small text-muted">
-            {{ selectedOrder?.dealerCode }}
-            <span class="st-badge ms-2" [ngClass]="statusClass(selectedOrder?.paymentStatus)">
-              {{
+            <div class="modal-header">
+                <div>
+                    <h6 class="modal-title mb-1 fw-semibold" style="font-size:.9rem !important">Update Order — {{
+                        selectedOrder?.orderNo }}</h6>
+                    <div class="small text-muted">
+                        {{ selectedOrder?.dealerCode }}
+                        <span class="st-badge ms-2" [ngClass]="statusClass(selectedOrder?.paymentStatus)">
+                            {{
                             selectedOrder?.paymentStatus
-              }}
-            </span>
-          </div>
-        </div>
-        <button type="button" class="btn-close" (click)="closeModal()"
-                [disabled]="isSubmitting || isDeleting"></button>
-      </div>
-
-      <div class="modal-body">
-
-        <!-- Items Table -->
-        <div class="items-wrap">
-          <table class="table items-table mb-0">
-            <thead>
-              <tr>
-                <th style="width:40px;">#</th>
-                <th>Part</th>
-                <th style="width:150px;">Qty</th>
-                <th class="text-end" style="width:120px;">Amount</th>
-                <th class="text-center" style="width:100px;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-
-              <ng-container>
-                <tr *ngFor="let it of orderItems; let i = index; trackBy: trackByItem"
-                    [class.row-dirty]="isDirty(it)">
-                  <td class="text-muted">{{ i + 1 }}</td>
-                  <td>
-                    <div class="part-name" [title]="it.desc">{{ it.desc }}</div>
-                    <div class="part-meta">
-                      {{ it.material }}
-                      <ng-container *ngIf="it.ndp">
-                        · ₹ {{ it.ndp }} + {{
- it.gstRate
-                        }}%
-                      </ng-container>
+                            }}
+                        </span>
                     </div>
-                  </td>
-                  <td>
-                    <div class="qty-stepper">
-                      <button type="button" (click)="decQty(it)"
-                              [disabled]="it.quantity <= 1 || rowBusyId === it.orderDetailId">
-                        −
-                      </button>
-                      <input type="number" min="1" [max]="MAX_QTY" [(ngModel)]="it.quantity"
-                             (blur)="onQtyInput(it)" (keydown)="blockInvalidKeys($event)"
-                             [disabled]="rowBusyId === it.orderDetailId">
-                      <button type="button" (click)="incQty(it)"
-                              [disabled]="it.quantity >= MAX_QTY || rowBusyId === it.orderDetailId">
-                        +
-                      </button>
+                </div>
+                <button type="button" class="btn-close" (click)="closeModal()"
+                    [disabled]="isSubmitting || isDeleting"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Items Table -->
+                <div class="items-wrap">
+                    <table class="table items-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">#</th>
+                                <th>Part</th>
+                                <th style="width:150px;">Qty</th>
+                                <th>Taxable</th>
+                                <th>Tax</th>
+                                <th class="text-end" style="width:120px;">Amount</th>
+                                <th class="text-center" style="width:100px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <ng-container>
+                                <tr *ngFor="let it of orderItems; let i = index; trackBy: trackByItem"
+                                    [class.row-dirty]="isDirty(it)">
+                                    <td class="text-muted">{{ i + 1 }}</td>
+                                    <td>
+                                        <div class="part-name" [title]="it.desc">{{ it.desc }}</div>
+                                        <div class="part-meta">
+                                            {{ it.material }}
+                                            <ng-container *ngIf="it.ndp">
+                                                · ₹ {{ it.ndp }} + {{
+                                                it.gstRate
+                                                }}%
+                                            </ng-container>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="qty-stepper">
+                                            <button type="button" (click)="decQty(it)"
+                                                [disabled]="it.quantity <= 1 || rowBusyId === it.orderDetailId">
+                                                −
+                                            </button>
+                                            <input type="number" min="1" [max]="MAX_QTY" [(ngModel)]="it.quantity"
+                                                (blur)="onQtyInput(it)" (keydown)="blockInvalidKeys($event)"
+                                                [disabled]="rowBusyId === it.orderDetailId">
+                                            <button type="button" (click)="incQty(it)"
+                                                [disabled]="it.quantity >= MAX_QTY || rowBusyId === it.orderDetailId">
+                                                +
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>{{ totalTaxableChangedAmount(it)| number:'1.2-2' }}</td>
+                                    <td>{{ totalTaxChangedAmount(it)| number:'1.2-2' }}</td>
+                                    <td class="text-end fw-semibold">₹ {{ lineAmount(it) | number:'1.2-2' }}</td>
+                                    <td class="text-center text-nowrap">
+                                        <button type="button" class="icon-btn icon-update me-1" title="Update quantity"
+                                            [disabled]="!isDirty(it) || rowBusyId === it.orderDetailId"
+                                            (click)="updateSparePartOrder('UPDATE', it)">
+                                            <span *ngIf="rowBusyId === it.orderDetailId && !deleteTarget; else saveIcon"
+                                                class="spinner-border spinner-border-sm"></span>
+                                            <ng-template #saveIcon><i class="fa-solid fa-floppy-disk"></i></ng-template>
+                                        </button>
+                                        <button type="button" class="icon-btn icon-delete" title="Delete item"
+                                            [disabled]="rowBusyId === it.orderDetailId" (click)="askDelete(it)">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <tr *ngIf="orderItems.length === 0">
+                                    <td colspan="5" class="text-center text-muted py-4">No items in this order.</td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                        <tfoot *ngIf="orderItems.length">
+                            <tr>
+                                <td></td>
+                                <td class="fw-semibold">Total</td>
+                                <td class="fw-semibold ps-3">{{ itemsTotalQty }}</td>
+                                <td class="text-end fw-bold">₹ {{ itemsTaxable| number:'1.2-2'}}</td>
+                                <td class="text-end fw-bold">₹ {{ itemsTax| number:'1.2-2'}}</td>
+                                <td class="text-end fw-bold">₹ {{ itemsGrandTotal | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="amount-strip mt-3">
+                    <div><span>Paid</span><b>₹ {{ (selectedOrder?.paidAmount ?? 0) | number:'1.2-2' }}</b></div>
+                    <div><span>Balance</span><b class="text-danger">₹ {{ payableAmount | number:'1.2-2' }}</b></div>
+                </div>
+
+                <!-- Payment Section -->
+                <div class="payment-section mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="paymentRequired"
+                            [(ngModel)]="paymentRequired" (change)="onPaymentToggle()" [disabled]="isSubmitting">
+                        <label class="form-check-label fw-semibold" for="paymentRequired">Payment Required</label>
                     </div>
-                  </td>
-                  <td class="text-end fw-semibold">₹ {{ lineAmount(it) | number:'1.2-2' }}</td>
-                  <td class="text-center text-nowrap">
-                    <button type="button" class="icon-btn icon-update me-1" title="Update quantity"
-                            [disabled]="!isDirty(it) || rowBusyId === it.orderDetailId"
-                            (click)="updateSparePartOrder('UPDATE', it)">
-                      <span *ngIf="rowBusyId === it.orderDetailId && !deleteTarget; else saveIcon"
-                            class="spinner-border spinner-border-sm"></span>
-                      <ng-template #saveIcon><i class="fa-solid fa-floppy-disk"></i></ng-template>
-                    </button>
-                    <button type="button" class="icon-btn icon-delete" title="Delete item"
-                            [disabled]="rowBusyId === it.orderDetailId" (click)="askDelete(it)">
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </td>
-                </tr>
 
-                <tr *ngIf="orderItems.length === 0">
-                  <td colspan="5" class="text-center text-muted py-4">No items in this order.</td>
-                </tr>
-              </ng-container>
-            </tbody>
-            <tfoot *ngIf="orderItems.length">
-              <tr>
-                <td></td>
-                <td class="fw-semibold">Total</td>
-                <td class="fw-semibold ps-3">{{ itemsTotalQty }}</td>
-                <td class="text-end fw-bold">₹ {{ itemsGrandTotal | number:'1.2-2' }}</td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
+                    <div class="row g-3 mt-1" *ngIf="paymentRequired">
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Amount <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" [(ngModel)]="payment.paymentAmount"
+                                placeholder="Enter amount" [class.is-invalid]="paymentTouched && amountError"
+                                readonly />
+                            <div class="invalid-feedback">{{ amountError }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+                            <select class="form-select" [(ngModel)]="payment.paymentMode"
+                                [class.is-invalid]="paymentTouched && modeError">
+                                <option value="" disabled>Select Payment Mode</option>
+                                <option *ngFor="let c of paymentModesOption" [value]="c.dropDownName">
+                                    {{
+                                    c.dropDownName
+                                    }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">{{ modeError }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transaction ID</label>
+                            <input type="text" class="form-control" maxlength="100" [(ngModel)]="payment.transactionId"
+                                placeholder="Enter transaction ID">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference No</label>
+                            <input type="text" class="form-control" maxlength="100" [(ngModel)]="payment.referenceNo"
+                                placeholder="Enter reference number">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Payment Remarks</label>
+                            <textarea class="form-control" rows="2" maxlength="500" [(ngModel)]="payment.paymentRemarks"
+                                placeholder="Enter payment remarks"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary px-4" (click)="closeModal()" [disabled]="isSubmitting">
+                    Cancel
+                </button>
+                <button type="button" class="btn custom-btn px-4" (click)="submitOrder()" [disabled]="isSubmitting">
+                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+                    Submit Order
+                </button>
+            </div>
         </div>
-
-        <div class="amount-strip mt-3">
-          <div><span>Paid</span><b>₹ {{ (selectedOrder?.paidAmount ?? 0) | number:'1.2-2' }}</b></div>
-          <div><span>Balance</span><b class="text-danger">₹ {{ payableAmount | number:'1.2-2' }}</b></div>
-        </div>
-
-        <!-- Payment Section -->
-        <div class="payment-section mt-3">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="paymentRequired"
-                   [(ngModel)]="paymentRequired" (change)="onPaymentToggle()" [disabled]="isSubmitting">
-            <label class="form-check-label fw-semibold" for="paymentRequired">Payment Required</label>
-          </div>
-
-          <div class="row g-3 mt-1" *ngIf="paymentRequired">
-            <div class="col-md-6">
-              <label class="form-label">Payment Amount <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" [(ngModel)]="payment.paymentAmount"
-                     placeholder="Enter amount" [class.is-invalid]="paymentTouched && amountError"
-                     readonly />
-              <div class="invalid-feedback">{{ amountError }}</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
-              <select class="form-select" [(ngModel)]="payment.paymentMode"
-                      [class.is-invalid]="paymentTouched && modeError">
-                <option value="" disabled>Select Payment Mode</option>
-                <option *ngFor="let c of paymentModesOption" [value]="c.dropDownName">
-                  {{
- c.dropDownName
-                  }}
-                </option>
-              </select>
-              <div class="invalid-feedback">{{ modeError }}</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Transaction ID</label>
-              <input type="text" class="form-control" maxlength="100" [(ngModel)]="payment.transactionId"
-                     placeholder="Enter transaction ID">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Reference No</label>
-              <input type="text" class="form-control" maxlength="100" [(ngModel)]="payment.referenceNo"
-                     placeholder="Enter reference number">
-            </div>
-            <div class="col-12">
-              <label class="form-label">Payment Remarks</label>
-              <textarea class="form-control" rows="2" maxlength="500" [(ngModel)]="payment.paymentRemarks"
-                        placeholder="Enter payment remarks"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary px-4" (click)="closeModal()"
-                [disabled]="isSubmitting">
-          Cancel
-        </button>
-        <button type="button" class="btn custom-btn px-4" (click)="submitOrder()" [disabled]="isSubmitting">
-          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1"></span>
-          Submit Order
-        </button>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- ================= DELETE CONFIRM ================= -->
 <div class="confirm-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
-  <div class="confirm-box" (click)="$event.stopPropagation()">
-    <div class="confirm-icon">
-      <i class="fa-regular fa-trash-can"></i>
-    </div>
-    <h5 class="fw-semibold mt-3 mb-1">Delete Item?</h5>
-    <p class="text-muted mb-1">Are you sure you want to delete this item from the order?</p>
-    <p class="confirm-part mb-3">
-      {{ deleteTarget?.desc }} <span *ngIf="deleteTarget?.material">
-        ({{
+    <div class="confirm-box" (click)="$event.stopPropagation()">
+        <div class="confirm-icon">
+            <i class="fa-regular fa-trash-can"></i>
+        </div>
+        <h5 class="fw-semibold mt-3 mb-1">Delete Item?</h5>
+        <p class="text-muted mb-1">Are you sure you want to delete this item from the order?</p>
+        <p class="confirm-part mb-3">
+            {{ deleteTarget?.desc }} <span *ngIf="deleteTarget?.material">
+                ({{
                 deleteTarget?.material
-        }})
-      </span>
-    </p>
-    <p class="small text-danger mb-4">This action cannot be undone.</p>
-    <div class="d-flex gap-2 justify-content-center">
-      <button type="button" class="btn btn-light px-4 border" (click)="cancelDelete()"
-              [disabled]="isDeleting">
-        No
-      </button>
-      <button type="button" class="btn btn-danger px-4" (click)="confirmDelete()" [disabled]="isDeleting">
-        <span *ngIf="isDeleting" class="spinner-border spinner-border-sm me-1"></span> Yes, Delete
-      </button>
+                }})
+            </span>
+        </p>
+        <p class="small text-danger mb-4">This action cannot be undone.</p>
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-light px-4 border" (click)="cancelDelete()" [disabled]="isDeleting">
+                No
+            </button>
+            <button type="button" class="btn btn-danger px-4" (click)="confirmDelete()" [disabled]="isDeleting">
+                <span *ngIf="isDeleting" class="spinner-border spinner-border-sm me-1"></span> Yes, Delete
+            </button>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- ================= CANCEL ORDER CONFIRM ================= -->
 <div class="confirm-overlay" *ngIf="cancelOrderTarget" (click)="cancelOrderConfirmation()">
-  <div class="confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-box" (click)="$event.stopPropagation()">
 
-    <div class="confirm-icon">
-      <i class="fa-solid fa-ban"></i>
+        <div class="confirm-icon">
+            <i class="fa-solid fa-ban"></i>
+        </div>
+
+        <h5 class="fw-semibold mt-3 mb-1">Cancel Order?</h5>
+
+        <p class="text-muted mb-1">
+            Are you sure you want to cancel this order?
+        </p>
+
+        <p class="confirm-part mb-3">
+            Order No:
+            <strong>{{ cancelOrderTarget?.orderNo || '-' }}</strong>
+        </p>
+
+        <p class="small text-danger mb-4">
+            This action cannot be undone.
+        </p>
+
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-light px-4 border" (click)="cancelOrderConfirmation()"
+                [disabled]="isCancelling">
+                No
+            </button>
+
+            <button type="button" class="btn btn-danger px-4" (click)="confirmCancelOrder()" [disabled]="isCancelling">
+
+                <span *ngIf="isCancelling" class="spinner-border spinner-border-sm me-1"></span>
+
+                Yes, Cancel Order
+            </button>
+        </div>
+
     </div>
-
-    <h5 class="fw-semibold mt-3 mb-1">Cancel Order?</h5>
-
-    <p class="text-muted mb-1">
-      Are you sure you want to cancel this order?
-    </p>
-
-    <p class="confirm-part mb-3">
-      Order No:
-      <strong>{{ cancelOrderTarget?.orderNo || '-' }}</strong>
-    </p>
-
-    <p class="small text-danger mb-4">
-      This action cannot be undone.
-    </p>
-
-    <div class="d-flex gap-2 justify-content-center">
-      <button type="button" class="btn btn-light px-4 border" (click)="cancelOrderConfirmation()"
-              [disabled]="isCancelling">
-        No
-      </button>
-
-      <button type="button" class="btn btn-danger px-4" (click)="confirmCancelOrder()" [disabled]="isCancelling">
-
-        <span *ngIf="isCancelling" class="spinner-border spinner-border-sm me-1"></span>
-
-        Yes, Cancel Order
-      </button>
-    </div>
-
-  </div>
 </div>
 
 <!-- =================  UPDATE Invoice MODAL ================= -->
 
 <div class="modal fade" #invoiceModalEl tabindex="-1" aria-hidden="true">
 
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 
-    <div class="modal-content order-modal">
+        <div class="modal-content order-modal">
 
-      <!-- ================= HEADER ================= -->
-      <div class="modal-header">
+            <!-- ================= HEADER ================= -->
+            <div class="modal-header">
 
-        <div>
-          <h6 class="modal-title mb-1 fw-semibold">Update Order — {{ selectedOrder?.orderNo }}</h6>
+                <div>
+                    <h6 class="modal-title mb-1 fw-semibold">Update Order — {{ selectedOrder?.orderNo }}</h6>
 
-          <div class="small text-muted">
-            {{ selectedOrder?.dealerCode }}
-            <span class="st-badge ms-2" [ngClass]="statusClass(selectedOrder?.paymentStatus)"> {{ selectedOrder?.paymentStatus }} </span>
-          </div>
-        </div>
-        <button type="button" class="btn-close" (click)="closeInvoiceModal()" [disabled]="isInvoiceSubmitting"></button>
-      </div>
+                    <div class="small text-muted">
+                        {{ selectedOrder?.dealerCode }}
+                        <span class="st-badge ms-2" [ngClass]="statusClass(selectedOrder?.paymentStatus)"> {{
+                            selectedOrder?.paymentStatus }} </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" (click)="closeInvoiceModal()"
+                    [disabled]="isInvoiceSubmitting"></button>
+            </div>
 
-      <div class="modal-body">
+            <div class="modal-body">
 
-        <div class="items-wrap">
+                <div class="items-wrap">
+                    <table class="table items-table mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">#</th>
+                                <th> Part</th>
+                                <th> Avail. Qty</th>
+                                <th style="width:150px;"> Qty </th>
+                                <th>Taxable</th>
+                                <th>Tax</th>
+                                <th class="text-end" style="width:120px;"> Amount </th>
+                                <!-- <th class="text-center" style="width:100px;"> Action </th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
 
-          <table class="table items-table mb-0">
+                            <tr *ngFor="let it of orderItems; let i = index; trackBy: trackByItem"
+                                [class.row-dirty]="isDirty(it)">
 
-            <thead>
-              <tr>
-                <th style="width:40px;">#</th>
-                <th> Part</th>
-                <th> Avail. Qty</th>
-                <th style="width:150px;"> Qty </th>
-                <th class="text-end" style="width:120px;"> Amount </th>
-                <!-- <th class="text-center" style="width:100px;"> Action </th> -->
-              </tr>
-            </thead>
-            <tbody>
+                                <td class="text-muted"> {{ i + 1 }} </td>
+                                <!-- Part -->
+                                <td>
+                                    <div class="part-name" [title]="it.desc"> {{ it.desc }}</div>
+                                    <div class="part-meta">
+                                        {{ it.material }}
+                                        <ng-container *ngIf="it.ndp">· ₹ {{ it.ndp }}+{{ it.gstRate }}%</ng-container>
+                                    </div>
+                                </td>
+                                <td>{{ it.currentQty}}</td>
 
-              <tr *ngFor="let it of orderItems; let i = index; trackBy: trackByItem" [class.row-dirty]="isDirty(it)">
-
-                <td class="text-muted"> {{ i + 1 }} </td>
-                <!-- Part -->
-                <td>
-                  <div class="part-name" [title]="it.desc"> {{ it.desc }}</div>
-                  <div class="part-meta">
-                    {{ it.material }}
-                    <ng-container *ngIf="it.ndp">· ₹ {{ it.ndp }}+{{ it.gstRate }}%</ng-container>
-                  </div>
-                </td>
-                <td>{{ it.currentQty}}</td>
-
-                <!-- Quantity -->
-                <td>
-                  {{ it.quantity}}
-                  <!-- <div class="qty-stepper">
+                                <!-- Quantity -->
+                                <td>
+                                    {{ it.quantity}}
+                                    <!-- <div class="qty-stepper">
 
                       <button type="button" (click)="decQty(it)" [disabled]="it.quantity <= 1 ||rowBusyId === it.orderDetailId">
                           −
@@ -476,9 +579,11 @@
 
                   </div> -->
 
-                </td>
-                <td class="text-end fw-semibold"> ₹{{lineAmount(it)| number:'1.2-2'}}</td>
-                <!-- <td class="text-center text-nowrap">
+                                </td>
+                                <td>{{ it.totalTaxableAmount}}</td>
+                                <td>{{ it.taxAmount }}</td>
+                                <td class="text-end fw-semibold"> ₹{{lineAmount(it)| number:'1.2-2'}}</td>
+                                <!-- <td class="text-center text-nowrap">
                     <button type="button" class="icon-btn icon-update me-1" title="Update quantity"
                         [disabled]="!isDirty(it) ||rowBusyId === it.orderDetailId
                         " (click)=" updateSparePartOrder('UPDATE',it)">
@@ -496,106 +601,168 @@
                         <i class="fa-regular fa-trash-can"></i>
                     </button>
                 </td> -->
-              </tr>
+                            </tr>
 
-              <!-- No Items -->
-              <tr *ngIf="orderItems.length === 0">
-                <td colspan="5" class="text-center text-muted py-4">
-                  No items in this order.
-                </td>
-              </tr>
-            </tbody>
-            <!-- Total -->
-            <tfoot *ngIf="orderItems.length">
-              <tr>
-                <td></td>
-                <td class="fw-semibold">Total</td>
-                <td></td>
-                <td class="fw-semibold ps-3">{{ itemsTotalQty }}</td>
-                <td class="text-end fw-bold">₹ {{itemsGrandTotal| number:'1.2-2'}} </td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+                            <!-- No Items -->
+                            <tr *ngIf="orderItems.length === 0">
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    No items in this order.
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- Total -->
+                        <tfoot *ngIf="orderItems.length">
+                            <tr>
+                                <td></td>
+                                <td class="fw-semibold">Total</td>
+                                <td></td>
+                                <td class="fw-semibold ps-3">{{ itemsTotalQty }}</td>
+                                <td>{{ itemsTotalTaxable}}</td>
+                                <td>{{itemsTotalTax}}</td>
+                                <td class="text-end fw-bold">₹ {{itemsGrandTotal| number:'1.2-2'}} </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
-        <div class="amount-strip mt-3">
-          <div><span> Paid</span><b>₹{{ selectedOrder?.paidAmount ?? 0 | number:'1.2-2' }}</b></div>
-          <div><span> Balance</span><b class="text-danger">₹{{payableAmount | number:'1.2-2'}}</b></div>
-        </div>
+                <div class="amount-strip mt-3">
+                    <div><span> Paid</span><b>₹{{ selectedOrder?.paidAmount ?? 0 | number:'1.2-2' }}</b></div>
+                    <div><span> Balance</span><b class="text-danger">₹{{payableAmount | number:'1.2-2'}}</b></div>
+                </div>
 
-        <!-- INVOICE SECTION -->
+                <!-- Payment Section -->
+                <div class="payment-section mt-3" *ngIf="selectedOrder?.isPaymentSuccess">
+                    <div class="section-header">
+                        <div class="fw-semibold" style="font-size:.9rem">Payment Details</div>
+                    </div>
 
-        <div class="invoice-section mt-3">
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Amount <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" [ngModel]="selectedOrder?.paymentAmount"
+                                readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" [ngModel]="selectedOrder?.paymentMode" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Transaction ID</label>
+                            <input type="text" class="form-control" [ngModel]="selectedOrder?.transactionId"
+                                placeholder="-" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference No</label>
+                            <input type="text" class="form-control" [ngModel]="selectedOrder?.referenceNo"
+                                placeholder="-" readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Payment Remarks</label>
+                            <textarea class="form-control h-auto" rows="3" [ngModel]="selectedOrder?.remarks"
+                                placeholder="-" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="section-header">
-            <div class="fw-semibold" style="font-size:.9rem"> Invoice Details</div>
-          </div>
+                <!-- INVOICE SECTION -->
+                <div class="invoice-section mt-3" *ngIf="InvoiceView">
 
-          <div class="row g-3 mt-1">
+                    <div class="section-header">
+                        <div class="fw-semibold" style="font-size:.9rem"> Invoice Details</div>
+                    </div>
 
-            <div class="col-md-4 col-sm-6">
-              <label class="form-label">Invoice Number<span class="text-danger" *ngIf="!selectedOrder?.isInvoicing">*</span></label>
-              <input type="text" class="form-control" maxlength="100" [(ngModel)]="invoice.invoiceNumber"
-                     placeholder="Enter invoice number" [readonly]="selectedOrder?.isInvoicing" [class.is-invalid]="
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label">Invoice Number<span class="text-danger"
+                                    *ngIf="!selectedOrder?.isInvoicing">*</span></label>
+                            <input type="text" class="form-control" maxlength="100" [(ngModel)]="invoice.invoiceNumber"
+                                placeholder="Enter invoice number" [readonly]="selectedOrder?.isInvoicing"
+                                [class.is-invalid]="
                                     invoiceTouched && !invoice.invoiceNumber " />
 
-              <div class="invalid-feedback" *ngIf="invoiceTouched && !invoice.invoiceNumber">Invoice number is required.</div>
-            </div>
-            <div class="col-md-4 col-sm-6">
-              <label class="form-label">Taxable Amount<span class="text-danger" *ngIf="!selectedOrder?.isInvoicing">*</span> </label>
-              <input type="number" class="form-control" min="0" [(ngModel)]="invoice.taxableAmount" placeholder="Enter taxable amount" readonly />
-            </div>
-            <div class="col-md-4 col-sm-6">
-              <label class="form-label">Tax Amount<span class="text-danger" *ngIf="!selectedOrder?.isInvoicing">*</span> </label>
-              <input type="number" class="form-control" min="0" [(ngModel)]="invoice.taxAmount" placeholder="Enter tax amount" readonly />
-            </div>
-            <div class="col-md-3 col-sm-6">
+                            <div class="invalid-feedback" *ngIf="invoiceTouched && !invoice.invoiceNumber">Invoice
+                                number is required.</div>
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label">Taxable Amount<span class="text-danger"
+                                    *ngIf="!selectedOrder?.isInvoicing">*</span> </label>
+                            <input type="number" class="form-control" min="0" [(ngModel)]="invoice.taxableAmount"
+                                placeholder="Enter taxable amount" readonly />
+                        </div>
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label">Tax Amount<span class="text-danger"
+                                    *ngIf="!selectedOrder?.isInvoicing">*</span> </label>
+                            <input type="number" class="form-control" min="0" [(ngModel)]="invoice.taxAmount"
+                                placeholder="Enter tax amount" readonly />
+                        </div>
+                        <div class="col-md-3 col-sm-6">
 
-              <label class="form-label">Total Amount</label>
-              <input type="number" class="form-control" [value]="calculateInvoiceTotal()" readonly />
+                            <label class="form-label">Total Amount</label>
+                            <input type="number" class="form-control" [value]="calculateInvoiceTotal()" readonly />
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <label class="form-label">Invoice Date<span class="text-danger"
+                                    *ngIf="!selectedOrder?.isInvoicing">*</span></label>
+                            <input type="date" [max]="today" class="form-control" [(ngModel)]="invoice.invoiceDate"
+                                placeholder="Enter invoice date" [readonly]="selectedOrder?.isInvoicing"
+                                [class.is-invalid]="invoiceTouched && !invoice.invoiceDate" />
+                            <div class="invalid-feedback" *ngIf="invoiceTouched && !invoice.invoiceDate"> Invoice Date
+                                is required. </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label class="form-label">Invoice PDF<span class="text-danger"
+                                    *ngIf="!selectedOrder?.isInvoicing">*</span></label>
+                            <input #invoiceFileInput *ngIf="!selectedOrder?.isInvoicing" type="file"
+                                class="form-control" accept=".pdf,application/pdf"
+                                [disabled]="selectedOrder?.isInvoicing || isInvoiceSubmitting"
+                                (change)="onInvoiceFileSelected($event)" />
+                            <small *ngIf="!selectedOrder?.isInvoicing" class="text-muted">Only PDF files are allowed.
+                                Maximum size: 10 MB.</small>
+                            <!-- Existing File -->
+                            <div *ngIf="invoice.invoiceFileName && !selectedInvoiceFile ">
+                                <button type="button" class="btn btn-outline-primary">
+                                    <a *ngIf="invoice.invoiceFileUrl" [href]="invoice.invoiceFileUrl" target="_blank"
+                                        class="text-primary text-decoration-none" style="font-size: 14px !important;">
+                                        <i class="fa-solid fa-file-pdf me-1"></i>{{ invoice.invoiceFileName }}
+                                    </a>
+                                    <span *ngIf="!invoice.invoiceFileUrl" class="text-muted"><i
+                                            class="fa-solid fa-file-pdf me-1"></i>{{ invoice.invoiceFileName }}</span>
+                                </button>
+                            </div>
+
+                        </div>
+                        <div class="col-md-12 col-sm-12" *ngIf="AddDeliveryView">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isDelivery" [(ngModel)]="isDelivery"
+                                    [disabled]="selectedOrder?.isDelivered || isInvoiceSubmitting" />
+                                <label class="form-check-label fw-semibold" style="font-size:.9rem" for="isDelivery">Add
+                                    Delivery Details</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" *ngIf="isDelivery">
+                            <label class="form-label">Docket Number<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" maxlength="100" [(ngModel)]="invoice.docketNumber"
+                                [readonly]="selectedOrder?.docketNumber" placeholder="Enter docket number"
+                                [class.is-invalid]="docketTouched && !invoice.docketNumber" />
+                            <div class="invalid-feedback" *ngIf="docketTouched &&!invoice.docketNumber">Docket number is
+                                required when delivery is selected.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3 col-sm-6">
-              <label class="form-label">Invoice Date<span class="text-danger" *ngIf="!selectedOrder?.isInvoicing">*</span></label>
-              <input type="date" [max]="today" class="form-control" [(ngModel)]="invoice.invoiceDate" placeholder="Enter invoice date" [readonly]="selectedOrder?.isInvoicing" [class.is-invalid]="invoiceTouched && !invoice.invoiceDate" />
-              <div class="invalid-feedback" *ngIf="invoiceTouched && !invoice.invoiceDate"> Invoice Date is required. </div>
+            <!-- FOOTER -->
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary px-4" (click)="closeInvoiceModal()"
+                    [disabled]="isInvoiceSubmitting">Cancel</button>
+                <button *ngIf="InvoiceViewButton" type="button" class="btn custom-btn px-4" (click)="submitInvoice()"
+                    [disabled]="isSubmitting || isInvoiceSubmitting">
+                    <span *ngIf="isInvoiceSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+                    {{isInvoiceSubmitting? 'Submitting...' : 'Submit Invoice'}}
+                </button>
             </div>
-            <div class="col-md-6 col-sm-6">
-              <label class="form-label">Invoice PDF<span class="text-danger" *ngIf="!selectedOrder?.isInvoicing">*</span></label>
-              <input #invoiceFileInput *ngIf="!selectedOrder?.isInvoicing" type="file" class="form-control" accept=".pdf,application/pdf" [disabled]="selectedOrder?.isInvoicing || isInvoiceSubmitting" (change)="onInvoiceFileSelected($event)" />
-              <small *ngIf="!selectedOrder?.isInvoicing" class="text-muted">Only PDF files are allowed. Maximum size: 10 MB.</small>
-              <!-- Existing File -->
-              <div *ngIf="invoice.invoiceFileName && !selectedInvoiceFile " class="mt-2">
-                <a *ngIf="invoice.invoiceFileUrl" [href]="invoice.invoiceFileUrl" target="_blank" class="text-primary text-decoration-none">
-                  <i class="fa-solid fa-file-pdf me-1"></i>{{ invoice.invoiceFileName }}
-                </a>
-                <span *ngIf="!invoice.invoiceFileUrl" class="text-muted"><i class="fa-solid fa-file-pdf me-1"></i>{{ invoice.invoiceFileName }}</span>
-              </div>
-            </div>
-            <div class="col-md-12 col-sm-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="isDelivery" [(ngModel)]="isDelivery" [disabled]="selectedOrder?.isDelivered || isInvoiceSubmitting" />
-                <label class="form-check-label fw-semibold" style="font-size:.9rem" for="isDelivery">Add Delivery Details</label>
-              </div>
-            </div>
-            <div class="col-md-6" *ngIf="isDelivery">
-              <label class="form-label">Docket Number<span class="text-danger">*</span></label>
-              <input type="text" class="form-control" maxlength="100" [(ngModel)]="invoice.docketNumber"
-                     placeholder="Enter docket number" [class.is-invalid]="docketTouched && !invoice.docketNumber" />
-              <div class="invalid-feedback" *ngIf="docketTouched &&!invoice.docketNumber">Docket number is required when delivery is selected.</div>
-            </div>
-          </div>
         </div>
-      </div>
-      <!-- FOOTER -->
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary px-4" (click)="closeInvoiceModal()" [disabled]="isInvoiceSubmitting">Cancel</button>
-        <button type="button" class="btn custom-btn px-4" (click)="submitInvoice()" [disabled]="isSubmitting || isInvoiceSubmitting">
-          <span *ngIf="isInvoiceSubmitting" class="spinner-border spinner-border-sm me-1"></span>
-          {{isInvoiceSubmitting? 'Submitting...' : 'Submit Invoice'}}
-        </button>
-      </div>
     </div>
-  </div>
 </div>

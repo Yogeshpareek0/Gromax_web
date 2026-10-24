@@ -1540,9 +1540,9 @@ export interface ItemScoreReportRow {
 }
 
 export interface ItemScoreColumn {
-  key: string;    
+  key: string;
   label: string;
-  max: number;   
+  max: number;
 }
 
 export interface DealerOption {
@@ -1582,6 +1582,22 @@ export interface SparePartOrderList {
   totalGSTAmount: number;
   isInvoicing: boolean;
   isDelivered: boolean;
+
+  isPaymentSuccess: boolean;
+  paymentAmount: number;
+  invTaxableAmount: number;
+  invTaxAmount: number;
+  invTotalAmount: number;
+  paymentDate: string;
+  paymentMode: string;
+  referenceNo: string;
+  remarks: string;
+  transactionId: string;
+  docketNumber: string | null;
+  invoiceNumber: string | null;
+  pdfUrl: string | null;
+  deliveryDate: string | null;
+  invoiceDate: string | null;
 }
 
 export interface SparePartOrderDetail {
