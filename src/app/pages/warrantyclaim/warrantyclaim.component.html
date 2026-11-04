@@ -1,11 +1,604 @@
-<div class="coming-soon-wrapper d-flex flex-column justify-content-center align-items-center">
+<div class="container-fluid px-0">
 
-  <div class="coming-soon-circle mb-4">
-    <div class="coming-soon-icon">🚀</div>
+  <!-- Tabs -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div class="wc-tabs">
+      <button *ngIf="isDealer" type="button" class="wc-tab" [class.active]="activeTab === 'jobcards'" (click)="switchTab('jobcards')">
+        <i class="fa-solid fa-clipboard-list me-1"></i> Closed Job Cards
+      </button>
+      <button type="button" class="wc-tab" [class.active]="activeTab === 'claims'" (click)="switchTab('claims')">
+        <i class="fa-solid fa-shield-halved me-1"></i> Warranty Claims
+      </button>
+    </div>
+    <!--<span class="role-chip"><i class="fa-solid fa-user-shield me-1"></i> {{ roleLabel }}</span>-->
   </div>
 
-  <h4 class="fw-bold mb-3">Coming Soon</h4>
-  <p class="mb-4 text-muted">
-    We are preparing something amazing for you. Stay tuned!
-  </p>
+  <!-- ================= TAB: CLOSED JOB CARDS (Dealer) ================= -->
+  <ng-container *ngIf="activeTab === 'jobcards'">
+    <div class="card shadow-sm px-4 border-0 pb-3 pt-3" style="border-radius: 12px;">
+      <div class="row align-items-end g-2">
+
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Job Card No</label>
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="jobCardNo"
+                 placeholder="Enter job card no" (keyup.enter)="onShowReport()">
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Chassis Number</label>
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="chassisNumber"
+                 placeholder="Enter chassis number" (keyup.enter)="onShowReport()">
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Job Card Type</label>
+          <select class="form-select form-select-sm" [(ngModel)]="selectedJobType">
+            <option value="">All</option>
+            <option *ngFor="let j of jobCardTypes" [value]="j">{{ j }}</option>
+          </select>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Duration</label>
+          <select class="form-select form-select-sm" [(ngModel)]="selectedDuration" (change)="onDurationChange()">
+            <option value="this Month">This Month</option>
+            <option value="this Quarter">This Quarter</option>
+            <option value="last Quarter">Last Quarter</option>
+            <option value="this FY">This FY</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <ng-container *ngIf="selectedDuration === 'custom'">
+          <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">Start Date</label>
+            <input type="date" class="form-control form-control-sm" [(ngModel)]="customStartDate"
+                   [max]="customEndDate || today">
+          </div>
+          <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+            <label class="form-label fw-medium mb-1" style="font-size:13px;">End Date</label>
+            <input type="date" class="form-control form-control-sm" [(ngModel)]="customEndDate"
+                   [min]="customStartDate" [max]="today">
+          </div>
+        </ng-container>
+
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <div class="d-flex gap-2">
+            <button class="btn w-100 custom-btn py-2" (click)="onShowReport()" style="font-size:13px;">
+              <i class="bi bi-clipboard-data me-1"></i> Show
+            </button>
+            <button class="btn w-100 btn-outline-secondary reset-btn py-2" (click)="onReset()" style="font-size:13px;">
+              <i class="fa-solid fa-rotate-left me-1"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-3">
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1500px;">
+        <thead>
+          <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Job Card No</th>
+            <th class="text-nowrap fw-normal">Job Card Date</th>
+            <th class="text-nowrap fw-normal">Job Card Type</th>
+            <th class="text-nowrap fw-normal">Chassis No</th>
+            <th class="text-nowrap fw-normal">Customer Name</th>
+            <th class="text-nowrap fw-normal">Mobile No</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal text-end">Hours</th>
+            <th class="text-nowrap fw-normal">Work Done By</th>
+            <th class="text-nowrap fw-normal text-end">Spare Total</th>
+            <th class="text-nowrap fw-normal text-end">Grand Total</th>
+            <th class="text-nowrap fw-normal">Status</th>
+            <th class="text-nowrap fw-normal text-center" style="border-top-right-radius: 6px;">Action</th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr *ngFor="let item of jobCardList; let i = index; trackBy: trackById">
+            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td class="text-nowrap fw-semibold" style="color:#215378;">{{ item.JobCardNo || '-' }}</td>
+            <td class="text-nowrap">{{ item.JobCardDate ? (item.JobCardDate | date:'dd-MM-yyyy') : '-' }}</td>
+            <td class="text-nowrap"><span class="type-badge">{{ item.JobCardType || '-' }}</span></td>
+            <td class="text-nowrap">{{ item.ChassiNumber || '-' }}</td>
+            <td class="text-nowrap">{{ item.CustomerName || '-' }}</td>
+            <td class="text-nowrap">{{ item.MobileNo || '-' }}</td>
+            <td class="text-nowrap">{{ item.DealerCode || '-' }}</td>
+            <td class="text-nowrap">{{ item.DealerName || '-' }}</td>
+            <td class="text-nowrap text-end">{{ item.Hours }}</td>
+            <td class="text-nowrap">{{ item.WorkDoneBy || '-' }}</td>
+            <td class="text-nowrap text-end">₹ {{ item.SpareTotal | number:'1.2-2' }}</td>
+            <td class="text-nowrap text-end fw-semibold">₹ {{ item.GrandTotal | number:'1.2-2' }}</td>
+            <td class="text-nowrap">
+              <span class="st-badge" [ngClass]="item.IsClosed ? 'st-success' : 'st-pending'">
+                {{ item.IsClosed ? 'Closed' : 'Open' }}
+              </span>
+            </td>
+            <td class="text-nowrap text-center">
+              <button type="button" class="btn btn-sm custom-btn px-3" (click)="onSelect(item)">
+                <i class="fa-solid fa-hand-pointer me-1"></i> Select
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="jobCardList.length === 0">
+            <td colspan="15" class="text-center text-muted py-4">No records found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [totalItems]="totalItems"
+                    [pageSize]="itemsPerPage"
+                    [currentPage]="currentPage"
+                    (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </ng-container>
+
+  <!-- ================= TAB: WARRANTY CLAIMS ================= -->
+  <ng-container *ngIf="activeTab === 'claims'">
+
+    <!-- Status Cards -->
+    <div class="status-cards mb-3">
+      <button type="button" class="status-card" *ngFor="let card of claimStatusCards"
+              [ngClass]="card.cls" [class.active]="claimStatus === card.status"
+              (click)="onStatusCardClick(card.status)">
+        <span class="sc-icon"><i [class]="card.icon"></i></span>
+        <span class="sc-text">
+          <span class="sc-label">{{ card.label }}</span>
+          <span class="sc-count">{{ getStatusCount(card.key) }}</span>
+        </span>
+        <i class="fa-solid fa-chevron-right sc-arrow"></i>
+      </button>
+    </div>
+
+    <div class="card shadow-sm px-4 border-0 pb-3 pt-3" style="border-radius: 12px;">
+      <div class="row align-items-end g-2">
+        <div class="col-xl-3 col-lg-4 col-sm-6 col-12">
+          <label class="form-label fw-medium mb-1" style="font-size:13px;">Search</label>
+          <input type="text" class="form-control form-control-sm" [(ngModel)]="claimSearch"
+                 placeholder="Claim no / chassis / dealer code" (keyup.enter)="onClaimSearch()">
+        </div>
+        <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
+          <div class="d-flex gap-2">
+            <button class="btn w-100 custom-btn py-2" (click)="onClaimSearch()" style="font-size:13px;">
+              <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+            </button>
+            <button class="btn w-100 btn-outline-secondary reset-btn py-2" (click)="onClaimRefresh()" style="font-size:13px;">
+              <i class="fa-solid fa-rotate me-1"></i> Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="enquiry-table-wrapper mt-3">
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width: 1500px;">
+        <thead>
+          <tr class="border-top-0" style="--bs-table-bg: #215378; --bs-table-color: white; font-size: 14px;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius: 8px;">S.No.</th>
+            <th class="text-nowrap fw-normal">Claim No</th>
+            <th class="text-nowrap fw-normal">Claim Date</th>
+            <th class="text-nowrap fw-normal">Chassis No</th>
+            <th class="text-nowrap fw-normal">Dealer Code</th>
+            <th class="text-nowrap fw-normal text-end">Parts Amount</th>
+            <th class="text-nowrap fw-normal text-end">Labour</th>
+            <th class="text-nowrap fw-normal text-end">GST</th>
+            <th class="text-nowrap fw-normal text-end">Total Claim</th>
+            <th class="text-nowrap fw-normal">CCM Status</th>
+            <th class="text-nowrap fw-normal">HO Status</th>
+            <th class="text-nowrap fw-normal">Current Stage</th>
+            <th class="text-nowrap fw-normal text-center" style="border-top-right-radius: 6px;">Action</th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 14px;">
+          <tr *ngFor="let c of claimList; let i = index; trackBy: trackByClaim">
+            <td>{{ (claimCurrentPage - 1) * claimItemsPerPage + i + 1 }}</td>
+            <td class="text-nowrap fw-semibold" style="color:#215378;">{{ c.WarrantyClaimNo || '-' }}</td>
+            <td class="text-nowrap">{{ c.ClaimDate ? (c.ClaimDate | date:'dd-MM-yyyy') : '-' }}</td>
+            <td class="text-nowrap">{{ c.ChasisNo || '-' }}</td>
+            <td class="text-nowrap">{{ c.DealerCode || '-' }}</td>
+            <td class="text-nowrap text-end">₹ {{ c.TotalPartsAmount | number:'1.2-2' }}</td>
+            <td class="text-nowrap text-end">₹ {{ c.TotalLabourAmount | number:'1.2-2' }}</td>
+            <td class="text-nowrap text-end">₹ {{ c.TotalGSTAmount | number:'1.2-2' }}</td>
+            <td class="text-nowrap text-end fw-semibold">₹ {{ c.TotalClaimAmount | number:'1.2-2' }}</td>
+            <td class="text-nowrap"><span class="st-badge" [ngClass]="statusClass(c.CCMApprovalStatus)">{{ statusLabel(c.CCMApprovalStatus) }}</span></td>
+            <td class="text-nowrap"><span class="st-badge" [ngClass]="hoStatusClass(c)">{{ hoStatusLabel(c) }}</span></td>
+            <td class="text-nowrap"><span class="st-badge" [ngClass]="stageClass(c)">{{ stageLabel(c) }}</span></td>
+            <td class="text-nowrap text-center">
+              <button *ngIf="canAct(c); else viewBtn" type="button" class="btn btn-sm custom-btn px-3" (click)="openClaimReview(c)">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Review
+              </button>
+              <ng-template #viewBtn>
+                <button type="button" class="btn btn-sm view-btn px-3" (click)="openClaimReview(c)">
+                  <i class="fa-regular fa-eye me-1"></i> View
+                </button>
+              </ng-template>
+            </td>
+          </tr>
+          <tr *ngIf="claimList.length === 0">
+            <td colspan="13" class="text-center text-muted py-4">No {{ claimStatusName }} warranty claims found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [totalItems]="claimTotalItems"
+                    [pageSize]="claimItemsPerPage"
+                    [currentPage]="claimCurrentPage"
+                    (pageChange)="onClaimPageChange($event)">
+    </app-pagination>
+  </ng-container>
+</div>
+
+<!-- ================= WARRANTY CLAIM FILL MODAL (Dealer) ================= -->
+<div class="modal fade" #claimModalEl tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content claim-modal">
+
+      <div class="modal-header">
+        <div>
+          <h6 class="modal-title mb-1 fw-semibold">Warranty Claim — {{ selectedJobCard?.JobCardNo }}</h6>
+          <div class="small text-muted">Select parts to include in the warranty claim</div>
+        </div>
+        <button type="button" class="btn-close" (click)="closeClaimModal()" [disabled]="isSubmitting"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="section-title">Job Card Details</div>
+        <div class="detail-grid">
+          <div class="detail-item"><span>Job Card No</span><b>{{ selectedJobCard?.JobCardNo || '-' }}</b></div>
+          <div class="detail-item"><span>Job Card Date</span><b>{{ selectedJobCard?.JobCardDate ? (selectedJobCard?.JobCardDate | date:'dd-MM-yyyy') : '-' }}</b></div>
+          <div class="detail-item"><span>Job Card Type</span><b>{{ selectedJobCard?.JobCardType || '-' }}</b></div>
+          <div class="detail-item"><span>Chassis No</span><b>{{ selectedJobCard?.ChassiNumber || '-' }}</b></div>
+          <div class="detail-item"><span>Customer Name</span><b>{{ selectedJobCard?.CustomerName || '-' }}</b></div>
+          <div class="detail-item"><span>Mobile No</span><b>{{ selectedJobCard?.MobileNo || '-' }}</b></div>
+          <div class="detail-item"><span>Dealer</span><b>{{ selectedJobCard?.DealerName || '-' }} <small class="text-muted">({{ selectedJobCard?.DealerCode }})</small></b></div>
+          <div class="detail-item"><span>Hours</span><b>{{ selectedJobCard?.Hours }}</b></div>
+          <div class="detail-item"><span>Work Done By</span><b>{{ selectedJobCard?.WorkDoneBy || '-' }}</b></div>
+          <div class="detail-item"><span>Job Card Total</span><b>₹ {{ selectedJobCard?.GrandTotal | number:'1.2-2' }}</b></div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+          <div class="section-title mb-0">Spare Parts</div>
+          <span class="select-count" *ngIf="partList.length">{{ claimSummary.count }} of {{ partList.length }} selected</span>
+        </div>
+
+        <div class="items-wrap">
+          <table class="table items-table mb-0">
+            <thead>
+              <tr>
+                <th style="width:44px;" class="text-center">
+                  <input type="checkbox" class="form-check-input claim-check"
+                         [checked]="allSelected" [indeterminate]="someSelected"
+                         [disabled]="!partList.length || isSubmitting" (change)="toggleAll()">
+                </th>
+                <th style="width:40px;">#</th>
+                <th>Part</th>
+                <th class="text-end" style="width:70px;">Qty</th>
+                <th class="text-end" style="width:120px;">Taxable</th>
+                <th class="text-end" style="width:130px;">GST</th>
+                <th class="text-end" style="width:120px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of partList; let i = index; trackBy: trackByPart"
+                  [class.row-selected]="isPartSelected(p)" (click)="togglePart(p)" class="part-row">
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  <input type="checkbox" class="form-check-input claim-check"
+                         [checked]="isPartSelected(p)" [disabled]="isSubmitting" (change)="togglePart(p)">
+                </td>
+                <td class="text-muted">{{ i + 1 }}</td>
+                <td>
+                  <div class="part-name" [title]="p.PartName">{{ p.PartName || '-' }}</div>
+                  <div class="part-meta">{{ p.PartNumber }}</div>
+                </td>
+                <td class="text-end">{{ p.Qty }}</td>
+                <td class="text-end">₹ {{ taxableAmount(p) | number:'1.2-2' }}</td>
+                <td class="text-end">
+                  ₹ {{ p.GstAmount | number:'1.2-2' }}
+                  <div class="part-meta">{{ p.GstRate }}%</div>
+                </td>
+                <td class="text-end fw-semibold">₹ {{ p.TotalPrice | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="partList.length === 0">
+                <td colspan="7" class="text-center text-muted py-4">No spare parts found for this job card.</td>
+              </tr>
+            </tbody>
+            <tfoot *ngIf="partList.length">
+              <tr>
+                <td></td>
+                <td></td>
+                <td class="fw-semibold">Selected Total ({{ claimSummary.count }} parts)</td>
+                <td class="text-end fw-semibold">{{ claimSummary.qty }}</td>
+                <td class="text-end fw-semibold">₹ {{ claimSummary.taxable | number:'1.2-2' }}</td>
+                <td class="text-end fw-semibold">₹ {{ claimSummary.gst | number:'1.2-2' }}</td>
+                <td class="text-end fw-bold">₹ {{ claimSummary.total | number:'1.2-2' }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="row g-3 mt-1">
+          <div class="col-md-4">
+            <label class="form-label">Labour Charge (₹)</label>
+            <div class="input-group labour-group">
+              <span class="input-group-text">₹</span>
+              <input type="text" inputmode="decimal" class="form-control" maxlength="9"
+                     placeholder="0.00" [value]="labourCharge"
+                     (input)="onLabourInput($event)" (blur)="onLabourBlur()"
+                     [class.is-invalid]="labourError" [disabled]="isSubmitting">
+            </div>
+            <div class="labour-error" *ngIf="labourError">{{ labourError }}</div>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Claim Remarks</label>
+            <textarea class="form-control" rows="1" maxlength="500" [(ngModel)]="claimRemarks"
+                      placeholder="Enter remarks (optional)" [disabled]="isSubmitting"></textarea>
+          </div>
+        </div>
+
+        <div class="claim-total-box mt-3">
+          <div class="claim-breakup">
+            <div><span>Taxable</span><b>₹ {{ claimSummary.taxable | number:'1.2-2' }}</b></div>
+            <div><span>GST</span><b>₹ {{ claimSummary.gst | number:'1.2-2' }}</b></div>
+            <div><span>Parts Total</span><b>₹ {{ claimSummary.total | number:'1.2-2' }}</b></div>
+            <div><span>Labour</span><b>₹ {{ labourAmount | number:'1.2-2' }}</b></div>
+          </div>
+          <div class="claim-final">
+            <span>Total Claim Amount</span>
+            <b>₹ {{ claimTotal | number:'1.2-2' }}</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary px-4" (click)="closeClaimModal()" [disabled]="isSubmitting">Cancel</button>
+        <button type="button" class="btn custom-btn px-4" (click)="submitClaim()"
+                [disabled]="isSubmitting || !claimSummary.count || !!labourError">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+          Submit Claim
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CLAIM REVIEW MODAL (Dealer view / CCM / HO) ================= -->
+<div class="modal fade" #reviewModalEl tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content claim-modal">
+
+      <div class="modal-header">
+        <div>
+          <h6 class="modal-title mb-1 fw-semibold">
+            Warranty Claim {{ selectedClaim?.WarrantyClaimNo ? '— ' + selectedClaim?.WarrantyClaimNo : '' }}
+          </h6>
+          <div class="small text-muted d-flex align-items-center gap-2 flex-wrap">
+            <span>{{ selectedClaim?.ChasisNo }}</span>
+            <span class="st-badge" *ngIf="selectedClaim" [ngClass]="stageClass(selectedClaim)">{{ stageLabel(selectedClaim) }}</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" (click)="closeReviewModal()" [disabled]="isUpdating || isActing"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Claim details -->
+        <div class="section-title">Claim Details</div>
+        <div class="detail-grid">
+          <div class="detail-item"><span>Claim No</span><b>{{ selectedClaim?.WarrantyClaimNo || '-' }}</b></div>
+          <div class="detail-item"><span>Claim Date</span><b>{{ selectedClaim?.ClaimDate ? (selectedClaim?.ClaimDate | date:'dd-MM-yyyy hh:mm a') : '-' }}</b></div>
+          <div class="detail-item"><span>Chassis No</span><b>{{ selectedClaim?.ChasisNo || '-' }}</b></div>
+          <div class="detail-item"><span>Dealer Code</span><b>{{ selectedClaim?.DealerCode || '-' }}</b></div>
+          <!--<div class="detail-item"><span>Submitted By</span><b [title]="selectedClaim?.CreatedBy">{{ selectedClaim?.CreatedBy || '-' }}</b></div>-->
+          <div class="detail-item"><span>Dealer Remarks</span><b [title]="selectedClaim?.DealerRemarks">{{ selectedClaim?.DealerRemarks || '-' }}</b></div>
+          <div class="detail-item" *ngIf="selectedClaim?.SupportingDocumentURL">
+            <span>Supporting Document</span>
+            <b><a [href]="selectedClaim?.SupportingDocumentURL" target="_blank" rel="noopener">View Document</a></b>
+          </div>
+        </div>
+
+        <!-- Approval timeline -->
+        <div class="section-title mt-4">Approval Status</div>
+        <div class="timeline">
+          <div class="tl-step" *ngFor="let step of claimTimeline" [ngClass]="'tl-' + step.state">
+            <div class="tl-head">
+              <span class="tl-dot"><i [class]="stepMeta[step.state]?.icon"></i></span>
+              <div>
+                <div class="tl-title">{{ step.title }}</div>
+                <div class="tl-role">{{ step.role }}</div>
+              </div>
+              <span class="tl-state">{{ stepMeta[step.state]?.label }}</span>
+            </div>
+            <div class="tl-body" *ngIf="step.by || step.date || step.remarks">
+              <!--<div *ngIf="step.by"><i class="fa-regular fa-user me-1"></i>{{ step.by }}</div>-->
+              <div *ngIf="step.date"><i class="fa-regular fa-clock me-1"></i>{{ step.date | date:'dd-MM-yyyy hh:mm a' }}</div>
+              <div *ngIf="step.remarks" class="tl-remarks">"{{ step.remarks }}"</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modify toggle (CCM only) -->
+        <div class="modify-toggle mt-3" *ngIf="canCcmAct(selectedClaim)" [class.active]="modifyMode">
+          <label class="modify-label" for="modifyClaim">
+            <input class="modify-check" type="checkbox" id="modifyClaim"
+                   [(ngModel)]="modifyMode" (change)="onModifyToggle()"
+                   [disabled]="isUpdating || !claimSpares.length">
+            <span class="modify-text">
+              <span class="modify-title">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Modify Claim
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <!-- Spares -->
+        <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+          <div class="section-title mb-0">Claimed Parts</div>
+          <span class="select-count" *ngIf="modifyMode">{{ reviewSummary.count }} of {{ claimSpares.length }} selected</span>
+        </div>
+
+        <div class="items-wrap">
+          <table class="table items-table mb-0">
+            <thead>
+              <tr>
+                <th *ngIf="modifyMode" style="width:44px;" class="text-center"></th>
+                <th style="width:40px;">#</th>
+                <th>Part</th>
+                <th class="text-end" style="width:100px;">Rate</th>
+                <th class="text-center" style="width:130px;">Qty</th>
+                <th class="text-end" style="width:115px;">Taxable</th>
+                <th class="text-end" style="width:115px;">GST</th>
+                <th class="text-end" style="width:115px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of visibleSpares; let i = index; trackBy: trackBySpare"
+                  [class.row-excluded]="!isSpareIncluded(s)">
+                <td *ngIf="modifyMode" class="text-center">
+                  <input type="checkbox" class="form-check-input claim-check"
+                         [checked]="isSpareIncluded(s)" [disabled]="isUpdating" (change)="toggleSpare(s)">
+                </td>
+                <td class="text-muted">{{ i + 1 }}</td>
+                <td>
+                  <div class="part-name" [title]="s.PartName">{{ s.PartName || '-' }}</div>
+                  <div class="part-meta">{{ s.PartCode }}</div>
+                </td>
+                <td class="text-end">₹ {{ s.Rate | number:'1.2-2' }}</td>
+
+                <!-- Qty: modify me stepper, warna sirf number -->
+                <td class="text-center">
+                  <ng-container *ngIf="modifyMode; else qtyView">
+                    <div class="qty-stepper">
+                      <button type="button" (click)="decSpareQty(s)"
+                              [disabled]="spareQty(s) <= 1 || !isSpareIncluded(s) || isUpdating">
+                        −
+                      </button>
+                      <input type="number" min="1" [max]="MAX_QTY" [value]="spareQty(s)"
+                             (change)="onSpareQtyChange(s, $event)" (keydown)="blockInvalidKeys($event)"
+                             [disabled]="!isSpareIncluded(s) || isUpdating">
+                      <button type="button" (click)="incSpareQty(s)"
+                              [disabled]="spareQty(s) >= MAX_QTY || !isSpareIncluded(s) || isUpdating">
+                        +
+                      </button>
+                    </div>
+                  </ng-container>
+                  <ng-template #qtyView>{{ s.ClaimQty | number:'1.0-2' }}</ng-template>
+                </td>
+
+                <td class="text-end">₹ {{ spareTaxable(s) | number:'1.2-2' }}</td>
+                <td class="text-end">
+                  ₹ {{ spareGst(s) | number:'1.2-2' }}
+                  <div class="part-meta">{{ s.GSTPercentage }}%</div>
+                </td>
+                <td class="text-end fw-semibold">₹ {{ spareTotal(s) | number:'1.2-2' }}</td>
+              </tr>
+
+              <tr *ngIf="visibleSpares.length === 0">
+                <td [attr.colspan]="modifyMode ? 8 : 7" class="text-center text-muted py-4">No parts found for this claim.</td>
+              </tr>
+            </tbody>
+            <tfoot *ngIf="visibleSpares.length">
+              <tr>
+                <td *ngIf="modifyMode"></td>
+                <td></td>
+                <td class="fw-semibold">Total ({{ reviewSummary.count }} parts)</td>
+                <td></td>
+                <td class="text-center fw-semibold">{{ reviewSummary.qty }}</td>
+                <td class="text-end fw-semibold">₹ {{ reviewSummary.taxable | number:'1.2-2' }}</td>
+                <td class="text-end fw-semibold">₹ {{ reviewSummary.gst | number:'1.2-2' }}</td>
+                <td class="text-end fw-bold">₹ {{ reviewSummary.total | number:'1.2-2' }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Labour (editable only in modify) -->
+        <div class="row g-3 mt-1" *ngIf="modifyMode">
+          <div class="col-md-4">
+            <label class="form-label">Labour Charge (₹)</label>
+            <div class="input-group labour-group">
+              <span class="input-group-text">₹</span>
+              <input type="text" inputmode="decimal" class="form-control" maxlength="9"
+                     placeholder="0.00" [value]="editLabour"
+                     (input)="onReviewLabourInput($event)" (blur)="onReviewLabourBlur()"
+                     [class.is-invalid]="reviewLabourError" [disabled]="isUpdating">
+            </div>
+            <div class="labour-error" *ngIf="reviewLabourError">{{ reviewLabourError }}</div>
+          </div>
+        </div>
+
+        <!-- Final Amount -->
+        <div class="claim-total-box mt-3">
+          <div class="claim-breakup">
+            <div><span>Taxable</span><b>₹ {{ reviewSummary.taxable | number:'1.2-2' }}</b></div>
+            <div><span>GST</span><b>₹ {{ reviewSummary.gst | number:'1.2-2' }}</b></div>
+            <div><span>Parts Total</span><b>₹ {{ reviewSummary.total | number:'1.2-2' }}</b></div>
+            <div><span>Labour</span><b>₹ {{ reviewSummary.labour | number:'1.2-2' }}</b></div>
+          </div>
+          <div class="claim-final">
+            <span>Total Claim Amount</span>
+            <b>₹ {{ reviewSummary.grand | number:'1.2-2' }}</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer: Modify ON → Update | Modify OFF → Reject / Approve -->
+      <div class="modal-footer review-footer">
+        <button type="button" class="btn btn-secondary px-4" (click)="closeReviewModal()" [disabled]="isUpdating || isActing">Close</button>
+
+        <ng-container *ngIf="modifyMode">
+          <button type="button" class="btn custom-btn px-4" (click)="saveModification()"
+                  [disabled]="isUpdating || !hasReviewChanges || !!reviewLabourError || !reviewSummary.count">
+            <span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!isUpdating" class="fa-solid fa-floppy-disk me-1"></i> Update
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="!modifyMode && canAct(selectedClaim)">
+          <button type="button" class="btn btn-reject px-4" (click)="openConfirm('reject')" [disabled]="isActing">
+            <i class="fa-solid fa-xmark me-1"></i> Reject
+          </button>
+          <button type="button" class="btn btn-approve px-4" (click)="openConfirm('approve')" [disabled]="isActing || !selectedSpareCount">
+            <i class="fa-solid fa-check me-1"></i> Approve
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APPROVE / REJECT CONFIRM ================= -->
+<div class="confirm-overlay" *ngIf="confirmAction" (click)="cancelConfirm()">
+  <div class="confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-icon" [ngClass]="confirmAction === 'approve' ? 'ci-approve' : 'ci-reject'">
+      <i [class]="confirmAction === 'approve' ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
+    </div>
+    <h5 class="fw-semibold mt-3 mb-1">{{ confirmAction === 'approve' ? 'Approve Claim?' : 'Reject Claim?' }}</h5>
+    <p class="text-muted mb-1">Are you sure you want to {{ confirmAction }} this warranty claim?</p>
+    <p class="confirm-part mb-3">
+      {{ selectedClaim?.WarrantyClaimNo || selectedClaim?.ChasisNo }} · ₹ {{ reviewSummary.grand | number:'1.2-2' }}
+    </p>
+
+    <div class="text-start mb-3">
+      <label class="form-label mb-1" style="font-size:13px;">
+        Remarks <span class="text-danger" *ngIf="confirmAction === 'reject'">*</span>
+      </label>
+      <textarea class="form-control" rows="2" maxlength="500" [(ngModel)]="actionRemarks"
+                [placeholder]="confirmAction === 'reject' ? 'Reason for rejection' : 'Remarks (optional)'"
+                [class.is-invalid]="actionTouched && actionRemarksError" [disabled]="isActing"></textarea>
+      <div class="invalid-feedback">{{ actionRemarksError }}</div>
+    </div>
+
+    <div class="d-flex gap-2 justify-content-center">
+      <button type="button" class="btn btn-light px-4 border" (click)="cancelConfirm()" [disabled]="isActing">No</button>
+      <button type="button" class="btn px-4" [ngClass]="confirmAction === 'approve' ? 'btn-approve' : 'btn-danger'"
+              (click)="submitAction()" [disabled]="isActing">
+        <span *ngIf="isActing" class="spinner-border spinner-border-sm me-1"></span>
+        Yes, {{ confirmAction === 'approve' ? 'Approve' : 'Reject' }}
+      </button>
+    </div>
+  </div>
 </div>

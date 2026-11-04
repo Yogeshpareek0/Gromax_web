@@ -1571,6 +1571,11 @@ export interface SparePartOrderList {
   orderNo: string;
   orderDate: string;
   dealerCode: string;
+  dealerName: string;
+  dealerLocation: string;
+  dealerState: string;
+
+
   orderStatus: string;
   totalQty: number;
   totalAmount: number;
@@ -1632,4 +1637,93 @@ export interface InvoiceDetail {
 
   // Existing docket
   docketNumber: string;
+}
+
+export interface ClosedJobCard {
+  Id: string;
+  JobCardNo: string;
+  ChassiNumber: string;
+  JobCardDate: string;
+  JobCardType: string;
+  CustomerName: string;
+  MobileNo: string;
+  DealerCode: string;
+  DealerName: string;
+  Hours: number;
+  WorkDoneBy: string;
+  SpareTotal: number;
+  GrandTotal: number;
+  IsClosed: boolean;
+  TotalCount?: number;
+}
+
+export interface WarrantyClaim {
+  Id: string;
+  WarrantyClaimNo: string | null;
+  JobCardId: string;
+  ChasisNo: string;
+  DealerCode: string | null;
+  ClaimDate: string;
+  PartsAmount: number;
+  PartsGSTAmount: number;
+  TotalPartsAmount: number;
+  LabourCharge: number;
+  LabourGSTAmount: number;
+  TotalLabourAmount: number;
+  TotalGSTAmount: number;
+  TotalClaimAmount: number;
+  DealerRemarks: string | null;
+  SupportingDocumentURL: string | null;
+  ClaimStatus: string | null;
+  CCMApprovalStatus: string | null;
+  CCMApprovedBy: string | null;
+  CCMApprovedDate: string | null;
+  CCMRemarks: string | null;
+  FinalApprovalStatus: string | null;
+  FinalApprovedBy: string | null;
+  FinalApprovedDate: string | null;
+  FinalApprovalRemarks: string | null;
+  CreatedBy: string;
+  CreatedDate: string;
+  ModifiedBy: string | null;
+  ModifiedDate: string | null;
+}
+
+export interface WarrantyClaimSpare {
+  Id: string;
+  WarrantyClaimId: string;
+  SparePartId: string;
+  PartCode: string;
+  PartName: string;
+  JobCardQty: number;
+  ClaimQty: number;
+  Rate: number;
+  GSTPercentage: number;
+  PartsAmount: number;
+  GSTAmount: number;
+  TotalAmount: number;
+  CreatedBy: string;
+  CreatedDate: string;
+  ModifiedBy: string | null;
+  ModifiedDate: string | null;
+  IsSelected: number | null;
+}
+export interface WarrantyClaimPart {
+  Id: string;
+  JobCardID: string;
+  PartNumber: string;
+  PartName: string;
+  Qty: number;
+  Labour: number | null;
+  Remark: string;
+  GstAmount: number;
+  TotalPrice: number;
+  BasePrice: number;
+  GstRate: number;
+
+}
+export interface WarrantyClaimCount {
+  PendingCount: number;
+  ApprovedCount: number;
+  RejectedCount: number;
 }

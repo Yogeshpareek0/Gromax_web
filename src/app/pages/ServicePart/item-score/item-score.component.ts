@@ -266,6 +266,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   getRequiredPhoto(item: any, answer: string | null | undefined): number {
     const min = this.getMinPhoto(item);
     if (min === 0) return 0;
+    if (this.isZeroScore(answer)) return 0;
     return this.isInputType(item) || String(answer) === '1' ? min : 0;
   }
 
@@ -543,5 +544,14 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
           }
         });
       });
+  }
+
+
+  private isZeroScore(answer: string | null | undefined): boolean {
+    if (answer === null || answer === undefined) return false;
+    const s = String(answer).trim();
+    if (s === '' || s === '.') return false;
+    const n = Number(s);
+    return !isNaN(n) && n === 0;
   }
 }

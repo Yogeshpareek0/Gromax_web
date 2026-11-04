@@ -176,6 +176,7 @@
           <th class="text-nowrap fw-normal">Prospect City</th>
           <th class="text-nowrap fw-normal">Prospect Tehsil</th>
           <th class="text-nowrap fw-normal">Mobile</th>
+          <th class="text-nowrap fw-normal">Alternative Mobile</th>
           <th class="text-nowrap fw-normal">Date Of Delivery</th>
           <th class="text-nowrap fw-normal">Date Of PDI</th>
           <th class="text-nowrap fw-normal">Date Of Installation</th>
@@ -244,6 +245,7 @@
 
 
           <td class="text-nowrap">{{ item.Mobile || '' }}</td>
+          <td class="text-nowrap">{{ item.CustomerMobile || '' }}</td>
 
           <td class="text-nowrap">
             {{ item.DeliveryDate ? (item.DeliveryDate | date:'dd-MM-yyyy') : '-' }}

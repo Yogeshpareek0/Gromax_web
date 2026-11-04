@@ -10,7 +10,7 @@ import { EnquiryfollowupComponent } from '../app/pages/enquiryfollowup/enquiryfo
 import { CoomingsoonComponent } from '../app/pages/coomingsoon/coomingsoon.component'
 //import { StockComponent } from '../app/pages/stock/stock.component'
 //import { TicketgenerationComponent } from '../app/pages/ticketgeneration/ticketgeneration.component'
-//import { WarrantyclaimComponent } from '../app/pages/warrantyclaim/warrantyclaim.component'
+import { WarrantyclaimComponent } from '../app/pages/warrantyclaim/warrantyclaim.component'
 import { TransferstockComponent } from '../app/pages/transferstock/transferstock.component'
 import { InstallationComponent } from '../app/pages/installation/installation.component'
 import { SevendayenquiryComponent } from '../app/pages/sevendayenquiry/sevendayenquiry.component'
@@ -75,7 +75,7 @@ export const routes: Routes = [
       { path: 'coomingsoon', component: CoomingsoonComponent },
       /* { path: 'stock', component: StockComponent },*/
       /*{ path: 'ticketgeneration', component: TicketgenerationComponent },*/
-      /*{ path: 'warrantyclaim', component: WarrantyclaimComponent },*/
+      { path: 'warrantyclaim', component: WarrantyclaimComponent },
       { path: 'transferstock', component: TransferstockComponent, canActivate: [menuGuard], data: { menuGroup: 'UploadBilling', subMenu: 'UploadBilling' } },/*upload billing*/
       { path: 'installation', component: InstallationComponent, canActivate: [menuGuard], data: { menuGroup: 'Service', subMenu: 'Installation' } },
       { path: 'sevendayenquiry', component: SevendayenquiryComponent, canActivate: [menuGuard], data: { menuGroup: 'Sales', subMenu: 'SuperHotEnquiry' } },

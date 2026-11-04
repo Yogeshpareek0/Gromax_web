@@ -12,6 +12,7 @@
     transform: translateY(-1px);
   }
 
+
 .enquiry-table-wrapper {
   max-height: calc(100vh - 240px);
   overflow: auto;

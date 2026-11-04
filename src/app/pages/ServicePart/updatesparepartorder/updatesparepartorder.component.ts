@@ -6,6 +6,7 @@ import { PaginationComponent } from '../../../layout/pagination/pagination.compo
 import { SparePartOrderList, SparePartOrderDetail, InvoiceDetail } from '../../../model/apiresponse';
 import { PermissionService } from '../../../services/userpermission/permission.service';
 import { ToastrService } from 'ngx-toastr';
+import * as XLSX from 'xlsx';
 
 
 declare var bootstrap: any;
@@ -30,6 +31,7 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
 
   // Main list
   orderList: SparePartOrderList[] = [];
+  orderListDownload: SparePartOrderList[] = [];
   totalItems = 0;
   currentPage = 1;
   itemsPerPage = 20;
@@ -105,6 +107,8 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
   customEndMonth: number = new Date().getMonth() + 1;
   customEndYear: number = new Date().getFullYear();
 
+  filterViewHo: boolean = false;
+
   months = [
     { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
     { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
@@ -117,6 +121,7 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
   constructor(private apis: AuthService, private permission: PermissionService, private toast: ToastrService) { }
 
   ngOnInit(): void {
+    this.filterViewHo = this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO');
     this.getStateList();
     this.getOrders(1);
   }
@@ -136,7 +141,7 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
 
   // ================= MAIN LIST =================
 
-  getOrders(page: number): void {
+  getOrders(page: number, isDownload: number = 0): void {
     const { startDate, endDate } = this.getDateRange();
 
     const filters = {
@@ -145,12 +150,18 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
       Duration: this.selectedDuration,
       StDate: startDate,
       EnDate: endDate,
-      OrderNo: (this.orderIdSearch || '').trim()
+      OrderNo: (this.orderIdSearch || '').trim(),
+      IsDownload: isDownload
     };
 
     this.apis.getSparePartsOrders(page, this.itemsPerPage, filters).subscribe({
       next: (res: any) => {
         if (res?.statusCode === 200 && res?.message?.toLowerCase() === 'success') {
+          if (isDownload === 1) {
+            this.orderListDownload = res.data?.data || [];
+            this.downloadExcel();
+            return;
+          }
           this.orderList = res.data?.data || [];
           this.totalItems = res.data?.totalRecords || 0;
           this.currentPage = page;
@@ -567,6 +578,22 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
       this.toast.warning('Some item quantities have been updated but not saved. Please click the Update button for each changed item before continuing.');
       return;
     }
+    if (!this.paymentRequired) {
+      this.toast.warning('Please complete the payment before continuing.');
+      return;
+    }
+    if (this.payment.paymentMode !== 'Cash') {
+      if (
+        !((this.payment.transactionId || '').trim()) &&
+        !((this.payment.referenceNo || '').trim())
+      ) {
+        this.toast.warning(
+          'Please enter either Transaction ID or Reference No.'
+        );
+        return;
+      }
+    }
+
 
     // Payment check nahi kiya to sirf modal band
     if (!this.paymentRequired) {
@@ -878,6 +905,13 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
       }
     });
   }
+  getDealerName(dealerCode: string): string {
+    const dealer = this.dealerList?.find(
+      x => x.dealerCode === dealerCode
+    );
+
+    return dealer?.dealerName || 'Test';
+  }
 
   onStateChange(): void {
     this.selectedDealership = 'All';
@@ -969,5 +1003,86 @@ export class UpdatesparepartorderComponent implements OnInit, AfterViewInit, OnD
       !(order?.isInvoicing === true && order?.isDelivered === true) &&
       this.permission.hasSubmenuPermission('UpdateOrderedSparePartHO')
     );
+  }
+
+  exportToExcel() {
+    this.getOrders(1, 1);
+  }
+
+  downloadExcel(): void {
+
+    if (!this.orderListDownload || this.orderListDownload.length === 0) {
+      this.toast.warning('No data available for download.');
+      return;
+    }
+
+    const excelData = this.orderListDownload.map(
+      (x: SparePartOrderList, index: number) => ({
+        'S.No.': index + 1,
+        'Order No': x.orderNo,
+
+        'Order Date': x.orderDate
+          ? new Date(x.orderDate).toLocaleDateString('en-GB').replace(/\//g, '-')
+          : '',
+
+        'Dealer Code': x.dealerCode,
+        'Order Status': x.isDelivered ? 'Complete' : 'Pending',
+        'Total Qty': x.totalQty,
+        'Total Amount': x.totalAmount,
+        'Payment Status': x.paymentStatus,
+        'Paid Amount': x.paidAmount,
+        'Balance Amount': x.balanceAmount,
+        'GST Amount': x.totalGSTAmount,
+        'Payment Amount': x.paymentAmount,
+        'Invoice Taxable Amount': x.invTaxableAmount,
+        'Invoice Tax Amount': x.invTaxAmount,
+        'Invoice Total Amount': x.invTotalAmount,
+
+        'Payment Date': x.paymentDate
+          ? new Date(x.paymentDate).toLocaleDateString('en-GB').replace(/\//g, '-')
+          : '',
+
+        'Payment Mode': x.paymentMode,
+        'Reference No': x.referenceNo,
+        'Remarks': x.remarks,
+        'Transaction ID': x.transactionId,
+        'Docket Number': x.docketNumber,
+        'Invoice Number': x.invoiceNumber,
+
+        'Delivery Date': x.deliveryDate
+          ? new Date(x.deliveryDate).toLocaleDateString('en-GB').replace(/\//g, '-')
+          : '',
+
+        'Invoice Date': x.invoiceDate
+          ? new Date(x.invoiceDate).toLocaleDateString('en-GB').replace(/\//g, '-')
+          : ''
+      })
+    );
+
+    const worksheet: XLSX.WorkSheet =
+      XLSX.utils.json_to_sheet(excelData);
+
+    const workbook: XLSX.WorkBook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      'Spare Parts Orders'
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `SparePartsOrders_${this.getFileDate()}.xlsx`
+    );
+  }
+  getFileDate(): string {
+    const now = new Date();
+
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+
+    return `${yyyy}${mm}${dd}`;
   }
 }

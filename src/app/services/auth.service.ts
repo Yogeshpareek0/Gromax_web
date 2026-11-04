@@ -13,8 +13,8 @@ import { __param } from 'tslib';
 export class AuthService {
 
   private readonly TOKEN_KEY = 'token';
-  private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
-  //private readonly baseUrl = 'https://localhost:44398/';
+  //private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
+  private readonly baseUrl = 'https://localhost:44398/';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -711,7 +711,7 @@ export class AuthService {
   }
 
   getSpareParts() {
-    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSparePartsPagination');
+    return this.http.get<any[]>(this.baseUrl + 'Api/Services/getSpareParts');
   }
 
   addJobCard(payload: any) {
@@ -1121,4 +1121,44 @@ export class AuthService {
       .set('OrderId', OrderId);
     return this.http.get<any[]>(this.baseUrl + 'Api/Services/GetSpareOrderInvoice', { params });
   }
+
+  getClosedJobCardList(filters: any) {
+    let params = new HttpParams();
+    Object.keys(filters).forEach(key => {
+      const val = filters[key];
+      if (val !== null && val !== undefined && String(val).trim() !== '') {
+        params = params.set(key, String(val).trim());
+      }
+    });
+    return this.http.get<any>(this.baseUrl + 'Api/Services/getClosedJobCardList', { params });
+  }
+  getSparePartListByJobCardId(JobCardMasterId: string) {
+    const params = new HttpParams().set('JobCardMasterId', JobCardMasterId);
+    return this.http.get<any>(this.baseUrl + 'Api/Services/getSparePartListByJobCardId', { params });
+  }
+
+  // Submit API abhi bani nahi — URL baad me match kar lena
+  saveWarrantyClaim(payload: any) {
+    return this.http.post<any>(this.baseUrl + 'Api/Services/saveWarrantyClaim', payload);
+  }
+
+
+  getPendingWarrantyClaimList(status: number) {
+    const params = new HttpParams().set('Status', String(status));
+    return this.http.get<any>(this.baseUrl + 'Api/Services/getPendingWarrantyClaimList', { params });
+  }
+
+  getWarrantySparesByMasterId(WarrantyClaimMasterId: string) {
+    const params = new HttpParams().set('WarrantyClaimMasterId', WarrantyClaimMasterId);
+    return this.http.get<any>(this.baseUrl + 'Api/Services/getWarrantySparesByMasterId', { params });
+  }
+
+  updateWarrantyClaim(payload: any) {
+    return this.http.post<any>(this.baseUrl + 'Api/Services/UpdateWarrantyClaim', payload);
+  }
+
+  updateWarrantyClaimApproval(payload: any) {
+    return this.http.post<any>(this.baseUrl + 'Api/Services/UpdateWarrantyClaimApproval', payload);
+  }
+
 }
