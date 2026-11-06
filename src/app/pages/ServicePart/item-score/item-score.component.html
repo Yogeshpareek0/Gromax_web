@@ -2,12 +2,11 @@
 
   <!-- ==================== TOP MODE BUTTONS ==================== -->
   <div class="is-mode-bar mt-2" *ngIf="view === 'dealers'">
-    <button *ngIf="canAdd" type="button" class="is-mode-btn"
-            [class.active]="mode === 'add'" (click)="switchMode('add')">
+    <button *ngIf="canAdd" type="button" class="is-mode-btn" [class.active]="mode === 'add'"
+      (click)="switchMode('add')">
       <i class="fa-solid fa-plus"></i> Add Item Score
     </button>
-    <button type="button" class="is-mode-btn"
-            [class.active]="mode === 'approval'" (click)="switchMode('approval')">
+    <button type="button" class="is-mode-btn" [class.active]="mode === 'approval'" (click)="switchMode('approval')">
       <i class="fa-solid fa-clipboard-check"></i> Approval Item Score
     </button>
   </div>
@@ -19,8 +18,8 @@
       <div class="row">
         <div class="col-xl-4 col-lg-5 col-sm-8">
           <div class="form-floating-custom" [class.has-value]="dealerSearch">
-            <input type="text" class="form-control" placeholder=" "
-                   [(ngModel)]="dealerSearch" (ngModelChange)="filterDealers()" />
+            <input type="text" class="form-control" placeholder=" " [(ngModel)]="dealerSearch"
+              (ngModelChange)="filterDealers()" />
             <label>Search Dealer Code / Name / Location</label>
           </div>
         </div>
@@ -72,7 +71,8 @@
               </td>
               <td>
                 <button type="button" class="btn btn-sm is-action-btn" (click)="onDealerClick(d)">
-                  <i class="fa-solid" [ngClass]="isDealerInProgress(d) ? 'fa-pen' : 'fa-play'" style="font-size:9px"></i>
+                  <i class="fa-solid" [ngClass]="isDealerInProgress(d) ? 'fa-pen' : 'fa-play'"
+                    style="font-size:9px"></i>
                   {{ isDealerInProgress(d) ? 'Continue' : 'Start' }}
                 </button>
               </td>
@@ -146,8 +146,7 @@
               <td class="fw-semibold" style="color:#215378">{{ row.DealerCode || '-' }}</td>
               <td>{{ row.DealerName || '-' }}</td>
               <td>{{ row.Location || '-' }}</td>
-              <td *ngFor="let c of scoreColumns" class="text-center"
-                  [class.zero-score]="scoreValue(row, c.key) === 0">
+              <td *ngFor="let c of scoreColumns" class="text-center" [class.zero-score]="scoreValue(row, c.key) === 0">
                 {{ scoreValue(row, c.key) }}
               </td>
               <td class="text-center fw-semibold" *ngIf="scoreColumns.length">{{ getTotal(row) }}</td>
@@ -160,18 +159,15 @@
               </td>
               <td class="text-center" *ngIf="canTakeAction">
                 <div class="d-inline-flex gap-1">
-                  <button type="button" class="btn btn-sm is-action-btn"
-                          [disabled]="actionLoadingId === getRowId(row)" (click)="onEditClick(row)">
-                    <span *ngIf="actionLoadingId === getRowId(row)" class="spinner-border spinner-border-sm" style="width:10px;height:10px"></span>
+                  <button type="button" class="btn btn-sm is-action-btn" [disabled]="actionLoadingId === getRowId(row)"
+                    (click)="onEditClick(row)">
+                    <span *ngIf="actionLoadingId === getRowId(row)" class="spinner-border spinner-border-sm"
+                      style="width:10px;height:10px"></span>
                     <i *ngIf="actionLoadingId !== getRowId(row)" class="fa-solid fa-pen" style="font-size:9px"></i> Edit
                   </button>
-                  <button type="button" class="btn btn-sm is-approve-btn"
-                          [disabled]="actionLoadingId === getRowId(row)" (click)="onApprovalAction(row, 'Approved')">
-                    <i class="fa-solid fa-check" style="font-size:9px"></i> Approve
-                  </button>
-                  <button type="button" class="btn btn-sm is-reject-btn"
-                          [disabled]="actionLoadingId === getRowId(row)" (click)="onApprovalAction(row, 'Rejected')">
-                    <i class="fa-solid fa-xmark" style="font-size:9px"></i> Reject
+                  <button type="button" class="btn btn-sm is-review-btn" [disabled]="actionLoadingId === getRowId(row)"
+                    (click)="onApprovalAction(row, 'Approved')">
+                    <i class="fa-solid fa-clipboard-check" style="font-size:10px"></i> Review
                   </button>
                 </div>
               </td>
@@ -200,8 +196,8 @@
       </table>
     </div>
 
-    <app-pagination *ngIf="approvalRows.length > itemsPerPage" [totalItems]="approvalRows.length" [pageSize]="itemsPerPage"
-                    [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+    <app-pagination *ngIf="approvalRows.length > itemsPerPage" [totalItems]="approvalRows.length"
+      [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
   </ng-container>
 
   <!-- ==================== GROUP LIST ==================== -->
@@ -214,7 +210,8 @@
       <div class="is-dealer-info">
         <span class="is-code-badge">{{ selectedDealer?.DealerCode }}</span>
         <span class="is-dealer-name">{{ selectedDealer?.DealerName }}</span>
-        <span *ngIf="editMode" class="is-badge is-badge-info"><i class="fa-solid fa-pen me-1" style="font-size:9px"></i>Edit Mode</span>
+        <span *ngIf="editMode" class="is-badge is-badge-info"><i class="fa-solid fa-pen me-1"
+            style="font-size:9px"></i>Edit Mode</span>
       </div>
     </div>
 
@@ -248,16 +245,14 @@
       </div>
 
       <div class="text-center pt-4 pb-2" *ngIf="!groupLoading && groupNames.length > 0">
-        <button type="button" class="btn text-white px-4"
-                [disabled]="!allGroupsComplete || submitting"
-                (click)="submitAll()"
-                style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
+        <button type="button" class="btn text-white px-4" [disabled]="!allGroupsComplete || submitting"
+          (click)="submitAll()" style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
           <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
           <i *ngIf="!submitting" class="fa-solid fa-paper-plane me-1"></i>
           {{
- submitting
-              ? (editMode ? 'Updating...' : 'Submitting...')
-              : (allGroupsComplete ? (editMode ? 'Update Score' : 'Submit Score') : 'Complete all sections to submit')
+          submitting
+          ? (editMode ? 'Updating...' : 'Submitting...')
+          : (allGroupsComplete ? (editMode ? 'Update Score' : 'Submit Score') : 'Complete all sections to submit')
           }}
         </button>
       </div>
@@ -274,7 +269,8 @@
       <div class="is-dealer-info">
         <span class="is-code-badge">{{ selectedDealer?.DealerCode }}</span>
         <span class="is-dealer-name">{{ selectedGroup }}</span>
-        <span *ngIf="editMode" class="is-badge is-badge-info"><i class="fa-solid fa-pen me-1" style="font-size:9px"></i>Edit Mode</span>
+        <span *ngIf="editMode" class="is-badge is-badge-info"><i class="fa-solid fa-pen me-1"
+            style="font-size:9px"></i>Edit Mode</span>
       </div>
     </div>
 
@@ -331,8 +327,8 @@
             <td>
               <button type="button" class="btn btn-sm is-action-btn" (click)="openScoreModal(item)">
                 <i class="fa-solid"
-                   [ngClass]="getPoint(item) ? 'fa-pen' : (isPrefilled(item) ? 'fa-camera' : 'fa-star')"
-                   style="font-size:9px"></i>
+                  [ngClass]="getPoint(item) ? 'fa-pen' : (isPrefilled(item) ? 'fa-camera' : 'fa-star')"
+                  style="font-size:9px"></i>
                 {{ getPoint(item) ? 'Edit' : 'Fill'}}
               </button>
             </td>
@@ -343,9 +339,8 @@
   </ng-container>
 
   <!-- ==================== INPUT / YES-NO + PHOTO MODAL ==================== -->
-  <div class="modal fade" tabindex="-1" [class.show]="showModal"
-       [style.display]="showModal ? 'block' : 'none'"
-       [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
+  <div class="modal fade" tabindex="-1" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'"
+    [style.background-color]="showModal ? 'rgba(0,0,0,0.5)' : ''">
     <div class="modal-dialog modal-dialog-top modal-dialog-scrollable">
       <div class="modal-content" *ngIf="modalItem">
 
@@ -365,23 +360,16 @@
             <div class="is-section-label">
               Enter Value<span *ngIf="modalItem.units"> ({{ modalItem.units }})</span>
             </div>
-            <input type="text"
-                   class="is-input-box"
-                   inputmode="decimal"
-                   maxlength="7"
-                   placeholder="Type here"
-                   [disabled]="isPrefilled(modalItem)"
-                   [value]="tempAnswer ?? ''"
-                   (input)="onAnswerInput($event)" />
+            <input type="text" class="is-input-box" inputmode="decimal" maxlength="7" placeholder="Type here"
+              [disabled]="isPrefilled(modalItem)" [value]="tempAnswer ?? ''" (input)="onAnswerInput($event)" />
           </div>
 
           <div *ngIf="!isInputType(modalItem)">
             <div class="is-section-label">Select Answer</div>
             <div class="is-score-wrap">
-              <button type="button" *ngFor="let opt of yesNoOptions"
-                      class="is-score-chip" [class.selected]="tempAnswer === opt.value"
-                      [disabled]="isPrefilled(modalItem)"
-                      (click)="selectYesNo(opt.value)">
+              <button type="button" *ngFor="let opt of yesNoOptions" class="is-score-chip"
+                [class.selected]="tempAnswer === opt.value" [disabled]="isPrefilled(modalItem)"
+                (click)="selectYesNo(opt.value)">
                 {{ opt.label }}
               </button>
             </div>
@@ -417,11 +405,10 @@
         </div>
 
         <div class="modal-footer border-0 pt-0">
-          <button type="button" class="btn btn-secondary" style="font-size:.90rem !important" (click)="closeModal()">Cancel</button>
-          <button type="button" class="btn text-white px-4"
-                  [disabled]="!canMarkDone()"
-                  (click)="onDone()"
-                  style="background-color: #4796BD; border-radius: 50px; font-size: .90rem !important">
+          <button type="button" class="btn btn-secondary" style="font-size:.90rem !important"
+            (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn text-white px-4" [disabled]="!canMarkDone()" (click)="onDone()"
+            style="background-color: #4796BD; border-radius: 50px; font-size: .90rem !important">
             <i class="fa-solid fa-check me-1"></i> Done
           </button>
         </div>
@@ -429,4 +416,114 @@
     </div>
   </div>
   <div class="modal-backdrop fade" *ngIf="showModal" [class.show]="showModal"></div>
+</div>
+
+<!-- ==================== APPROVE / REJECT MODAL ==================== -->
+<div class="am-overlay" *ngIf="showActionModal && actionRow">
+  <div class="am-dialog" [class.am-approve]="isApproveAction" [class.am-reject]="!isApproveAction" role="dialog"
+    aria-modal="true">  
+
+    <button type="button" class="am-close" [disabled]="actionSubmitting" (click)="closeActionModal()"
+      aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Hero -->
+    <div class="am-hero">
+      <div class="am-icon-ring">
+        <i class="fa-solid" [ngClass]="isApproveAction ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
+      </div>
+      <h5 class="am-title">{{ isApproveAction ? 'Approve Item Score' : 'Reject Item Score' }}</h5>
+      <p class="am-subtitle">
+        {{
+        isApproveAction
+        ? 'Please review the score details below. Once approved, this item score will be marked as final.'
+        : 'Please mention a clear reason for rejection so the dealer can understand and correct the score.'
+        }}
+      </p>
+    </div>
+
+    <div class="am-body">
+
+      <!-- Action switch -->
+      <div class="am-switch">
+        <button type="button" class="am-switch-btn approve" [class.active]="isApproveAction"
+          [disabled]="actionSubmitting" (click)="setActionType('Approved')">
+          <i class="fa-solid fa-thumbs-up"></i> Approve
+        </button>
+        <button type="button" class="am-switch-btn reject" [class.active]="!isApproveAction"
+          [disabled]="actionSubmitting" (click)="setActionType('Rejected')">
+          <i class="fa-solid fa-thumbs-down"></i> Reject
+        </button>
+      </div>
+
+      <!-- Dealer info -->
+      <div class="am-info-card">
+        <div class="am-dealer-row">
+          <span class="is-code-badge">{{ actionRow.DealerCode || '-' }}</span>
+          <span class="am-dealer-name">{{ actionRow.DealerName || '-' }}</span>
+        </div>
+        <div class="am-dealer-meta">
+          <span><i class="fa-solid fa-location-dot me-1"></i>{{ actionRow.Location || '-' }}</span>
+          <span><i class="fa-solid fa-map me-1"></i>{{ actionRow.StateName || '-' }}</span>
+        </div>
+
+        <div class="am-stats">
+          <div class="am-stat">
+            <div class="am-stat-label">Total Score</div>
+            <div class="am-stat-value">{{ getTotal(actionRow) }}</div>
+          </div>
+          <div class="am-stat">
+            <div class="am-stat-label">Max Score</div>
+            <div class="am-stat-value">{{ getMaxScore(actionRow) }}</div>
+          </div>
+          <div class="am-stat">
+            <div class="am-stat-label">Percentage</div>
+            <div class="am-stat-value">
+              <span class="pct-badge" [ngClass]="percentClass(actionRow)">{{ getPercent(actionRow) | number:'1.0-2'
+                }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Remark -->
+      <div class="am-remark">
+        <label class="am-label">
+          <span>
+            <i class="fa-solid fa-comment-dots me-1"></i>
+            {{ isApproveAction ? 'Remark' : 'Reason for Rejection' }}
+            <span *ngIf="isRemarkRequired" class="am-req">*</span>
+            <span *ngIf="!isRemarkRequired" class="am-optional">(Optional)</span>
+          </span>
+        </label>
+        <textarea class="am-textarea" [class.invalid]="showRemarkError" [(ngModel)]="actionRemark"
+          [maxlength]="REMARK_MAX" [disabled]="actionSubmitting" (blur)="actionRemarkTouched = true"
+          [placeholder]="isApproveAction ? 'Add a note (optional)...' : 'e.g. Photos are not clear, please re-upload...'"></textarea>
+        <div class="am-remark-foot">
+          <span class="am-error" *ngIf="showRemarkError">
+            <i class="fa-solid fa-circle-exclamation me-1"></i>Reason is required to reject.
+          </span>
+          <span *ngIf="!showRemarkError"></span>
+          <span>{{ remarkLength }}/{{ REMARK_MAX }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="am-footer">
+      <button type="button" class="am-btn am-btn-cancel" [disabled]="actionSubmitting" (click)="closeActionModal()">
+        Cancel
+      </button>
+      <button type="button" class="am-btn am-btn-confirm" [disabled]="actionSubmitting" (click)="submitAction()">
+        <span *ngIf="actionSubmitting" class="spinner-border spinner-border-sm"></span>
+        <i *ngIf="!actionSubmitting" class="fa-solid" [ngClass]="isApproveAction ? 'fa-check' : 'fa-ban'"></i>
+        {{
+        actionSubmitting
+        ? (isApproveAction ? 'Approving...' : 'Rejecting...')
+        : (isApproveAction ? 'Yes, Approve' : 'Yes, Reject')
+        }}
+      </button>
+    </div>
+  </div>
 </div>

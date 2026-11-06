@@ -13,6 +13,8 @@ const DRAFT_KEY = 'itemScoreDraft';
 const ROLE_CCM = 'Service CCM';
 const ROLE_NSH = 'National Service Head';
 
+type ApprovalAction = 'Approved' | 'Rejected';
+
 @Component({
   selector: 'app-item-score',
   standalone: true,
@@ -84,6 +86,15 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   private approvalReqId = 0;
   currentPage = 1;
   itemsPerPage = 20;
+
+  // ─── Approve / Reject Modal ───
+  readonly REMARK_MAX = 500;
+  showActionModal = false;
+  actionRow: ItemScoreReportRow | null = null;
+  actionType: ApprovalAction = 'Approved';
+  actionRemark = '';
+  actionRemarkTouched = false;
+  actionSubmitting = false;
 
   // ─── Edit (NSH) ───
   editMode = false;
@@ -712,7 +723,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   }
 
   getRowId(row: any): string | null {
-
     const id = row?.ItemScoreId;
     return id !== null && id !== undefined && String(id).trim() !== '' ? String(id) : null;
   }
@@ -751,48 +761,119 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     this.currentPage = page;
   }
 
-  // ===================== APPROVE / REJECT =====================
+  // ===================== APPROVE / REJECT (single modal) =====================
 
-  onApprovalAction(row: ItemScoreReportRow, action: 'Approved' | 'Rejected'): void {
+  get isApproveAction(): boolean {
+    return this.actionType === 'Approved';
+  }
+
+  get isRemarkRequired(): boolean {
+    return !this.isApproveAction;   // Reject pe remark mandatory
+  }
+
+  get remarkLength(): number {
+    return (this.actionRemark || '').length;
+  }
+
+  get showRemarkError(): boolean {
+    return this.actionRemarkTouched && this.isRemarkRequired && !(this.actionRemark || '').trim();
+  }
+
+  get canSubmitAction(): boolean {
+    if (!this.actionRow || this.actionSubmitting) return false;
+    if (this.isRemarkRequired && !(this.actionRemark || '').trim()) return false;
+    return true;
+  }
+
+  // Table ke Approve / Reject button se yahi call hota hai
+  onApprovalAction(row: ItemScoreReportRow, action: ApprovalAction): void {
     if (!this.canTakeAction) return;
+    if (!this.getRowId(row)) {
+      this.apis.showAlert('error', 'Error!', 'Item score id not found.');
+      return;
+    }
+
+    this.actionRow = row;
+    this.actionType = action;
+    this.actionRemark = '';
+    this.actionRemarkTouched = false;
+    this.actionSubmitting = false;
+    this.showActionModal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  setActionType(action: ApprovalAction): void {
+    if (this.actionSubmitting || this.actionType === action) return;
+    this.actionType = action;
+    this.actionRemarkTouched = false;
+  }
+
+  closeActionModal(force: boolean = false): void {
+    if (this.actionSubmitting && !force) return;
+    this.showActionModal = false;
+    this.actionRow = null;
+    this.actionType = 'Approved';
+    this.actionRemark = '';
+    this.actionRemarkTouched = false;
+    this.actionSubmitting = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  submitAction(): void {
+    if (!this.actionRow || this.actionSubmitting) return;
+
+    this.actionRemarkTouched = true;
+    if (!this.canSubmitAction) return;
+
+    const row = this.actionRow;
     const id = this.getRowId(row);
     if (!id) {
       this.apis.showAlert('error', 'Error!', 'Item score id not found.');
       return;
     }
 
-    const isApprove = action === 'Approved';
-    this.apis.showRemarkConfirm(
-      isApprove ? 'Approve Item Score?' : 'Reject Item Score?',
-      `${row.DealerCode} - ${row.DealerName}`,
-      isApprove ? 'Approve' : 'Reject',
-      'Cancel'
-    ).then(result => {
-      if (!result.isConfirmed) return;
+    const isApprove = this.isApproveAction;
+    const dealerText = `${row.DealerName || ''} (${row.DealerCode || '-'})`.trim();
 
-      const payload = {
-        itemScoreId: id,
-        status: action,
-        remark: String(result.value || '').trim()
-      };
+    const payload = {
+      approvalId: id,
+      status: isApprove ? 1 : -1,          // Approve = 1, Reject = -1
+      remark: (this.actionRemark || '').trim()
+    };
 
-      this.actionLoadingId = id;
-      this.apis.itemScoreApproval(payload).subscribe({
+    this.actionSubmitting = true;
+    this.actionLoadingId = id;
+
+    this.apis.approveReimbursementScore(payload)
+      .pipe(timeout(this.TIMEOUT_MS))
+      .subscribe({
         next: (res: any) => {
+          this.actionSubmitting = false;
           this.actionLoadingId = null;
+
           if (this.isOk(res)) {
-            this.apis.showAlert('success', 'Success', `Item score ${isApprove ? 'approved' : 'rejected'} successfully.`)
-              .then(() => this.fetchApprovalList());
+            this.closeActionModal(true);
+            this.apis.showAlert(
+              'success',
+              isApprove ? 'Approved Successfully' : 'Rejected Successfully',
+              isApprove
+                ? `Item score for ${dealerText} has been approved.`
+                : `Item score for ${dealerText} has been rejected.`
+            ).then(() => this.fetchApprovalList());
           } else {
-            this.apis.showAlert('error', 'Failed', res?.message || 'Could not update status.');
+            this.apis.showAlert('error', 'Action Failed',
+              res?.message || `Could not ${isApprove ? 'approve' : 'reject'} the item score. Please try again.`);
           }
         },
-        error: () => {
+        error: (err) => {
+          this.actionSubmitting = false;
           this.actionLoadingId = null;
-          this.apis.showAlert('error', 'Failed', 'Could not update status.');
+          this.apis.showAlert('error', 'Action Failed',
+            err?.name === 'TimeoutError'
+              ? 'Request is taking too long. Please check your connection and try again.'
+              : (err?.error?.message || `Could not ${isApprove ? 'approve' : 'reject'} the item score. Please try again.`));
         }
       });
-    });
   }
 
   // ===================== EDIT (NSH) =====================
@@ -920,7 +1001,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
         if (!result.isConfirmed) return;
 
         this.submitting = true;
-        console.log(JSON.stringify(payload));
         this.apis.updateItemScore(payload).subscribe({
           next: (res: any) => {
             this.submitting = false;
