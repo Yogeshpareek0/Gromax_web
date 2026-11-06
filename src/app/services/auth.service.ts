@@ -85,6 +85,32 @@ export class AuthService {
       }
     });
   }
+  showRemarkConfirm(
+    title: string,
+    text: string,
+    confirmButtonText: string = 'Confirm',
+    cancelButtonText: string = 'Cancel',
+    allowOutsideClick: boolean = false
+  ) {
+    return Swal.fire({
+      icon: 'question',
+      title,
+      text,
+      input: 'textarea',
+      inputPlaceholder: 'Enter remark...',
+      inputAttributes: { maxlength: '500' },
+      showCancelButton: true,
+      showConfirmButton: true,
+      confirmButtonText,
+      cancelButtonText,
+      allowOutsideClick,
+      inputValidator: (value: string) => (!value || !value.trim()) ? 'Remark is required.' : null,
+      customClass: {
+        title: 'swal-title-small',
+        htmlContainer: 'swal-text-small'
+      }
+    });
+  }
 
   sendotp(message: string, mobile: string) {
     const url = 'https://loadcrm.com/SmsApi/api/OwnApi/SendSms';
@@ -1161,4 +1187,23 @@ export class AuthService {
     return this.http.post<any>(this.baseUrl + 'Api/Services/UpdateWarrantyClaimApproval', payload);
   }
 
+
+
+  // ===== Item Score Approval =====
+  getItemScoreById(itemScoreId: string) {
+    const params = new HttpParams().set('ScoreId', itemScoreId);
+    return this.http.get(this.baseUrl + 'Api/Services/getReimbursementScoreListById', { params });
+  }
+
+  updateItemScore(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/updateReimbursementScore', payload);
+  }
+
+  itemScoreApproval(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/itemScoreApproval', payload);
+  }
+  getItemScorePendingReport() {
+    
+    return this.http.get(this.baseUrl + 'Api/Services/getItemScoreApprocalPendList');
+  }
 }

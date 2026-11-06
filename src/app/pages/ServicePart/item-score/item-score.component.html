@@ -1,7 +1,19 @@
 <div class="container-fluid px-0">
 
-  <!-- ==================== DEALER LIST ==================== -->
-  <ng-container *ngIf="view === 'dealers'">
+  <!-- ==================== TOP MODE BUTTONS ==================== -->
+  <div class="is-mode-bar mt-2" *ngIf="view === 'dealers'">
+    <button *ngIf="canAdd" type="button" class="is-mode-btn"
+            [class.active]="mode === 'add'" (click)="switchMode('add')">
+      <i class="fa-solid fa-plus"></i> Add Item Score
+    </button>
+    <button type="button" class="is-mode-btn"
+            [class.active]="mode === 'approval'" (click)="switchMode('approval')">
+      <i class="fa-solid fa-clipboard-check"></i> Approval Item Score
+    </button>
+  </div>
+
+  <!-- ==================== DEALER LIST (ADD) ==================== -->
+  <ng-container *ngIf="mode === 'add' && view === 'dealers'">
 
     <div class="card shadow-sm px-4 border-0 pb-1 pt-4 mt-2" style="border-radius: 12px;">
       <div class="row">
@@ -71,6 +83,127 @@
     </div>
   </ng-container>
 
+  <!-- ==================== APPROVAL LIST ==================== -->
+  <ng-container *ngIf="mode === 'approval' && view === 'dealers'">
+
+    <!--<div class="card shadow-sm px-4 border-0 pb-2 pt-3 mt-2" style="border-radius: 12px;">
+      <div class="row">
+        <div class="col-xl-2 col-lg-3 col-sm-6 mb-3">
+          <label class="form-label fw-medium mb-0">Year</label>
+          <select class="form-select" [(ngModel)]="selectedYear">
+            <option *ngFor="let y of yearOptions" [ngValue]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <div class="col-xl-3 col-lg-3 col-sm-6 mb-3">
+          <label class="form-label fw-medium mb-0">Half Year</label>
+          <select class="form-select" [(ngModel)]="selectedHalfYear">
+            <option *ngFor="let h of halfYearOptions" [ngValue]="h.value">{{ h.label }}</option>
+          </select>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-sm-6 mb-3 align-self-end">
+          <button class="btn custom-btn w-100 py-2" [disabled]="approvalLoading" (click)="fetchApprovalList()">
+            <i class="bi bi-clipboard-data me-1"></i> Show
+          </button>
+        </div>
+      </div>
+    </div>-->
+
+    <div class="d-flex align-items-center justify-content-end flex-wrap gap-2 mt-3">
+      <span class="range-chip">
+        <i class="fas fa-calendar-days me-1"></i> {{ halfYearLabel }} {{ selectedYear }}
+      </span>
+      <span class="range-chip" *ngIf="maxTotal > 0">Max Score : {{ maxTotal }}</span>
+      <span class="total-chip">Pending : {{ approvalRows.length }}</span>
+    </div>
+
+    <div class="report-table-wrapper mt-2">
+      <table class="table table-bordered table-striped mb-0">
+        <thead>
+          <tr style="--bs-table-bg:#215378;--bs-table-color:white;">
+            <th class="fw-normal" style="border-top-left-radius:8px;">Sr No</th>
+            <th class="fw-normal">State</th>
+            <th class="fw-normal">Dealer Code</th>
+            <th class="fw-normal">Dealer Name</th>
+            <th class="fw-normal">Location</th>
+            <th *ngFor="let c of scoreColumns" class="fw-normal text-center">
+              {{ c.label }}
+              <div class="max-sub" *ngIf="c.max">Max {{ c.max }}</div>
+            </th>
+            <th class="fw-normal text-center" *ngIf="scoreColumns.length">Total Score</th>
+            <th class="fw-normal text-center">Max Score</th>
+            <th class="fw-normal text-center">Percentage</th>
+            <th class="fw-normal text-center" [style.border-top-right-radius]="canTakeAction ? null : '8px'">Status</th>
+            <th class="fw-normal text-center" *ngIf="canTakeAction" style="border-top-right-radius:8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="!approvalLoading">
+            <tr *ngFor="let row of pagedRows; let i = index">
+              <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+              <td>{{ row.StateName || '-' }}</td>
+              <td class="fw-semibold" style="color:#215378">{{ row.DealerCode || '-' }}</td>
+              <td>{{ row.DealerName || '-' }}</td>
+              <td>{{ row.Location || '-' }}</td>
+              <td *ngFor="let c of scoreColumns" class="text-center"
+                  [class.zero-score]="scoreValue(row, c.key) === 0">
+                {{ scoreValue(row, c.key) }}
+              </td>
+              <td class="text-center fw-semibold" *ngIf="scoreColumns.length">{{ getTotal(row) }}</td>
+              <td class="text-center">{{ getMaxScore(row) }}</td>
+              <td class="text-center">
+                <span class="pct-badge" [ngClass]="percentClass(row)">{{ getPercent(row) | number:'1.0-2' }}%</span>
+              </td>
+              <td class="text-center">
+                <span class="is-badge is-badge-warning">HO Approval Pending</span>
+              </td>
+              <td class="text-center" *ngIf="canTakeAction">
+                <div class="d-inline-flex gap-1">
+                  <button type="button" class="btn btn-sm is-action-btn"
+                          [disabled]="actionLoadingId === getRowId(row)" (click)="onEditClick(row)">
+                    <span *ngIf="actionLoadingId === getRowId(row)" class="spinner-border spinner-border-sm" style="width:10px;height:10px"></span>
+                    <i *ngIf="actionLoadingId !== getRowId(row)" class="fa-solid fa-pen" style="font-size:9px"></i> Edit
+                  </button>
+                  <button type="button" class="btn btn-sm is-approve-btn"
+                          [disabled]="actionLoadingId === getRowId(row)" (click)="onApprovalAction(row, 'Approved')">
+                    <i class="fa-solid fa-check" style="font-size:9px"></i> Approve
+                  </button>
+                  <button type="button" class="btn btn-sm is-reject-btn"
+                          [disabled]="actionLoadingId === getRowId(row)" (click)="onApprovalAction(row, 'Rejected')">
+                    <i class="fa-solid fa-xmark" style="font-size:9px"></i> Reject
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <tr *ngIf="approvalLoading">
+            <td [attr.colspan]="approvalColspan">
+              <div class="empty-state">
+                <div class="spinner-border spinner-border-sm mb-2" style="color:#4796BD"></div>
+                <div class="empty-sub">Loading approval list...</div>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!approvalLoading && approvalRows.length === 0">
+            <td [attr.colspan]="approvalColspan">
+              <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <div class="empty-title">No Pending Approval</div>
+                <div class="empty-sub">Try changing the year or half year</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination *ngIf="approvalRows.length > itemsPerPage" [totalItems]="approvalRows.length" [pageSize]="itemsPerPage"
+                    [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+  </ng-container>
+
   <!-- ==================== GROUP LIST ==================== -->
   <ng-container *ngIf="view === 'groups'">
     <div class="nda-form-header mb-2 mt-2">
@@ -81,6 +214,7 @@
       <div class="is-dealer-info">
         <span class="is-code-badge">{{ selectedDealer?.DealerCode }}</span>
         <span class="is-dealer-name">{{ selectedDealer?.DealerName }}</span>
+        <span *ngIf="editMode" class="is-badge is-badge-info"><i class="fa-solid fa-pen me-1" style="font-size:9px"></i>Edit Mode</span>
       </div>
     </div>
 
@@ -120,7 +254,11 @@
                 style="background-color: #4796BD; border-radius: 50px; font-size: 14px;">
           <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
           <i *ngIf="!submitting" class="fa-solid fa-paper-plane me-1"></i>
-          {{ submitting ? 'Submitting...' : (allGroupsComplete ? 'Submit Score' : 'Complete all sections to submit') }}
+          {{
+ submitting
+              ? (editMode ? 'Updating...' : 'Submitting...')
+              : (allGroupsComplete ? (editMode ? 'Update Score' : 'Submit Score') : 'Complete all sections to submit')
+          }}
         </button>
       </div>
     </div>
@@ -136,6 +274,7 @@
       <div class="is-dealer-info">
         <span class="is-code-badge">{{ selectedDealer?.DealerCode }}</span>
         <span class="is-dealer-name">{{ selectedGroup }}</span>
+        <span *ngIf="editMode" class="is-badge is-badge-info"><i class="fa-solid fa-pen me-1" style="font-size:9px"></i>Edit Mode</span>
       </div>
     </div>
 
@@ -181,7 +320,10 @@
               </span>
             </td>
             <td>
-              <span *ngIf="getPoint(item)" class="is-badge is-badge-success">
+              <span *ngIf="isItemChanged(item)" class="is-badge is-badge-info">
+                <i class="fa-solid fa-pen me-1" style="font-size:9px"></i>Changed
+              </span>
+              <span *ngIf="!isItemChanged(item) && getPoint(item)" class="is-badge is-badge-success">
                 <i class="fa-solid fa-check me-1" style="font-size:9px"></i>Done
               </span>
               <span *ngIf="!getPoint(item)" class="is-badge is-badge-warning">Pending</span>
@@ -214,13 +356,11 @@
 
         <div class="modal-body">
 
-          <!-- Description -->
           <div class="is-desc-box" *ngIf="modalItem.cat">
             <div class="is-desc-label">Description</div>
             <div class="is-desc-text">{{ modalItem.cat }}</div>
           </div>
 
-          <!-- isInput = 1 → Input -->
           <div *ngIf="isInputType(modalItem)">
             <div class="is-section-label">
               Enter Value<span *ngIf="modalItem.units"> ({{ modalItem.units }})</span>
@@ -235,7 +375,6 @@
                    (input)="onAnswerInput($event)" />
           </div>
 
-          <!-- isInput = 0 → Yes / No -->
           <div *ngIf="!isInputType(modalItem)">
             <div class="is-section-label">Select Answer</div>
             <div class="is-score-wrap">
@@ -248,7 +387,6 @@
             </div>
           </div>
 
-          <!-- Photos: input me hamesha, Yes/No me sirf Yes par (minPhoto > 0 ho to) -->
           <div class="mt-4" *ngIf="isModalPhotoEnabled">
             <div class="is-section-label">
               Photo (min {{ getMinPhoto(modalItem) }}, max {{ getMaxPhoto(modalItem) }})

@@ -1,21 +1,30 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { timeout } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { DraftPoint, ItemScoreDraft, ItemScorePhotoSlot, GroupStatus } from '../../../model/apiresponse';
+import { PaginationComponent } from '../../../layout/pagination/pagination.component';
+import {
+  DraftPoint, ItemScoreDraft, ItemScorePhotoSlot, GroupStatus,
+  ItemScoreColumn, ItemScoreReportRow
+} from '../../../model/apiresponse';
 
 const DRAFT_KEY = 'itemScoreDraft';
+const ROLE_CCM = 'Service CCM';
+const ROLE_NSH = 'National Service Head';
 
 @Component({
   selector: 'app-item-score',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './item-score.component.html',
   styleUrl: './item-score.component.css'
 })
 export class ItemScoreComponent implements OnInit, OnDestroy {
 
+  mode: 'add' | 'approval' = 'add';
   view: 'dealers' | 'groups' | 'items' = 'dealers';
+  positionId: string = '';
 
   // Dealer list
   dealers: any[] = [];
@@ -41,7 +50,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   // Modal
   showModal: boolean = false;
   modalItem: any = null;
-  tempAnswer: string | null = null;   // isInput=1 → typed value, isInput=0 → '1' (Yes) / '0' (No)
+  tempAnswer: string | null = null;
   tempSlots: ItemScorePhotoSlot[] = [];
   activeSlotIndex: number = -1;
 
@@ -52,16 +61,76 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
 
   submitting: boolean = false;
 
+  // ─── Approval list ───
+  readonly halfYearOptions = [
+    { label: 'Apr - Sep', value: 1 },
+    { label: 'Oct - Mar', value: 2 }
+  ];
+  private readonly FIXED_KEYS = [
+    'ItemScoreId', 'Id', 'Status', 'CateType',
+    'StateName', 'DealerCode', 'DealerName', 'Location',
+    'TotalGetScore', 'MaxScore', 'Percentage', 'TotalCount'
+  ];
+  private readonly TIMEOUT_MS = 60000;
+
+  yearOptions: number[] = [];
+  selectedYear!: number;
+  selectedHalfYear!: number;
+  approvalRows: ItemScoreReportRow[] = [];
+  scoreColumns: ItemScoreColumn[] = [];
+  maxTotal = 0;
+  approvalLoading = false;
+  actionLoadingId: string | null = null;
+  private approvalReqId = 0;
+  currentPage = 1;
+  itemsPerPage = 20;
+
+  // ─── Edit (NSH) ───
+  editMode = false;
+  editItemScoreId: string | null = null;
+  private originalPoints: { [pointId: string]: { score: string; images: string[] } } = {};
+
   constructor(private apis: AuthService) { }
 
   ngOnInit(): void {
-    this.draft = this.readDraft();
-    this.loadDealers();
+    this.positionId = (sessionStorage.getItem('possitionId') || '').trim();
+    this.initYearAndHalf();
+
+    if (this.canAdd) {
+      this.mode = 'add';
+      this.draft = this.readDraft();
+      this.loadDealers();
+    } else {
+      this.mode = 'approval';
+      this.fetchApprovalList();
+    }
   }
 
   ngOnDestroy(): void {
     this.revokeTempPreviews();
     document.body.style.overflow = 'auto';
+  }
+
+  // ===================== ROLE =====================
+
+  get isCCM(): boolean { return this.positionId === ROLE_CCM; }
+  get isNSH(): boolean { return this.positionId === ROLE_NSH; }
+  get canAdd(): boolean { return !this.isNSH; }
+  get canTakeAction(): boolean { return this.isNSH; }
+
+  switchMode(mode: 'add' | 'approval'): void {
+    if (this.mode === mode) return;
+    if (mode === 'add' && !this.canAdd) return;
+
+    this.mode = mode;
+    this.view = 'dealers';
+
+    if (mode === 'add') {
+      this.draft = this.readDraft();
+      if (!this.dealers.length && !this.dealerLoading) this.loadDealers();
+    } else {
+      this.fetchApprovalList();
+    }
   }
 
   // ===================== COMMON =====================
@@ -82,6 +151,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   }
 
   private writeDraft(): void {
+    if (this.editMode) return;   // edit me draft sirf memory me
     try {
       if (this.draft) localStorage.setItem(DRAFT_KEY, JSON.stringify(this.draft));
     } catch (e) {
@@ -224,6 +294,16 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   }
 
   backToDealers(): void {
+    if (this.editMode) {
+      if (!this.hasEditChanges()) {
+        this.exitEdit(false);
+        return;
+      }
+      this.apis.showConfirm('Discard Changes?', 'Your changes will be lost. Do you want to go back?', 'Yes', 'Cancel')
+        .then(r => { if (r.isConfirmed) this.exitEdit(false); });
+      return;
+    }
+
     this.view = 'dealers';
     this.selectedDealer = null;
     this.selectedGroup = '';
@@ -244,6 +324,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   }
 
   isPrefilled(item: any): boolean {
+    if (this.editMode) return false;   // NSH sab edit kar sakta hai
     const v = item?.filledValue;
     return v !== null && v !== undefined && String(v).trim() !== '';
   }
@@ -262,7 +343,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return max > 0 ? max : min;
   }
 
-  // Input wale item me hamesha, Yes/No wale me sirf Yes ('1') par photo required
   getRequiredPhoto(item: any, answer: string | null | undefined): number {
     const min = this.getMinPhoto(item);
     if (min === 0) return 0;
@@ -270,7 +350,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return this.isInputType(item) || String(answer) === '1' ? min : 0;
   }
 
-  // Row ka answer: prefilled ho to API ki value, warna draft ki
   getItemAnswer(item: any): string | null {
     if (this.isPrefilled(item)) return this.getFilledValue(item);
     return this.draft?.points[String(item?.id)]?.score ?? null;
@@ -282,7 +361,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     if (this.isPrefilled(item)) {
       const filled = this.getFilledValue(item);
       if (saved) return { ...saved, score: filled };
-      // Photo required nahi hai to seedha done, warna photo lagne tak pending
       if (this.getRequiredPhoto(item, filled) === 0) {
         return { groupName: item.groupName, score: filled, images: [] };
       }
@@ -291,7 +369,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return saved;
   }
 
-  // List view helpers
   getSavedRequiredPhoto(item: any): number {
     return this.getRequiredPhoto(item, this.getItemAnswer(item));
   }
@@ -309,6 +386,12 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return String(ans) === '1' ? 'Yes' : 'No';
   }
 
+  isItemChanged(item: any): boolean {
+    if (!this.editMode) return false;
+    const p = this.getPoint(item);
+    return !!p && this.isPointChanged(String(item.id), p);
+  }
+
   // ===================== MODAL =====================
 
   openScoreModal(item: any): void {
@@ -318,7 +401,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
       ? this.getFilledValue(item)
       : (point ? String(point.score) : null);
 
-    // Slots hamesha bana do (minPhoto > 0 ho to) — Yes/No me 'Yes' select hote hi dikh jayenge
     const max = this.getMinPhoto(item) > 0 ? this.getMaxPhoto(item) : 0;
     this.tempSlots = Array.from({ length: max }, (_, i) => ({
       preview: point?.images?.[i] || null,
@@ -346,7 +428,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     });
   }
 
-  // isInput = 1 → sirf number aur '.', max 7 char
   onAnswerInput(event: Event): void {
     if (this.isPrefilled(this.modalItem)) return;
     const el = event.target as HTMLInputElement;
@@ -355,7 +436,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     this.tempAnswer = value;
   }
 
-  // isInput = 0 → '1' / '0'
   selectYesNo(value: string): void {
     if (this.isPrefilled(this.modalItem)) return;
     this.tempAnswer = value;
@@ -469,7 +549,6 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   onDone(): void {
     if (!this.canMarkDone() || !this.draft) return;
 
-    // Photo section hidden ho (Yes/No me 'No') to koi photo save nahi hogi
     const images = this.isModalPhotoEnabled
       ? this.tempSlots.map(s => s.serverUrl).filter((u): u is string => !!u)
       : [];
@@ -481,7 +560,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
         : String(this.tempAnswer);
 
     this.draft.points[String(this.modalItem.id)] = {
-      groupName: this.selectedGroup,
+      groupName: this.modalItem.groupName || this.selectedGroup,
       score,
       images
     };
@@ -492,13 +571,21 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
 
   // ===================== FINAL SUBMIT =====================
 
+  private getAllEntries(): [string, DraftPoint][] {
+    return this.allItems
+      .map(item => [String(item.id), this.getPoint(item)] as [string, DraftPoint | null])
+      .filter((e): e is [string, DraftPoint] => !!e[1]);
+  }
+
   submitAll(): void {
     if (!this.draft || !this.allGroupsComplete || this.submitting) return;
 
-    // Draft + prefilled dono items (getPoint se)
-    const entries: [string, DraftPoint][] = this.allItems
-      .map(item => [String(item.id), this.getPoint(item)] as [string, DraftPoint | null])
-      .filter((e): e is [string, DraftPoint] => !!e[1]);
+    if (this.editMode) {
+      this.submitEdit();
+      return;
+    }
+
+    const entries = this.getAllEntries();
 
     if (entries.length === 0) {
       this.apis.showAlert('warning', 'Warning!', 'No scores found to submit.');
@@ -546,12 +633,337 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
       });
   }
 
-
   private isZeroScore(answer: string | null | undefined): boolean {
     if (answer === null || answer === undefined) return false;
     const s = String(answer).trim();
     if (s === '' || s === '.') return false;
     const n = Number(s);
     return !isNaN(n) && n === 0;
+  }
+
+  // ===================== APPROVAL LIST =====================
+
+  private initYearAndHalf(): void {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    this.yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
+    this.selectedYear = currentYear;
+    this.selectedHalfYear = now.getMonth() >= 3 && now.getMonth() <= 8 ? 1 : 2;
+  }
+
+  get halfYearLabel(): string {
+    return this.halfYearOptions.find(h => h.value === this.selectedHalfYear)?.label ?? '';
+  }
+
+  get pagedRows(): ItemScoreReportRow[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.approvalRows.slice(start, start + this.itemsPerPage);
+  }
+
+  get approvalColspan(): number {
+    return this.scoreColumns.length + 9 + (this.canTakeAction ? 1 : 0);
+  }
+
+  private parseScoreKey(key: string): ItemScoreColumn {
+    const idx = key.lastIndexOf('-');
+    const maxPart = idx > -1 ? Number(key.substring(idx + 1)) : NaN;
+    return {
+      key,
+      label: idx > -1 && !isNaN(maxPart) ? key.substring(0, idx) : key,
+      max: isNaN(maxPart) ? 0 : maxPart
+    };
+  }
+
+  private buildScoreColumns(rows: ItemScoreReportRow[]): void {
+    if (!rows.length) {
+      this.scoreColumns = [];
+      this.maxTotal = 0;
+      return;
+    }
+    this.scoreColumns = Object.keys(rows[0])
+      .filter(k => !this.FIXED_KEYS.includes(k))
+      .map(k => this.parseScoreKey(k));
+    this.maxTotal = Number(rows[0].MaxScore) || 0;
+  }
+
+  scoreValue(row: ItemScoreReportRow, key: string): number {
+    const n = Number(row[key]);
+    return isNaN(n) ? 0 : n;
+  }
+
+  getMaxScore(row: ItemScoreReportRow): number {
+    return Number(row.MaxScore) || 0;
+  }
+
+  getTotal(row: ItemScoreReportRow): number {
+    return Number(row.TotalGetScore) || 0;
+  }
+
+  getPercent(row: ItemScoreReportRow): number {
+    const p = Number(row.Percentage);
+    return isNaN(p) ? 0 : Math.round(p * 100) / 100;
+  }
+
+  percentClass(row: ItemScoreReportRow): string {
+    const p = this.getPercent(row);
+    if (p >= 75) return 'pct-good';
+    if (p >= 40) return 'pct-mid';
+    return 'pct-low';
+  }
+
+  getRowId(row: any): string | null {
+
+    const id = row?.ItemScoreId;
+    return id !== null && id !== undefined && String(id).trim() !== '' ? String(id) : null;
+  }
+
+  // Abhi report wali API hi use ho rahi hai
+  fetchApprovalList(): void {
+    const reqId = ++this.approvalReqId;
+    this.approvalLoading = true;
+    this.approvalRows = [];
+    this.currentPage = 1;
+
+    this.apis.getItemScorePendingReport()
+      .pipe(timeout(this.TIMEOUT_MS))
+      .subscribe({
+        next: (res: any) => {
+          if (reqId !== this.approvalReqId) return;
+          const rows: ItemScoreReportRow[] = Array.isArray(res?.data) ? res.data : [];
+          this.buildScoreColumns(rows);
+          this.approvalRows = rows;
+          this.approvalLoading = false;
+        },
+        error: (err) => {
+          if (reqId !== this.approvalReqId) return;
+          this.approvalLoading = false;
+          this.approvalRows = [];
+          this.scoreColumns = [];
+          this.apis.showAlert('error', 'Error!',
+            err?.name === 'TimeoutError'
+              ? 'Loading is taking too long. Please check your connection and try again.'
+              : (err?.error?.message || 'Failed to fetch approval list.'));
+        }
+      });
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  // ===================== APPROVE / REJECT =====================
+
+  onApprovalAction(row: ItemScoreReportRow, action: 'Approved' | 'Rejected'): void {
+    if (!this.canTakeAction) return;
+    const id = this.getRowId(row);
+    if (!id) {
+      this.apis.showAlert('error', 'Error!', 'Item score id not found.');
+      return;
+    }
+
+    const isApprove = action === 'Approved';
+    this.apis.showRemarkConfirm(
+      isApprove ? 'Approve Item Score?' : 'Reject Item Score?',
+      `${row.DealerCode} - ${row.DealerName}`,
+      isApprove ? 'Approve' : 'Reject',
+      'Cancel'
+    ).then(result => {
+      if (!result.isConfirmed) return;
+
+      const payload = {
+        itemScoreId: id,
+        status: action,
+        remark: String(result.value || '').trim()
+      };
+
+      this.actionLoadingId = id;
+      this.apis.itemScoreApproval(payload).subscribe({
+        next: (res: any) => {
+          this.actionLoadingId = null;
+          if (this.isOk(res)) {
+            this.apis.showAlert('success', 'Success', `Item score ${isApprove ? 'approved' : 'rejected'} successfully.`)
+              .then(() => this.fetchApprovalList());
+          } else {
+            this.apis.showAlert('error', 'Failed', res?.message || 'Could not update status.');
+          }
+        },
+        error: () => {
+          this.actionLoadingId = null;
+          this.apis.showAlert('error', 'Failed', 'Could not update status.');
+        }
+      });
+    });
+  }
+
+  // ===================== EDIT (NSH) =====================
+
+  onEditClick(row: ItemScoreReportRow): void {
+    if (!this.canTakeAction) return;
+    const id = this.getRowId(row);
+    if (!id) {
+      this.apis.showAlert('error', 'Error!', 'Item score id not found.');
+      return;
+    }
+
+    this.actionLoadingId = id;
+    this.apis.getItemScoreById(id).subscribe({
+      next: (res: any) => {
+        this.actionLoadingId = null;
+        const list = res?.data?.report ?? res?.data?.Report;
+        const rows = Array.isArray(list) ? list : [];
+
+        if (!this.isOk(res)) {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed to fetch item score details.');
+          return;
+        }
+        if (!rows.length) {
+          this.apis.showAlert('warning', 'No Data', 'No item score data found.');
+          return;
+        }
+        this.startEdit(id, row, rows);
+      },
+      error: () => {
+        this.actionLoadingId = null;
+        this.apis.showAlert('error', 'Error!', 'Failed to fetch item score details.');
+      }
+    });
+  }
+
+  private startEdit(id: string, row: ItemScoreReportRow, rawRows: any[]): void {
+    const rows = rawRows.map(r => ({
+      ...r,
+      id: r.Id ?? r.id,                          // detail Id
+      dealerCode: r.DealerCode ?? r.dealerCode
+    }));
+
+    this.editMode = true;
+    this.editItemScoreId = id;
+
+    const dealerCode = row.DealerCode ?? rows[0]?.dealerCode;
+    const dealerName = row.DealerName ?? rows[0]?.dealerName;
+    this.selectedDealer = { DealerCode: dealerCode, DealerName: dealerName };
+
+    this.allItems = rows;
+    this.catType = rows[0]?.catType ?? row['CateType'] ?? null;
+    this.groupNames = [...new Set(rows.map(x => x.groupName).filter(Boolean))] as string[];
+
+    const points: { [id: string]: DraftPoint } = {};
+    this.originalPoints = {};
+
+    rows.forEach(r => {
+      if (r.score === null || r.score === undefined || String(r.score).trim() === '') return;
+      const pid = String(r.id);
+      const score = this.normalizeScore(r, r.score);
+      const images = this.parseImages(r.images);
+      points[pid] = { groupName: r.groupName, score, images };
+      this.originalPoints[pid] = { score, images: [...images] };
+    });
+
+    this.draft = { dealerCode, dealerName, points };
+    this.selectedGroup = '';
+    this.groupItems = [];
+    this.view = 'groups';
+    this.refreshGroupStatus();
+  }
+
+  private parseImages(val: any): string[] {
+    if (Array.isArray(val)) {
+      return val.map(x => typeof x === 'string' ? x : (x?.image || x?.imageUrl)).filter(Boolean);
+    }
+    if (typeof val === 'string' && val.trim()) {
+      return val.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  private isPointChanged(pointId: string, p: DraftPoint): boolean {
+    const o = this.originalPoints[pointId];
+    if (!o) return true;
+    const sameScore = String(o.score).trim() === String(p.score).trim();
+    const sameImages = [...o.images].sort().join('|') === [...(p.images || [])].sort().join('|');
+    return !(sameScore && sameImages);
+  }
+
+  private hasEditChanges(): boolean {
+    return this.getAllEntries().some(([id, p]) => this.isPointChanged(id, p));
+  }
+
+  private submitEdit(): void {
+    const entries = this.getAllEntries();
+    const changedIds = new Set(entries.filter(([id, p]) => this.isPointChanged(id, p)).map(([id]) => id));
+
+    if (changedIds.size === 0) {
+      this.apis.showAlert('info', 'No Changes', 'You have not changed any item score.');
+      return;
+    }
+
+    const payload = {
+      itemScoreId: this.editItemScoreId,
+      dealerCode: this.draft!.dealerCode,
+      date: new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).replace(' ', 'T'),
+      CateType: this.catType,
+      points: entries.map(([pointId, p]) => ({
+        pointId,
+        groupName: p.groupName,
+        score: p.score,
+        status: changedIds.has(pointId) ? 'Changed' : 'Unchanged'
+      })),
+      // Sabhi points ki images (purani + nayi), kyunki SP har aaye point ki images delete karke wapas insert karta hai
+      pointImages: entries.flatMap(([pointId, p]) =>
+        (p.images || []).map(imageUrl => ({ pointId, image: imageUrl }))
+      )
+    };
+
+    this.apis.showConfirm('Update Score?',
+      `${changedIds.size} item(s) changed for ${this.draft!.dealerCode}. Update score?`, 'Update', 'Cancel')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        this.submitting = true;
+        console.log(JSON.stringify(payload));
+        this.apis.updateItemScore(payload).subscribe({
+          next: (res: any) => {
+            this.submitting = false;
+            if (this.isOk(res)) {
+              this.apis.showAlert('success', 'Success', 'Score updated successfully.')
+                .then(() => this.exitEdit(true));
+            } else {
+              this.apis.showAlert('error', 'Update Failed', res?.message || 'Could not update score.');
+            }
+          },
+          error: () => {
+            this.submitting = false;
+            this.apis.showAlert('error', 'Update Failed', 'Could not update score.');
+          }
+        });
+      });
+  }
+
+  private exitEdit(reload: boolean): void {
+    this.editMode = false;
+    this.editItemScoreId = null;
+    this.originalPoints = {};
+    this.allItems = [];
+    this.groupNames = [];
+    this.groupStatusMap = {};
+    this.selectedDealer = null;
+    this.selectedGroup = '';
+    this.groupItems = [];
+    this.catType = null;
+    this.draft = this.readDraft();
+    this.mode = 'approval';
+    this.view = 'dealers';
+    if (reload) this.fetchApprovalList();
+  }
+
+  private normalizeScore(item: any, score: any): string {
+    const n = Number(score);
+    if (isNaN(n)) return String(score).trim();
+
+    // Yes/No → '1' / '0'
+    if (!this.isInputType(item)) return n >= 1 ? '1' : '0';
+
+    // Input → "5.00" -> "5", "12.50" -> "12.5"
+    return String(n);
   }
 }
