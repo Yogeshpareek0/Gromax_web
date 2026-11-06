@@ -13,8 +13,8 @@ import { __param } from 'tslib';
 export class AuthService {
 
   private readonly TOKEN_KEY = 'token';
-  //private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
-  private readonly baseUrl = 'https://localhost:44398/';
+  private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
+  // private readonly baseUrl = 'https://localhost:44398/';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -1199,11 +1199,14 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'Api/Services/updateReimbursementScore', payload);
   }
 
-  itemScoreApproval(payload: any) {
-    return this.http.post(this.baseUrl + 'Api/Services/itemScoreApproval', payload);
-  }
+ 
   getItemScorePendingReport() {
-    
+
     return this.http.get(this.baseUrl + 'Api/Services/getItemScoreApprocalPendList');
   }
+
+  approveReimbursementScore(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Services/approveReimbursementScore', payload);
+  }
 }
+
