@@ -1199,7 +1199,7 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'Api/Services/updateReimbursementScore', payload);
   }
 
- 
+
   getItemScorePendingReport() {
 
     return this.http.get(this.baseUrl + 'Api/Services/getItemScoreApprocalPendList');

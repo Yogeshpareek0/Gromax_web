@@ -546,26 +546,30 @@ export class MechanicComponent implements OnInit {
       dataToExport = this.mechanicList.map(item => ({
         "Mechanic Name": item.mechanicName,
         "Contact No.": item.contactNo,
-        "Aadhar Card No.": item.aadharNo,
+        "Aadhar Card No.": item.aadharCardNo,
+        "Dealer Code": item.dealerCode,
+        "Dealer Name": item.dealerName,
+        "State Name": item.stateName,
+        "Location": item.location,
         "Type": item.typeOfMechanic,
         "Education": item.education,
-        "Exp. in Dealership": item.experienceInDealership,
+        "Exp. in Gromax": item.experienceInGromax,
         "Prior Exp.": item.priorExperience,
         "Prior Exp. Years": item.priorExperienceYears,
         "Total Experience": item.totalExperience,
-        "Physical Training": item.physicalTraining,
-        "Virtual Training": item.virtualTraining,
+        "Physical Training Count": item.physicalTrainingCount,
+        "Virtual Training Count": item.virtualTrainingCount,
         "Installation": item.installationAttendance,
         "Hydraulic": item.hydraulicAttendance,
         "Engine": item.engineAttendance,
-        "Complete Training": item.completeTraining,
-        "System & Process": item.systemProcess,
+        "Complete Tractor Training": item.completeTractorTraining,
+        "System & Process": item.systemAndProcess,
         "Skill Level": item.skillLevel,
         "Service Manpower": item.serviceManpower,
-        "Current Status": item.currentStatus,
-        "Approval Status": item.approvalStatus
+        "Approval Status": item.approvalStatus,
       }));
-    } else if (this.activeTab === 'approval') {
+    }
+    else if (this.activeTab === 'approval') {
       dataToExport = this.approvalList.map(item => ({
         "Mechanic Name": item.mechanicName,
         "Contact No.": item.contactNo,

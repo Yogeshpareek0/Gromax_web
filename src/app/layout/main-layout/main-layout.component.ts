@@ -276,7 +276,7 @@ export class MainLayoutComponent implements OnInit {
       dealermaster: 'Add Dealer',
       reimbursementservice: 'Reimbursement Service',
       generatedinvoicelist: 'Generated Invoice List',
-      Mechanic: 'Mechanic Master',
+      Mechanic: 'Dealer Manpower',
       ftrform: 'Raise FTR',
       sparepartorder: 'Order Spare Part',
       updatesparepartorder: 'Update Spare Part Order',
