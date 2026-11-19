@@ -768,105 +768,114 @@
   --sc-soft: #eef7fc;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: #fff;
-  border: 1px solid #e4e7ec;
-  border-left: 4px solid var(--sc-color);
-  border-radius: 12px;
+  border: 1px solid var(--sc-color);
+  border-radius: 8px;
   text-align: left;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, .05);
-  transition: box-shadow .2s, transform .15s, background .2s, border-color .2s;
+  transition: background .2s, box-shadow .2s, transform .15s;
 }
 
   .status-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(16, 24, 40, .08);
-  }
-
-  .status-card.active {
-    background: var(--sc-soft);
-    border-color: var(--sc-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-color) 15%, transparent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--sc-color) 15%, transparent);
   }
 
   .status-card:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(71, 150, 189, .25);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sc-color) 25%, transparent);
   }
-
-.sc-icon {
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  background: var(--sc-soft);
-  color: var(--sc-color);
-}
-
-.status-card.active .sc-icon {
-  background: var(--sc-color);
-  color: #fff;
-}
 
 .sc-text {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  gap: 4px;
   min-width: 0;
 }
 
 .sc-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #667085;
-  text-transform: uppercase;
-  letter-spacing: .4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sc-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sc-count {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 500;
   color: #1d2939;
-  line-height: 1.4;
+  line-height: 1;
 }
 
-.sc-arrow {
-  font-size: 11px;
-  color: #c0c7d1;
-  transition: transform .2s, color .2s;
-}
-
-.status-card:hover .sc-arrow,
-.status-card.active .sc-arrow {
+.sc-icon {
+  font-size: 20px;
   color: var(--sc-color);
-  transform: translateX(2px);
+  flex-shrink: 0;
 }
 
+/* Active = light tint */
+.status-card.active {
+  background: var(--sc-soft);
+  border-width: 1.5px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sc-color) 15%, transparent);
+}
+
+  .status-card.active .sc-count {
+    font-weight: 700;
+  }
+
+/* ===== Colors ===== */
 .sc-pending {
-  --sc-color: #D59D3E;
-  --sc-soft: #fdf5e6;
+  --sc-color: #E59A2F;
+  --sc-soft: #fff7ea;
 }
 
 .sc-approved {
-  --sc-color: #4D963A;
-  --sc-soft: #ecf7e9;
+  --sc-color: #3E9A35;
+  --sc-soft: #eef8eb;
 }
 
 .sc-rejected {
-  --sc-color: #d64545;
-  --sc-soft: #fdecec;
+  --sc-color: #E5532D;
+  --sc-soft: #fdeee9;
 }
 
 @media (max-width: 576px) {
-  .status-cards {
+  .status-card {
     grid-template-columns: 1fr;
   }
+}
+/* ===== FTR Table ===== */
+.ftr-wrap {
+  max-height: 240px;
+  overflow: auto;
+  border: 1px solid #eef0f3;
+  border-radius: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #4796BD #f1f1f1;
+}
+
+.ftr-table {
+  min-width: 1100px;
+}
+
+  .ftr-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+  }
+
+.ftr-text {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 

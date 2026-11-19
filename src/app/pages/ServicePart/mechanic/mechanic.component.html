@@ -113,7 +113,7 @@
                    [ngClass]="{'is-invalid': submitClicked && !experienceInDealership}"
                    min="0"
                    [disabled]="activeTab==='update'">
-            <label>Experience in Dealership [Years]</label>
+            <label>Experience in Gromax dealership</label>
           </div>
         </div>
 
@@ -123,7 +123,7 @@
             <input type="text" [(ngModel)]="priorExperience" name="priorExperience" class="form-control"
                    [ngClass]="{'is-invalid': submitClicked && !priorExperience.trim()}"
                    [disabled]="activeTab==='update'">
-            <label>Prior Experience in Tractor</label>
+            <label>Name of the Previous Tractor Industry worked</label>
           </div>
         </div>
 
@@ -133,7 +133,7 @@
             <input type="number" [(ngModel)]="priorExperienceYears" name="priorExperienceYears" class="form-control"
                    [ngClass]="{'is-invalid': submitClicked && !priorExperienceYears}"
                    min="0" [disabled]="activeTab==='update'">
-            <label>No. of years</label>
+            <label>Previous Tractor Industry Experience (Years)</label>
           </div>
         </div>
 
@@ -381,7 +381,7 @@
             </th>
 
             <!-- Mechanic Details -->
-            <th colspan="7" class="text-nowrap fw-normal text-center">
+            <th colspan="9" class="text-nowrap fw-normal text-center">
               Mechanic Details
             </th>
 
@@ -459,6 +459,12 @@
             <th class="text-nowrap fw-normal">
               Total Exp.
             </th>
+            <th class="text-nowrap fw-normal">
+              Skill level
+            </th>
+            <th class="text-nowrap fw-normal">
+              Service Manpower
+            </th>
 
 
             <!-- Prior Experience -->
@@ -534,6 +540,8 @@
             <td class="text-nowrap">{{ item.education }}</td>
             <td class="text-nowrap">{{ item.experienceInGromax }}</td>
             <td class="text-nowrap">{{ item.totalExperience }}</td>
+            <td class="text-nowrap">{{ item.skillLevel }}</td>
+            <td class="text-nowrap">{{ item.serviceManpower}}</td>
 
             <td class="text-nowrap">{{ item.priorExperience }}</td>
             <td class="text-nowrap">{{ item.priorExperienceYears }}</td>

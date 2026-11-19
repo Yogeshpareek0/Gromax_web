@@ -3,12 +3,12 @@
   <!-- ═══════════ COMMON FILTER PANEL ═══════════ -->
   <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
     <div class="row align-items-end">
-      <div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showRaiseList">
+      <!--<div class="col-xl-3 col-lg-4 col-sm-6 mb-3" *ngIf="showRaiseList">
         <label class="form-label fw-medium mb-0">FTR Type</label>
         <select class="form-select" [(ngModel)]="selectedType" (ngModelChange)="onTypeChange()">
           <option *ngFor="let o of ftrTypeOptions" [value]="o.value">{{ o.label }}</option>
         </select>
-      </div>
+      </div>-->
       <div class="col-xl-2 col-lg-3 col-sm-6 mb-3">
         <label class="form-label fw-medium mb-0">Start Date</label>
         <input type="date" class="form-control" [(ngModel)]="stDate" [max]="enDate || today">

@@ -144,12 +144,11 @@
       <button type="button" class="status-card" *ngFor="let card of claimStatusCards"
               [ngClass]="card.cls" [class.active]="claimStatus === card.status"
               (click)="onStatusCardClick(card.status)">
-        <span class="sc-icon"><i [class]="card.icon"></i></span>
         <span class="sc-text">
           <span class="sc-label">{{ card.label }}</span>
           <span class="sc-count">{{ getStatusCount(card.key) }}</span>
         </span>
-        <i class="fa-solid fa-chevron-right sc-arrow"></i>
+        <i class="sc-icon" [class]="'sc-icon ' + card.icon"></i>
       </button>
     </div>
 
@@ -158,7 +157,7 @@
         <div class="col-xl-3 col-lg-4 col-sm-6 col-12">
           <label class="form-label fw-medium mb-1" style="font-size:13px;">Search</label>
           <input type="text" class="form-control form-control-sm" [(ngModel)]="claimSearch"
-                 placeholder="Claim no / chassis / dealer code" (keyup.enter)="onClaimSearch()">
+                 placeholder="chassis" (keyup.enter)="onClaimSearch()">
         </div>
         <div class="col-xl-2 col-lg-3 col-sm-6 col-12">
           <div class="d-flex gap-2">
@@ -258,6 +257,44 @@
           <div class="detail-item"><span>Hours</span><b>{{ selectedJobCard?.Hours }}</b></div>
           <div class="detail-item"><span>Work Done By</span><b>{{ selectedJobCard?.WorkDoneBy || '-' }}</b></div>
           <div class="detail-item"><span>Job Card Total</span><b>₹ {{ selectedJobCard?.GrandTotal | number:'1.2-2' }}</b></div>
+        </div>
+
+        <!-- FTR Details -->
+        <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+          <div class="section-title mb-0">FTR Details</div>
+          <span class="select-count" *ngIf="ftrList.length">{{ ftrList.length }} record{{ ftrList.length > 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="ftr-wrap">
+          <table class="table items-table ftr-table mb-0">
+            <thead>
+              <tr>
+                <th>SSE Name</th>
+                <th>Failure Date</th>
+                <th class="text-end">Hours Worked</th>
+                <th>Repair Date</th>
+                <th>Nature Of Work Done</th>
+                <th class="text-center">Implement / Trolley Size</th>
+                <th>Customer Complaints</th>
+                <th>Problem Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of ftrList; trackBy: trackByFtr">
+                <td class="text-nowrap fw-semibold">{{ f.SSEName || '-' }}</td>
+                <td class="text-nowrap">{{ f.FailureDate ? (f.FailureDate | date:'dd-MM-yyyy') : '-' }}</td>
+                <td class="text-nowrap text-end">{{ f.HoursWorked != null ? (f.HoursWorked | number:'1.0-2') : '-' }}</td>
+                <td class="text-nowrap">{{ f.RepairDate ? (f.RepairDate | date:'dd-MM-yyyy') : '-' }}</td>
+                <td class="text-nowrap">{{ f.NatureOfWorkDone || '-' }}</td>
+                <td class="text-nowrap text-center">{{ f.ImplementTrolleySize || '-' }}</td>
+                <td><div class="ftr-text" [title]="f.CustomerComplaints || ''">{{ f.CustomerComplaints || '-' }}</div></td>
+                <td><div class="ftr-text" [title]="f.ProblemDefinition || ''">{{ f.ProblemDefinition || '-' }}</div></td>
+              </tr>
+              <tr *ngIf="ftrList.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">No FTR details found for this job card.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
@@ -400,6 +437,44 @@
           </div>
         </div>
 
+        <!-- FTR Details -->
+        <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+          <div class="section-title mb-0">FTR Details</div>
+          <!--<span class="select-count" *ngIf="ftrList.length">{{ ftrList.length }} record{{ ftrList.length > 1 ? 's' : '' }}</span>-->
+        </div>
+
+        <div class="ftr-wrap">
+          <table class="table items-table ftr-table mb-0">
+            <thead>
+              <tr>
+                <th>SSE Name</th>
+                <th>Failure Date</th>
+                <th class="text-end">Hours Worked</th>
+                <th>Repair Date</th>
+                <th>Nature Of Work Done</th>
+                <th class="text-center">Implement / Trolley Size</th>
+                <th>Customer Complaints</th>
+                <th>Problem Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of ftrList; trackBy: trackByFtr">
+                <td class="text-nowrap fw-semibold">{{ f.SSEName || '-' }}</td>
+                <td class="text-nowrap">{{ f.FailureDate ? (f.FailureDate | date:'dd-MM-yyyy') : '-' }}</td>
+                <td class="text-nowrap text-end">{{ f.HoursWorked != null ? (f.HoursWorked | number:'1.0-2') : '-' }}</td>
+                <td class="text-nowrap">{{ f.RepairDate ? (f.RepairDate | date:'dd-MM-yyyy') : '-' }}</td>
+                <td class="text-nowrap">{{ f.NatureOfWorkDone || '-' }}</td>
+                <td class="text-nowrap text-center">{{ f.ImplementTrolleySize || '-' }}</td>
+                <td><div class="ftr-text" [title]="f.CustomerComplaints || ''">{{ f.CustomerComplaints || '-' }}</div></td>
+                <td><div class="ftr-text" [title]="f.ProblemDefinition || ''">{{ f.ProblemDefinition || '-' }}</div></td>
+              </tr>
+              <tr *ngIf="ftrList.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">No FTR details found for this job card.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <!-- Approval timeline -->
         <div class="section-title mt-4">Approval Status</div>
         <div class="timeline">
@@ -448,7 +523,7 @@
                 <th style="width:40px;">#</th>
                 <th>Part</th>
                 <th class="text-end" style="width:100px;">Rate</th>
-                <th class="text-center" style="width:130px;">Qty</th>
+                <th class="text-end" style="width:130px;">Qty</th>
                 <th class="text-end" style="width:115px;">Taxable</th>
                 <th class="text-end" style="width:115px;">GST</th>
                 <th class="text-end" style="width:115px;">Total</th>
@@ -469,7 +544,7 @@
                 <td class="text-end">₹ {{ s.Rate | number:'1.2-2' }}</td>
 
                 <!-- Qty: modify me stepper, warna sirf number -->
-                <td class="text-center">
+                <!--<td class="text-center">
                   <ng-container *ngIf="modifyMode; else qtyView">
                     <div class="qty-stepper">
                       <button type="button" (click)="decSpareQty(s)"
@@ -486,7 +561,8 @@
                     </div>
                   </ng-container>
                   <ng-template #qtyView>{{ s.ClaimQty | number:'1.0-2' }}</ng-template>
-                </td>
+                </td>-->
+                <td class="text-end">{{ s.ClaimQty| number:'1.0-2'  }}</td>
 
                 <td class="text-end">₹ {{ spareTaxable(s) | number:'1.2-2' }}</td>
                 <td class="text-end">
@@ -506,7 +582,7 @@
                 <td></td>
                 <td class="fw-semibold">Total ({{ reviewSummary.count }} parts)</td>
                 <td></td>
-                <td class="text-center fw-semibold">{{ reviewSummary.qty }}</td>
+                <td class="text-end fw-semibold">{{ reviewSummary.qty }}</td>
                 <td class="text-end fw-semibold">₹ {{ reviewSummary.taxable | number:'1.2-2' }}</td>
                 <td class="text-end fw-semibold">₹ {{ reviewSummary.gst | number:'1.2-2' }}</td>
                 <td class="text-end fw-bold">₹ {{ reviewSummary.total | number:'1.2-2' }}</td>
@@ -571,7 +647,7 @@
 </div>
 
 <!-- ================= APPROVE / REJECT CONFIRM ================= -->
-<div class="confirm-overlay" *ngIf="confirmAction" (click)="cancelConfirm()">
+<div class="confirm-overlay" *ngIf="confirmAction" (click)="cancelConfirm()" (focusin)="$event.stopPropagation()">
   <div class="confirm-box" (click)="$event.stopPropagation()">
     <div class="confirm-icon" [ngClass]="confirmAction === 'approve' ? 'ci-approve' : 'ci-reject'">
       <i [class]="confirmAction === 'approve' ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>

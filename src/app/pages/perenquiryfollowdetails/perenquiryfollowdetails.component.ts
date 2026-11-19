@@ -283,7 +283,7 @@ export class PerenquiryfollowdetailsComponent implements OnInit {
     'AGGREGATOR': ['Tractor Junction', 'Tractor Guru', 'CMV 360', 'Tractor Gyaan', 'Plantix', 'Other'],
     'TM': ['Field Visit', 'BTL', 'HO Digital', 'Other'],
     'FO': ['Field Visit', 'BTL', 'HO Digital', 'Other'],
-    'DEALER': ['Walkin', 'DSP', 'Sales Manager', 'HO Digital', 'Dealer Digital', 'MID', 'Local Expo', 'Van Campaign', 'Display', 'Field Demo', 'Other BTL'],
+    'DEALER': ['Walkin', 'DSP', 'Sales Manager', 'HO Digital', 'Dealer Digital', 'MID', 'Local Expo', 'Van Campaign', 'Display', 'Field Demo', 'Other BTL', 'Customer Meet'],
     'DES': ['Field Demo', 'Display', 'MID', 'Other']
   };
 
@@ -751,7 +751,14 @@ export class PerenquiryfollowdetailsComponent implements OnInit {
           }
         });
       },
-      error: () => this.apis.showAlert('error', 'Error!', 'An error occurred while updating enquiry.')
+      error: (err) => {
+        const errorCode = err?.error?.errorCode;
+        const errorMessage = errorCode?.toString().trim()
+          ? err.error.message
+          : 'An error occurred. Please try again.';
+
+        this.apis.showAlert('error', 'Error!', errorMessage);
+      }
     });
   }
 

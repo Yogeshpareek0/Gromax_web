@@ -23,7 +23,7 @@ export class FtrReportComponent implements OnInit {
   readonly columns: FtrReportColumn[] = [
     { key: 'srNo', label: 'Sr No' },
     { key: 'SSEName', label: 'Name of SSE' },
-    { key: 'stockType', label: 'Stock Type', type: 'stock' },
+   /* { key: 'stockType', label: 'Stock Type', type: 'stock' },*/
     { key: 'DealerCode', label: 'Dealer Code' },
     { key: 'DealerName', label: 'Dealer Name' },
     { key: 'DealerAddress', label: 'Dealer Address', wide: true },

@@ -93,65 +93,91 @@
 }
 
 /* ── Sticky header: 2 rows ── */
-#mechanicTable thead th {
-  position: sticky;
-  z-index: 10;
-  font-size: 13px;
-  padding: 12px 10px;
-  background-color: #215378 !important; /* solid bg, taaki peeche ka data na dikhe */
-  color: #fff;
+/* ── Border fix: collapse me sticky border gayab hota hai ── */
+#mechanicTable {
+  border-collapse: separate !important;
+  border-spacing: 0;
 }
 
-/* Row 1 -> top par */
-#mechanicTable thead tr:nth-child(1) th {
-  top: 0;
-}
+  #mechanicTable th,
+  #mechanicTable td {
+    border-style: solid !important;
+    border-color: #dee2e6 !important;
+    border-width: 0 1px 1px 0 !important;
+  }
 
-/* Row 2 -> row 1 ki height ke neeche (height ~ 45px, zarurat ho to adjust karo) */
-#mechanicTable thead tr:nth-child(2) th {
-  top: 45px;
-}
+  /* ── Sticky header: 2 rows ── */
+  #mechanicTable thead th {
+    position: sticky;
+    z-index: 10;
+    font-size: 13px;
+    padding: 12px 10px;
+    background-color: #215378 !important;
+    color: #fff;
+  }
 
-/* rowspan wale cells (S.No., Action) row 1 me hain, unhe upar rakho */
-#mechanicTable thead tr:nth-child(1) th[rowspan] {
-  z-index: 12;
-}
+  #mechanicTable thead tr:nth-child(1) th {
+    top: 0;
+  }
 
-/* ── Sticky first 2 columns (S.No. + Action) ── */
-/* S.No. column */
-#mechanicTable thead tr:nth-child(1) th:nth-child(1),
-#mechanicTable tbody td:nth-child(1) {
-  position: sticky;
-  left: 0;
-  min-width: 60px;
-  width: 60px;
-}
+  #mechanicTable thead tr:nth-child(2) th {
+    top: 45px;
+  }
 
-/* Action column */
-#mechanicTable thead tr:nth-child(1) th:nth-child(2),
-#mechanicTable tbody td:nth-child(2) {
-  position: sticky;
-  left: 60px;
-  min-width: 70px;
-  width: 70px;
-}
+  /* ── Sticky left columns ── */
+  #mechanicTable .sticky-sno {
+    position: sticky;
+    left: 0;
+    min-width: 60px;
+    width: 60px;
+    max-width: 60px;
+  }
 
-/* Body ke sticky cells ko solid bg do, warna scroll hote data dikhega */
-#mechanicTable tbody td:nth-child(1),
-#mechanicTable tbody td:nth-child(2) {
-  z-index: 5;
-  background-color: #fff;
-}
+  #mechanicTable .sticky-action {
+    position: sticky;
+    left: 60px;
+    min-width: 70px;
+    width: 70px;
+    max-width: 70px;
+  }
 
-#mechanicTable tbody tr:nth-child(odd) td:nth-child(1),
-#mechanicTable tbody tr:nth-child(odd) td:nth-child(2) {
-  background-color: #f2f2f2; /* striped rows ke saath match */
-}
+  #mechanicTable .sticky-dealer {
+    position: sticky;
+    /* left [style.left.px] se aa raha hai */
+    min-width: 110px;
+  }
 
-#mechanicTable tbody tr:hover td:nth-child(1),
-#mechanicTable tbody tr:hover td:nth-child(2) {
-  background-color: #f0f7fc;
-}
+  /* Header ke frozen cells sabse upar */
+  #mechanicTable thead th.sticky-sno,
+  #mechanicTable thead th.sticky-action,
+  #mechanicTable thead th.sticky-dealer {
+    z-index: 15;
+  }
+
+  /* Body ke frozen cells */
+  #mechanicTable tbody td.sticky-sno,
+  #mechanicTable tbody td.sticky-action,
+  #mechanicTable tbody td.sticky-dealer {
+    z-index: 5;
+    background-color: #fff;
+  }
+
+  #mechanicTable tbody tr:nth-child(odd) td.sticky-sno,
+  #mechanicTable tbody tr:nth-child(odd) td.sticky-action,
+  #mechanicTable tbody tr:nth-child(odd) td.sticky-dealer {
+    background-color: #f2f2f2;
+  }
+
+  #mechanicTable tbody tr:hover td.sticky-sno,
+  #mechanicTable tbody tr:hover td.sticky-action,
+  #mechanicTable tbody tr:hover td.sticky-dealer {
+    background-color: #f0f7fc;
+  }
+
+  /* Frozen area ke end me halki shadow, separation dikhe */
+  #mechanicTable .sticky-dealer {
+    box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.15);
+  }
 
   #mechanicTable tbody td,
   .enquiry-table-wrapper table tbody td {

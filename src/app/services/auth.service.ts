@@ -14,7 +14,7 @@ export class AuthService {
 
   private readonly TOKEN_KEY = 'token';
   private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
-  // private readonly baseUrl = 'https://localhost:44398/';
+  //private readonly baseUrl = 'https://localhost:44398/';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -1062,6 +1062,19 @@ export class AuthService {
     return this.http.get(this.baseUrl + 'Api/Services/getFTRData', { params });
   }
 
+  getFTRDataByJobCardId(Id: string | null, jobCardId: string | null) {
+    let params = new HttpParams();
+
+    if (Id) {
+      params = params.set('Ftrid', Id);
+    }
+
+    if (jobCardId) {
+      params = params.set('JobCardId', jobCardId);
+    }
+    return this.http.get(this.baseUrl + 'Api/Services/getFTRById', { params });
+  }
+
   updateFTR(payload: FtrUpdatePayload) {
     return this.http.post(this.baseUrl + 'Api/Services/updateFTR', payload);
   }
@@ -1169,8 +1182,8 @@ export class AuthService {
   }
 
 
-  getPendingWarrantyClaimList(status: number) {
-    const params = new HttpParams().set('Status', String(status));
+  getPendingWarrantyClaimList(status: string) {
+    const params = new HttpParams().set('ClaimStatus', String(status));
     return this.http.get<any>(this.baseUrl + 'Api/Services/getPendingWarrantyClaimList', { params });
   }
 
@@ -1207,6 +1220,11 @@ export class AuthService {
 
   approveReimbursementScore(payload: any) {
     return this.http.post(this.baseUrl + 'Api/Services/approveReimbursementScore', payload);
+  }
+
+
+  GetWarrantyClaimsCount() {
+    return this.http.get(this.baseUrl + 'Api/Services/GetWarrantyClaimsCount');
   }
 }
 

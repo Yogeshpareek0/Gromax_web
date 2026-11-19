@@ -50,6 +50,7 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   customEndDate: string = '';
 
   jobCardList: ClosedJobCard[] = [];
+  ftrList: any[] = [];
   totalItems = 0;
   currentPage = 1;
   itemsPerPage = 20;
@@ -94,9 +95,9 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   private onReviewHidden = () => this.handleReviewModalHidden();
 
   readonly claimStatusCards = [
-    { status: 0, key: 'PendingCount', label: 'Pending', icon: 'fa-solid fa-hourglass-half', cls: 'sc-pending' },
-    { status: 1, key: 'ApprovedCount', label: 'Approved', icon: 'fa-solid fa-circle-check', cls: 'sc-approved' },
-    { status: -1, key: 'RejectedCount', label: 'Rejected', icon: 'fa-solid fa-circle-xmark', cls: 'sc-rejected' }
+    { status: 0, key: 'PendingCount', label: 'Pending Claims', icon: 'fa-solid fa-hourglass-half', cls: 'sc-pending' },
+    { status: 1, key: 'ApprovedCount', label: 'Approved Claims', icon: 'fa-solid fa-circle-check', cls: 'sc-approved' },
+    { status: -1, key: 'RejectedCount', label: 'Rejected Claims', icon: 'fa-solid fa-circle-xmark', cls: 'sc-rejected' }
   ];
 
   claimStatus: number = 0;   // 0 = Pending, 1 = Approved, -1 = Rejected
@@ -111,6 +112,7 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
       this.getClosedJobCards(1);
     } else {
       this.activeTab = 'claims';
+      this.GetWarrantyClaimsCount();
       this.getWarrantyClaims();
     }
   }
@@ -154,7 +156,7 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   switchTab(tab: 'jobcards' | 'claims'): void {
     if (this.activeTab === tab) return;
     this.activeTab = tab;
-    if (tab === 'claims') this.getWarrantyClaims();
+    if (tab === 'claims') { this.getWarrantyClaims(); this.GetWarrantyClaimsCount(); }
     else this.getClosedJobCards(this.currentPage);
   }
 
@@ -247,10 +249,12 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   onSelect(item: ClosedJobCard): void {
     this.selectedJobCard = item;
     this.partList = [];
+    this.ftrList = [];
     this.selectedPartIds.clear();
     this.claimRemarks = '';
     this.labourCharge = '';
     this.getPartsByJobCard(item.Id);
+    this.getFtrByJobCardId(this.selectedJobCard?.Id);
     this.claimModal?.show();
   }
 
@@ -262,6 +266,7 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   private handleClaimModalHidden(): void {
     this.selectedJobCard = null;
     this.partList = [];
+    this.ftrList = [];
     this.selectedPartIds.clear();
     this.claimRemarks = '';
     this.labourCharge = '';
@@ -394,18 +399,19 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   // ================= CLAIM LIST =================
 
   getWarrantyClaims(keepPage = false): void {
-    this.apis.getPendingWarrantyClaimList(this.claimStatus).subscribe({
+    const d = this.claimStatus === 1 ? 'approved' : this.claimStatus === -1 ? 'rejected' : 'pending';
+    this.apis.getPendingWarrantyClaimList(d).subscribe({
       next: (res: any) => {
         if (res?.statusCode === 200 && res?.message?.toLowerCase() === 'success') {
           const d = res.data;
           this.allClaims = Array.isArray(d) ? d : (d?.claims || []);
 
-          const cnt = d?.count?.[0];
-          this.claimCount = {
-            PendingCount: Number(cnt?.PendingCount) || 0,
-            ApprovedCount: Number(cnt?.ApprovedCount) || 0,
-            RejectedCount: Number(cnt?.RejectedCount) || 0
-          };
+          //const cnt = d?.count?.[0];
+          //this.claimCount = {
+          //  PendingCount: Number(cnt?.PendingCount) || 0,
+          //  ApprovedCount: Number(cnt?.ApprovedCount) || 0,
+          //  RejectedCount: Number(cnt?.RejectedCount) || 0
+          //};
 
           this.applyClaimSearch(keepPage ? this.claimCurrentPage : 1);
 
@@ -547,6 +553,7 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   // ================= CLAIM REVIEW =================
 
   openClaimReview(c: WarrantyClaim): void {
+    this.getFtrByJobCardId(c.JobCardId);
     this.setSelectedClaim(c);
     this.claimSpares = [];
     this.resetModify();
@@ -700,6 +707,7 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
           this.confirmAction = null;
           this.reviewModal?.hide();
           this.getWarrantyClaims(true);
+          this.GetWarrantyClaimsCount();
         } else {
           this.apis.showAlert('error', 'Error!', res?.message || 'Failed to update claim status.');
         }
@@ -938,4 +946,45 @@ export class WarrantyclaimComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   trackBySpare = (_: number, s: WarrantyClaimSpare) => s.SparePartId;
+
+  getFtrByJobCardId(jobId: string): void {
+    this.apis.getFTRDataByJobCardId(null, jobId ?? null).subscribe({
+      next: (res: any) => {
+        if (res?.statusCode === 200 && res?.message?.toLowerCase() === 'success') {
+          const d = res.data;
+          this.ftrList = Array.isArray(d) ? d : (Array.isArray(d?.data) ? d.data : []);
+        } else {
+          this.ftrList = [];
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed fetching FTR Data.');
+        }
+      },
+      error: (err: any) => {
+        this.ftrList = [];
+        this.apis.showAlert('error', 'Error!', this.getErrMsg(err, 'Something went wrong while fetching FTR Data.'));
+      }
+    });
+  }
+  trackByFtr = (_: number, f: any) => f.Id;
+
+
+  GetWarrantyClaimsCount(): void {
+    debugger;
+    this.apis.GetWarrantyClaimsCount().subscribe({
+      next: (res: any) => {
+        if (res?.statusCode === 200 && res?.message?.toLowerCase() === 'success') {
+          const cnt = res.data;
+          this.claimCount = {
+            PendingCount: Number(cnt?.Pending) || 0,
+            ApprovedCount: Number(cnt?.Approved) || 0,
+            RejectedCount: Number(cnt?.Rejected) || 0
+          };
+        } else {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed fetching FTR Data.');
+        }
+      },
+      error: (err: any) => {
+        this.apis.showAlert('error', 'Error!', this.getErrMsg(err, 'Something went wrong while fetching FTR Data.'));
+      }
+    });
+  }
 }

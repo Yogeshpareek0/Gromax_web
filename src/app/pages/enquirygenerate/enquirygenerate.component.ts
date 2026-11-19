@@ -211,7 +211,7 @@ export class EnquirygenerateComponent implements OnInit {
     'AGGREGATOR': ['Tractor Junction', 'Tractor Guru', 'CMV 360', 'Tractor Gyaan', 'Plantix', 'Other'],
     'TM': ['Field Visit', 'BTL', 'HO Digital', 'Other'],
     'FO': ['Field Visit', 'BTL', 'HO Digital', 'Other'],
-    'DEALER': ['Walkin', 'DSP', 'Sales Manager', 'HO Digital', 'Dealer Digital', 'MID', 'Local Expo', 'Van Campaign', 'Display', 'Field Demo', 'Other BTL'],
+    'DEALER': ['Walkin', 'DSP', 'Sales Manager', 'HO Digital', 'Dealer Digital', 'MID', 'Local Expo', 'Van Campaign', 'Display', 'Field Demo', 'Other BTL', 'Customer Meet'],
     'DES': ['Field Demo', 'Display', 'MID', 'Other'],
     'GPL CAMPAIGN': ['GPL VAN']
   };
@@ -1973,7 +1973,14 @@ export class EnquirygenerateComponent implements OnInit {
           this.apis.showAlert('error', 'Error!', response?.message || 'Failed to generate enquiry.');
         }
       },
-      error: () => { this.apis.showAlert('error', 'Error!', 'An error occurred. Please try again.'); }
+      error: (err) => {
+        const errorCode = err?.error?.errorCode;
+        const errorMessage = errorCode?.toString().trim()
+          ? err.error.message
+          : 'An error occurred. Please try again.';
+
+        this.apis.showAlert('error', 'Error!', errorMessage);
+      }
     });
   }
 
@@ -2120,7 +2127,14 @@ export class EnquirygenerateComponent implements OnInit {
           this.apis.showAlert('error', 'Error!', response?.message || 'Failed to update enquiry.');
         }
       },
-      error: () => { this.apis.showAlert('error', 'Error!', 'An error occurred. Please try again.'); }
+      error: (err) => {
+        const errorCode = err?.error?.errorCode;
+        const errorMessage = errorCode?.toString().trim()
+          ? err.error.message
+          : 'An error occurred. Please try again.';
+
+        this.apis.showAlert('error', 'Error!', errorMessage);
+      }
     });
   }
 
