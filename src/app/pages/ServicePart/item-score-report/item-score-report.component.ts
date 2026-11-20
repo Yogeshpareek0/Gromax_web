@@ -133,9 +133,8 @@ export class ItemScoreReportComponent implements OnInit {
   }
   percentClass(row: ItemScoreReportRow): string {
     const p = this.getPercent(row);
-    if (p >= 75) return 'pct-good';
-    if (p >= 40) return 'pct-mid';
-    return 'pct-low';
+    if (p >= 70) return 'pct-good';
+    else return 'pct-mid';
   }
 
   // ─── REPORT ─────────────────────────────────────────────────

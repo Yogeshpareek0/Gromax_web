@@ -90,7 +90,9 @@
       </div>
 
       <!-- PDI Completed -->
-      <div class="stat-card stat-card-green">
+      <div class="stat-card stat-card-green clickable-card"
+           [class.active]="boxValue === 'Ok'"
+           (click)="onBoxClick('Ok')">
         <div class="stat-card-content">
           <h6>NTIR Completed</h6>
           <p class="count">{{ pdiCompletedCount }}</p>
@@ -101,7 +103,9 @@
       </div>
 
       <!-- Defect Found -->
-      <div class="stat-card stat-card-red">
+      <div class="stat-card stat-card-red clickable-card"
+           [class.active]="boxValue === 'Not Ok'"
+           (click)="onBoxClick('Not Ok')">
         <div class="stat-card-content">
           <h6>Defect Found</h6>
           <p class="count">{{ defectFoundCount }}</p>
@@ -236,8 +240,8 @@
           </th>
 
           <!--<th *ngIf="!hiddenColumns.has('brand')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('brand')" [style.left.px]="getFrozenLeft('brand')">
-    <div class="th-content"><span>Brand</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('brand')" (click)="openColumnFilter($event,'brand')"><i class="fas fa-filter"></i></button></div>
-  </th>-->
+            <div class="th-content"><span>Brand</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('brand')" (click)="openColumnFilter($event,'brand')"><i class="fas fa-filter"></i></button></div>
+          </th>-->
 
           <th *ngIf="!hiddenColumns.has('remark')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('remark')" [style.left.px]="getFrozenLeft('remark')">
             <div class="th-content"><span>Remark</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('remark')" (click)="openColumnFilter($event,'remark')"><i class="fas fa-filter"></i></button></div>

@@ -472,11 +472,16 @@ thead .frozen-col {
   border-radius: 8px;
   padding: 8px 12px;
   border: 1px solid;
+  background-color: #ffffff;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  transition: all 0.2s ease-in-out;
 }
 
-  .stat-card:hover {
+.clickable-card {
+  cursor: pointer;
+}
+
+  .clickable-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
   }
@@ -548,6 +553,52 @@ thead .frozen-col {
 .stat-card-icon i {
   color: white;
   font-size: 15px;
+}
+
+/* Clicked / Active State (All Colors Supported) */
+.stat-card.active {
+  color: #ffffff !important;
+  transform: translateY(1px);
+}
+
+.stat-card-blue.active {
+  background-color: #4796BD;
+  box-shadow: 0 4px 12px rgba(71, 150, 189, 0.4);
+}
+
+.stat-card-orange.active {
+  background-color: #FF9500;
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.4);
+}
+
+.stat-card-green.active {
+  background-color: #4CAF50;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.stat-card-red.active {
+  background-color: #F44336;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+.stat-card.active .stat-card-icon {
+  background-color: #ffffff;
+}
+
+.stat-card-blue.active .stat-card-icon i {
+  color: #4796BD;
+}
+
+.stat-card-orange.active .stat-card-icon i {
+  color: #FF9500;
+}
+
+.stat-card-green.active .stat-card-icon i {
+  color: #4CAF50;
+}
+
+.stat-card-red.active .stat-card-icon i {
+  color: #F44336;
 }
 
 @media (max-width: 768px) {

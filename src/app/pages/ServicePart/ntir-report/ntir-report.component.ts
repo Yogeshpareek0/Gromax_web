@@ -33,15 +33,19 @@ export class NtirReportComponent implements OnInit, OnDestroy {
     }
   };
   paginatedPDIData: NTIRReport[] = [];
+  ExportedPDIData: NTIRReport[] = [];
 
   selectedFilter: string = 'This Month';
   startdate_val: string = '';
   enddate_val: string = '';
   displayDateInputs: boolean = false;
+  isDownload: boolean = false;
   selectedState: string = '';
   selectedDealer: string = '';
   selectedSection: string = '';
   selectedChassis: string = '';
+  boxValue: string = 'Not Ok';
+  selectedBox: string = 'Not Ok';
   statelist: any[] = [];
   dealerlist: any[] = [];
 
@@ -132,7 +136,7 @@ export class NtirReportComponent implements OnInit, OnDestroy {
 
   private orderedColKeys = [
     'sno', 'DealerCode', 'DealerName', 'StateName', 'ModelCode', 'ModelName',
-    'engineNo', 'runningHours', 'Name', 'section', 'brand', 'remark', 'ntirDate','chasisno'
+    'engineNo', 'runningHours', 'Name', 'section', 'brand', 'remark', 'ntirDate', 'chasisno'
   ];
 
   @ViewChild('filterDropdownEl') filterDropdownElRef!: ElementRef<HTMLElement>;
@@ -381,7 +385,6 @@ export class NtirReportComponent implements OnInit, OnDestroy {
   getPDIReport(page: number = 1): void {
     const offset = (page - 1) * this.itemsPerPage;
     //const { startDateISO, endDateISO } = this.getDateRange();
-    this.paginatedPDIData = [];
     this.totalItems = 0;
 
     //this.totalTractorsCount = 0;
@@ -397,7 +400,9 @@ export class NtirReportComponent implements OnInit, OnDestroy {
       enDate: this.enddate_val,
       pageSize: this.itemsPerPage,
       rowStart: offset,
-      chasisNo: this.selectedChassis
+      chasisNo: this.selectedChassis,
+      type: this.boxValue || 'Not Ok',
+      isDownload: this.isDownload
     };
 
     this.apis.getNTIRReport(request).subscribe({
@@ -405,32 +410,48 @@ export class NtirReportComponent implements OnInit, OnDestroy {
         this.apiResponse = res as NTIRResponse;
         if (this.apiResponse.message?.toLowerCase() === 'success') {
 
-          this.totalTractorsCount = this.apiResponse.data?.countResponse?.totalTractorsCount;
-          this.pdiPendingCount = this.apiResponse.data?.countResponse?.ntirPendingCount;
-          this.pdiCompletedCount = this.apiResponse.data?.countResponse?.ntirCompletedCount;
-          this.defectFoundCount = this.apiResponse.data?.countResponse?.defectFoundCount;
+          if (this.isDownload === false) {
+            this.totalTractorsCount = this.apiResponse.data?.countResponse?.totalTractorsCount;
+            this.pdiPendingCount = this.apiResponse.data?.countResponse?.ntirPendingCount;
+            this.pdiCompletedCount = this.apiResponse.data?.countResponse?.ntirCompletedCount;
+            this.defectFoundCount = this.apiResponse.data?.countResponse?.defectFoundCount;
+          }
 
           if (this.apiResponse && this.apiResponse.data?.ntirReport?.length > 0) {
-            this.paginatedPDIData = this.apiResponse.data?.ntirReport;
-            this.totalItems = this.apiResponse.data?.ntirReport[0].length;
+            if (this.isDownload === false) {
+              this.paginatedPDIData = [];
+              this.paginatedPDIData = this.apiResponse.data?.ntirReport;
+              this.totalItems = this.apiResponse.data?.ntirReport[0].length;
+              this.currentPage = page;
 
-            this.currentPage = page;
+            }
+            else {
+              this.ExportedPDIData = this.apiResponse.data?.ntirReport;
+            }
+
           }
+
           else {
             this.toastr.info(
               'No NTIR Data are available at the moment.',
             );
 
           }
+          this.isDownload = false;
 
           //console.log('paginatedPDIData', this.paginatedPDIData);
         } else {
+          this.isDownload = false;
           this.toastr.error('Failed fetching NTIR data.', 'Error!');
+
           /* this.apis.showAlert('error', 'Error!', 'Failed fetching PDI data.');*/
         }
       },
       error: () => {
+        this.isDownload = false;
+
         this.toastr.error('An error occurred while fetching NTIR data.', 'Error!');
+
         /*this.apis.showAlert('error', 'Error!', 'An error occurred while fetching PDI data.');*/
       }
     });
@@ -466,17 +487,19 @@ export class NtirReportComponent implements OnInit, OnDestroy {
   }
 
   exportToExcel(): void {
-    if (!this.paginatedPDIData?.length) {
+    this.isDownload = true;
+    this.getPDIReport();
+    if (!this.ExportedPDIData?.length) {
       this.apis.showAlert('info', 'No Data', 'No data found to export.');
       return;
     }
 
-    const worksheet = XLSX.utils.json_to_sheet(this.paginatedPDIData);
+    const worksheet = XLSX.utils.json_to_sheet(this.ExportedPDIData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'PDIReport');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'NTIRReport');
     const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    saveAs(blob, `PDIReport_${new Date().toISOString().split('T')[0]}.xlsx`);
+    saveAs(blob, `NTIRReport_${new Date().toISOString().split('T')[0]}.xlsx`);
   }
 
   searchValue(): void {
@@ -523,5 +546,17 @@ export class NtirReportComponent implements OnInit, OnDestroy {
   }
   viewPhoto(photoUrl: string) {
     window.open(photoUrl, '_blank');
+  }
+
+  onBoxClick(boxName: string): void {
+    this.selectedBox = this.boxValue === boxName ? '' : boxName;
+    this.boxValue = boxName;
+    if (!this.selectedBox) {
+      this.selectedBox = this.boxValue;
+      return;
+    }
+    this.getPDIReport()
+
+    // Your function logic here
   }
 }
