@@ -384,15 +384,8 @@ export class PdiReportComponent implements OnInit, OnDestroy {
     this.getPDIReport();
   }
 
-  getPDIReport(page: number = 1): void {
+  getPDIReport(page: number = 1, onComplete?: () => void): void {
     const offset = (page - 1) * this.itemsPerPage;
-    //const { startDateISO, endDateISO } = this.getDateRange();
-    this.totalItems = 0;
-
-    //this.totalTractorsCount = 0;
-    //this.pdiPendingCount = 0;
-    //this.pdiCompletedCount = 0;
-    //this.defectFoundCount = 0;
 
     const request = {
       state: this.selectedState || '',
@@ -400,57 +393,65 @@ export class PdiReportComponent implements OnInit, OnDestroy {
       duration: this.selectedFilter || '',
       stDate: this.startdate_val,
       enDate: this.enddate_val,
-      pageSize: this.itemsPerPage,
-      rowStart: offset,
+      pageSize: this.isDownload ? 100000 : this.itemsPerPage,
+      rowStart: this.isDownload ? 0 : offset,
       chasisNo: this.selectedChassis,
       type: this.boxValue || 'Not Ok',
       isDownload: this.isDownload
-
     };
 
     this.apis.getPDIReport(request).subscribe({
       next: (res) => {
         this.apiResponse = res as PDIResponse;
         if (this.apiResponse.message?.toLowerCase() === 'success') {
-          if (this.isDownload === false) {
-            this.totalTractorsCount = this.apiResponse.data?.countResponse?.totalTractorsCount;
-            this.pdiPendingCount = this.apiResponse.data?.countResponse?.pdiPendingCount;
-            this.pdiCompletedCount = this.apiResponse.data?.countResponse?.pdiCompletedCount;
-            this.defectFoundCount = this.apiResponse.data?.countResponse?.defectFoundCount;
+          if (!this.isDownload) {
+            this.totalTractorsCount = this.apiResponse.data?.countResponse?.totalTractorsCount ?? 0;
+            this.pdiPendingCount = this.apiResponse.data?.countResponse?.pdiPendingCount ?? 0;
+            this.pdiCompletedCount = this.apiResponse.data?.countResponse?.pdiCompletedCount ?? 0;
+            this.defectFoundCount = this.apiResponse.data?.countResponse?.defectFoundCount ?? 0;
           }
 
-          if (this.apiResponse && this.apiResponse.data?.pdiReport?.length > 0) {
-            if (this.isDownload === false) {
-              this.paginatedPDIData = [];
-              this.paginatedPDIData = this.apiResponse.data?.pdiReport;
-              this.totalItems = this.apiResponse.data?.pdiReport[0].length;
+          const reportList = this.apiResponse.data?.pdiReport ?? [];
+          if (reportList.length > 0) {
+            if (!this.isDownload) {
+              this.paginatedPDIData = reportList;
+
+              const d = this.apiResponse.data as any;
+              const firstRow = reportList[0] as any;
+              this.totalItems =
+                d?.totalCount ??
+                d?.totalRecords ??
+                d?.totalRowCount ??
+                firstRow?.TotalCount ??
+                firstRow?.totalCount ??
+                firstRow?.totalRecords ??
+                firstRow?.length ??
+                reportList.length;
+
               this.currentPage = page;
-
+            } else {
+              this.ExportedPDIData = reportList;
             }
-            else {
-              this.ExportedPDIData = this.apiResponse.data?.pdiReport;
+          } else {
+            if (!this.isDownload) {
+              this.paginatedPDIData = [];
+              this.totalItems = 0;
             }
-
+            this.toastr.info('No PDI Data are available at the moment.');
           }
-          else {
-            this.toastr.info(
-              'No PDI Data are available at the moment.',
-            );
 
-          }
           this.isDownload = false;
-
-          //console.log('paginatedPDIData', this.paginatedPDIData);
+          onComplete?.();
         } else {
           this.isDownload = false;
           this.toastr.error('Failed fetching PDI data.', 'Error!');
-          /* this.apis.showAlert('error', 'Error!', 'Failed fetching PDI data.');*/
+          onComplete?.();
         }
       },
       error: () => {
         this.isDownload = false;
         this.toastr.error('An error occurred while fetching PDI data.', 'Error!');
-        /*this.apis.showAlert('error', 'Error!', 'An error occurred while fetching PDI data.');*/
+        onComplete?.();
       }
     });
   }
@@ -486,18 +487,20 @@ export class PdiReportComponent implements OnInit, OnDestroy {
 
   exportToExcel(): void {
     this.isDownload = true;
-    this.getPDIReport();
-    if (!this.ExportedPDIData?.length) {
-      this.apis.showAlert('info', 'No Data', 'No data found to export.');
-      return;
-    }
+    this.getPDIReport(1, () => {
+      if (!this.ExportedPDIData?.length) {
+        this.apis.showAlert('info', 'No Data', 'No data found to export.');
+        return;
+      }
 
-    const worksheet = XLSX.utils.json_to_sheet(this.ExportedPDIData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'PDIReport');
-    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    saveAs(blob, `PDIReport_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const worksheet = XLSX.utils.json_to_sheet(this.ExportedPDIData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'PDIReport');
+      const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      saveAs(blob, `PDIReport_${new Date().toISOString().split('T')[0]}.xlsx`);
+      this.ExportedPDIData = [];
+    });
   }
 
   searchValue(): void {
@@ -547,14 +550,10 @@ export class PdiReportComponent implements OnInit, OnDestroy {
   }
 
   onBoxClick(boxName: string): void {
-    this.selectedBox = this.boxValue === boxName ? '' : boxName;
     this.boxValue = boxName;
-    if (!this.selectedBox) {
-      this.selectedBox = this.boxValue;
-      return;
-    }
-    this.getPDIReport()
-
-    // Your function logic here
+    this.selectedBox = boxName;
+    this.currentPage = 1;
+    this.activeFilters.clear();
+    this.getPDIReport(1);
   }
 }
