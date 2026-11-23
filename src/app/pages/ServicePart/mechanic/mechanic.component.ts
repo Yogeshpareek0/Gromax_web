@@ -202,8 +202,10 @@ export class MechanicComponent implements OnInit {
       !this.priorExperience ||
       !this.priorExperienceYears ||
       !this.totalExperience ||
-      !this.physicalTraining ||
-      !this.virtualTraining ||
+      this.physicalTraining === null ||
+      this.physicalTraining === undefined ||
+      this.virtualTraining === null ||
+      this.virtualTraining === undefined ||
       !this.installationAttendance ||
       !this.hydraulicAttendance ||
       !this.engineAttendance ||
@@ -276,6 +278,7 @@ export class MechanicComponent implements OnInit {
   }
 
   onSubmitMechanic(): void {
+    debugger;
     this.submitClicked = true;
     if (this.positionId === "Dealer")
       this.selectedDealer = sessionStorage.getItem('dealerCode') ?? null;
