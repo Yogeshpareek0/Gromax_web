@@ -567,8 +567,8 @@ export class MechanicComponent implements OnInit {
         "Engine": item.engineAttendance,
         "Complete Tractor Training": item.completeTractorTraining,
         "System & Process": item.systemAndProcess,
-        "Skill Level": item.skillLevel,
-        "Service Manpower": item.serviceManpower,
+        "Skill Level": item.skillLevelName,
+        "Service Manpower": item.serviceManpowerName,
         "Approval Status": item.approvalStatus,
       }));
     }
