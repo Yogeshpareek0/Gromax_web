@@ -319,7 +319,7 @@ export class InstallationComponent implements OnInit {
       next: (res: any) => {
         if (res.Message && res.Message.toLowerCase() === 'success') {
           const data: any[] = res.InstallationList || [];
-
+console.log(data)
           if (!data.length) {
             this.apis.showAlert('error', 'Info', 'No data available to download.');
             return;

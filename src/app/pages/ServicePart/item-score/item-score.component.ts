@@ -5,6 +5,7 @@ import { timeout } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { PaginationComponent } from '../../../layout/pagination/pagination.component';
 import * as XLSX from 'xlsx';
+import { PdfReportService } from '../../../services/pdf-report.service';
 import {
   DraftPoint, ItemScoreDraft, ItemScorePhotoSlot, GroupStatus,
   ItemScoreColumn, ItemScoreReportRow
@@ -102,7 +103,7 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
   editItemScoreId: string | null = null;
   private originalPoints: { [pointId: string]: { score: string; images: string[] } } = {};
 
-  constructor(private apis: AuthService) { }
+  constructor(private apis: AuthService, private pdfReportService: PdfReportService) { }
 
   ngOnInit(): void {
     this.positionId = (sessionStorage.getItem('possitionId') || '').trim();
@@ -1047,11 +1048,9 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     return String(n);
   }
 
-  // ===================== EXCEL EXPORT =====================
+  // ===================== PDF EXPORT =====================
 
-  // ===================== EXCEL DOWNLOAD (WITHOUT OPENING EDIT) =====================
-
-  onDownloadExcelClick(row: ItemScoreReportRow): void {
+  onOpenPdfClick(row: ItemScoreReportRow): void {
     const id = this.getRowId(row);
     if (!id) {
       this.apis.showAlert('error', 'Error!', 'Item score id not found.');
@@ -1074,7 +1073,75 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.downloadReportExcel(row, rows);
+        const sortedRows = [...rows].sort((a: any, b: any) => {
+          const groupA = (a?.groupName || '').trim();
+          const groupB = (b?.groupName || '').trim();
+          return groupA.localeCompare(groupB);
+        });
+
+        const first = sortedRows[0] || {};
+        const dealerCode = first.dealerCode ?? first.DealerCode ?? row.DealerCode ?? '-';
+        const dealerName = row.DealerName ?? first.dealerName ?? '-';
+        const MarksWiseCat = first.MarksWiseCat ?? first.marksWiseCat ?? row['MarksWiseCat'] ?? '-';
+        const ItemScoreDate = this.formatDateDdMmYyyy(
+          first.ItemScoreDate ?? first.itemScoreDate ?? row['ItemScoreDate']
+        );
+
+        const formattedRows = sortedRows.map((r: any, index: number) => {
+          const isInput = Number(r?.isInput) === 1;
+          const rawScore = r?.score !== null && r?.score !== undefined ? String(r.score).trim() : '';
+          const normalizedScore = rawScore !== '' ? this.normalizeScore(r, rawScore) : '';
+
+          let answer = '-';
+          if (normalizedScore !== '') {
+            answer = isInput
+              ? `${normalizedScore}${r.units ? ' ' + r.units : ''}`
+              : (normalizedScore === '1' ? 'Yes' : 'No');
+          }
+
+          return {
+            'Sr. No.': index + 1,
+            'Group Name': r.groupName ?? '-',
+            'Group Item': r.groupItem ?? '-',
+            'Audit Criteria': r.cat ?? '-',
+            'Answer': answer,
+            'Max Score': r.maxScore ?? 0,
+            'Obtain Score': r.obtainScore ?? 0,
+            'Images': this.parseImages(r.images)
+          };
+        });
+
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const todayDate = `${dd}-${mm}-${yyyy}`;
+        const safeDealerCode = String(dealerCode).trim().replace(/[\\/:*?"<>|]+/g, '_');
+        const pdfFileName = `Item_Score_Date_${safeDealerCode}_${todayDate}`;
+
+        this.pdfReportService.openInNewTab({
+          title: 'Item Score Data',
+          fileName: pdfFileName,
+          imageMaxWidth: 320,
+          imageQuality: 0.42,
+          commonFields: [
+            { label: 'Dealer Code', value: dealerCode },
+            { label: 'Dealer Name', value: dealerName },
+            { label: 'Marks Wise Category', value: MarksWiseCat },
+            { label: 'Assessment Date', value: ItemScoreDate }
+          ],
+          columns: [
+            { key: 'Sr. No.', type: 'text', align: 'center' },
+            { key: 'Group Name', type: 'text' },
+            { key: 'Group Item', type: 'text' },
+            { key: 'Audit Criteria', type: 'text' },
+            { key: 'Answer', type: 'text' },
+            { key: 'Max Score', type: 'text', align: 'center', sum: true },
+            { key: 'Obtain Score', type: 'text', align: 'center', sum: true },
+            { key: 'Images', type: 'image' }
+          ],
+          rows: formattedRows
+        });
       },
       error: () => {
         this.actionLoadingId = null;
@@ -1083,70 +1150,26 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
     });
   }
 
-  private downloadReportExcel(row: ItemScoreReportRow, rows: any[]): void {
-    // 1. Group Name ke hisaab se Order By (Ascending)
-    const sortedRows = [...rows].sort((a: any, b: any) => {
-      const groupA = (a?.groupName || '').trim();
-      const groupB = (b?.groupName || '').trim();
-      return groupA.localeCompare(groupB);
-    });
+  private formatDateDdMmYyyy(val: any): string {
+    if (!val) return '-';
 
-    // 2. Sorted rows ko map karein
-    const excelRows = sortedRows.map((r: any, index: number) => {
-      const isInput = Number(r?.isInput) === 1;
-      const rawScore = r?.score !== null && r?.score !== undefined ? String(r.score).trim() : '';
-      const normalizedScore = rawScore !== '' ? this.normalizeScore(r, rawScore) : '';
+    const str = String(val).trim();
+    const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (dmyMatch) {
+      return `${dmyMatch[1].padStart(2, '0')}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[3]}`;
+    }
 
-      // Answer column (Yes/No ya Input value + unit)
-      let answer = '-';
-      if (normalizedScore !== '') {
-        answer = isInput
-          ? `${normalizedScore}${r.units ? ' ' + r.units : ''}`
-          : (normalizedScore === '1' ? 'Yes' : 'No');
-      }
+    const ymdMatch = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (ymdMatch) {
+      return `${ymdMatch[3].padStart(2, '0')}-${ymdMatch[2].padStart(2, '0')}-${ymdMatch[1]}`;
+    }
 
-      // Multiple images ko comma-separated string banayein
-      const images = this.parseImages(r.images);
+    const dt = val instanceof Date ? val : new Date(str);
+    if (isNaN(dt.getTime())) return str;
 
-      return {
-        'Sr. No.': index + 1,
-        'Dealer Code': r.dealerCode ?? r.DealerCode ?? row.DealerCode ?? '',
-        'Dealer Name': row.DealerName ?? '',
-        'Category Type': r.catType ?? row['CateType'] ?? '',
-        'Group Name': r.groupName ?? '',
-        'Group Item': r.groupItem ?? '',
-        'Audit Criteria': r.cat ?? '',
-        'Answer': answer,
-        'Max Score': r.maxScore ?? 0,
-        'Units': r.units ?? '-',
-        'Image URLs': images.length > 0 ? images.join(', ') : ''
-      };
-    });
-
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelRows);
-
-    // 11 columns ke hisaab se exact width
-    worksheet['!cols'] = [
-      { wch: 8 },   // Sr. No.
-      { wch: 14 },  // Dealer Code
-      { wch: 25 },  // Dealer Name
-      { wch: 15 },  // Category Type
-      { wch: 24 },  // Group Name
-      { wch: 35 },  // Group Item
-      { wch: 50 },  // Audit Criteria
-      { wch: 14 },  // Answer
-      { wch: 12 },  // Max Score
-      { wch: 10 },  // Units
-      { wch: 80 }   // Image URLs
-    ];
-
-    const workbook: XLSX.WorkBook = {
-      Sheets: { 'Item Score Report': worksheet },
-      SheetNames: ['Item Score Report']
-    };
-
-    const dealerCode = row.DealerCode || sortedRows[0]?.dealerCode || sortedRows[0]?.DealerCode || 'Report';
-    const dateStr = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10);
-    XLSX.writeFile(workbook, `Item_Score_${dealerCode}_${dateStr}.xlsx`);
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const yyyy = dt.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
   }
 }

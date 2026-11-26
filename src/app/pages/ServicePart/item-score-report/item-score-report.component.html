@@ -31,7 +31,7 @@
             <i class="bi bi-clipboard-data me-1"></i> Show Report
           </button>
           <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px"
-                  [disabled]="exporting || loading" (click)="exportToExcel()" title="Export to Excel">
+            [disabled]="exporting || loading" (click)="exportToExcel()" title="Export to Excel">
             <span *ngIf="exporting" class="spinner-border spinner-border-sm"></span>
             <i *ngIf="!exporting" class="fas fa-download"></i>
           </button>
@@ -66,6 +66,7 @@
           <th class="fw-normal text-center" *ngIf="scoreColumns.length">Total Score</th>
           <th class="fw-normal text-center">Max Score</th>
           <th class="fw-normal text-center" style="border-top-right-radius:8px;">Percentage</th>
+          <th class="fw-normal">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -75,14 +76,20 @@
           <td class="fw-semibold" style="color:#215378">{{ row.DealerCode || '-' }}</td>
           <td>{{ row.DealerName || '-' }}</td>
           <td>{{ row.Location || '-' }}</td>
-          <td *ngFor="let c of scoreColumns" class="text-center"
-              [class.zero-score]="scoreValue(row, c.key) === 0">
+          <td *ngFor="let c of scoreColumns" class="text-center" [class.zero-score]="scoreValue(row, c.key) === 0">
             {{ scoreValue(row, c.key) }}
           </td>
           <td class="text-center fw-semibold" *ngIf="scoreColumns.length">{{ getTotal(row) }}</td>
           <td class="text-center">{{ getMaxScore(row) }}</td>
           <td class="text-center">
             <span class="pct-badge" [ngClass]="percentClass(row)">{{ getPercent(row) | number:'1.0-2' }}%</span>
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-danger ms-1"
+              [disabled]="actionLoadingId === getPdfRowId(row)" (click)="onOpenPdfClick(row)">
+              <span *ngIf="actionLoadingId === getPdfRowId(row)" class="spinner-border spinner-border-sm"></span>
+              <i *ngIf="actionLoadingId !== getPdfRowId(row)" class="fa-solid fa-file-pdf"></i>
+            </button>
           </td>
         </tr>
 
@@ -109,5 +116,5 @@
   </div>
 
   <app-pagination *ngIf="allRows.length > itemsPerPage" [totalItems]="allRows.length" [pageSize]="itemsPerPage"
-                  [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+    [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
 </div>
