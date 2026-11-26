@@ -13,8 +13,8 @@ import { __param } from 'tslib';
 export class AuthService {
 
   private readonly TOKEN_KEY = 'token';
-  private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
-  //private readonly baseUrl = 'https://localhost:44398/';
+  //private readonly baseUrl = 'https://loadcrm.com/growmaxmobileapi/';
+  private readonly baseUrl = 'https://localhost:44398/';
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -1225,6 +1225,13 @@ export class AuthService {
 
   GetWarrantyClaimsCount() {
     return this.http.get(this.baseUrl + 'Api/Services/GetWarrantyClaimsCount');
+  }
+  processRetailReturn(payload: any) {
+    return this.http.post(this.baseUrl + 'Api/Retiledsales/ProcessRetailReturn', payload);
+  }
+  getRetailedListForReturn(payload: any) {
+    // TODO: backend API ban jaye to endpoint replace kar dena
+    return this.http.post(this.baseUrl + 'Api/Retiledsales/GetRetailedListForReturn', payload);
   }
 }
 

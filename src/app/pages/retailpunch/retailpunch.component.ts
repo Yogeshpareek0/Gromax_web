@@ -92,6 +92,29 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
 
   private modal: any;
 
+  // ── Retail Return (National Sales Head only) ──
+  pageMode: 'update' | 'return' = 'update';
+  returnItem: NotRetaildList | null = null;
+  returnRemark: string = '';
+  returnRemarkError: string = '';
+  isReturnSubmitting = false;
+  private returnModal: any;
+
+
+  returnList: any[] = [];
+  returnTotalItems = 0;
+  returnCurrentPage = 1;
+  returnItemsPerPage = 20;
+  returnDateFilter: 'thisMonth' | 'custom' = 'thisMonth';
+  returnStartDate: string = '';
+  returnEndDate: string = '';
+  returnChassisNo: string = '';
+  returnDateError: string = '';
+
+  get isNSH(): boolean {
+    return this.positionId === 'National Sales Head';
+  }
+
   currentFilterCol = '';
   filterSearchText = '';
   allDropdownValues: string[] = [];
@@ -1026,5 +1049,148 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
     this.retailForm.expectedRetailDate = value;
 
 
+  }
+
+
+  setPageMode(mode: 'update' | 'return'): void {
+    if (mode === 'return' && !this.isNSH) return;
+    this.pageMode = mode;
+    if (mode === 'return') {
+      this.closeFilterDropdown();
+      this.returnDateFilter = 'thisMonth';
+      this.returnChassisNo = '';
+      this.returnDateError = '';
+      this.loadReturnList(1);
+    }
+  }
+
+  onReturnClick(item: NotRetaildList): void {
+    if (!this.isNSH) return;
+    this.returnItem = item;
+    this.returnRemark = '';
+    this.returnRemarkError = '';
+    const modalEl = document.getElementById('retailReturnModal');
+    if (modalEl) {
+      this.returnModal = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+      this.returnModal.show();
+    }
+  }
+
+  closeReturnModal(): void {
+    if (this.returnModal) this.returnModal.hide();
+    this.returnItem = null;
+    this.returnRemark = '';
+    this.returnRemarkError = '';
+    this.isReturnSubmitting = false;
+  }
+
+  onReturnSubmit(): void {
+    if (!this.isNSH || !this.returnItem) return;
+
+    const remark = (this.returnRemark || '').trim();
+    if (!remark) {
+      this.returnRemarkError = 'Remark is required.';
+      return;
+    }
+    if (remark.length > 500) {
+      this.returnRemarkError = 'Remark cannot exceed 500 characters.';
+      return;
+    }
+    this.returnRemarkError = '';
+
+    const payload = {
+      SalesId: (this.returnItem as any).SalesId || (this.returnItem as any).salesId,
+      Remarks: remark
+    };
+
+    this.isReturnSubmitting = true;
+    this.apis.processRetailReturn(payload).subscribe({
+      next: (res: any) => {
+        this.isReturnSubmitting = false;
+        if (res?.statusCode === 200) {
+          this.apis.showAlert('success', 'Success!', 'Retail return processed successfully.');
+          this.closeReturnModal();
+          this.loadReturnList(this.returnCurrentPage);
+        } else {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed to process retail return.');
+        }
+      },
+      error: (err: any) => {
+        this.isReturnSubmitting = false;
+        // Backend ka ApiResponse body (500001 SqlException / 404 / 500) -> message jaisa aaya waisa hi dikhao
+        const body = err?.error;
+        const backendMsg = (body && typeof body === 'object' && body.message) ? body.message : '';
+        this.apis.showAlert('error', 'Error!', backendMsg || 'Something went wrong. Please try again.');
+      }
+    });
+  }
+
+  private getThisMonthRange(): { start: string; end: string } {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return { start: this.formatDate(start), end: this.formatDate(end) };
+  }
+
+  onReturnDateFilterChange(): void {
+    this.returnDateError = '';
+    if (this.returnDateFilter === 'custom') {
+      const r = this.getThisMonthRange();
+      this.returnStartDate = r.start;
+      this.returnEndDate = this.todayDate < r.end ? this.todayDate : r.end;
+    }
+  }
+
+  onReturnSearch(): void { this.loadReturnList(1); }
+
+  onReturnPageChange(page: number): void { this.loadReturnList(page); }
+
+  loadReturnList(page: number = 1): void {
+    let startDate: string;
+    let endDate: string;
+
+    if (this.returnDateFilter === 'custom') {
+      if (!this.returnStartDate || !this.returnEndDate) {
+        this.returnDateError = 'Start Date and End Date are required.';
+        return;
+      }
+      if (this.returnStartDate > this.returnEndDate) {
+        this.returnDateError = 'Start Date cannot be after End Date.';
+        return;
+      }
+      startDate = this.returnStartDate;
+      endDate = this.returnEndDate;
+    } else {
+      const r = this.getThisMonthRange();
+      startDate = r.start;
+      endDate = r.end;
+    }
+    this.returnDateError = '';
+
+    const payload = {
+      StartDate: startDate,
+      EndDate: endDate,
+      ChassisNo: this.returnChassisNo?.trim() || '',
+      PageSize: this.returnItemsPerPage,
+      RowStart: (page - 1) * this.returnItemsPerPage
+    };
+
+    this.apis.getRetailedListForReturn(payload).subscribe({
+      next: (res: any) => {
+        if (res?.statusCode === 200 && res.data) {
+          this.returnList = res.data;
+          this.returnTotalItems = res.data[0]?.TotalCount ?? res.data.length;
+        } else {
+          this.returnList = [];
+          this.returnTotalItems = 0;
+        }
+        this.returnCurrentPage = page;
+      },
+      error: () => {
+        this.apis.showAlert('error', 'Error!', 'We were unable to retrieve the retailed data. Please try again.');
+        this.returnList = [];
+        this.returnTotalItems = 0;
+      }
+    });
   }
 }

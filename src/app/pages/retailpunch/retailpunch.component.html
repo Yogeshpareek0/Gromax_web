@@ -1,285 +1,384 @@
 <div class="container-fluid px-0" (click)="onDocumentClick($event)">
 
-  <!-- Filter Section -->
-  <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
-    <div class="row g-3 align-items-end mb-3">
-      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
-        <label class="form-label fw-medium mb-0">State Head</label>
-        <select class="form-select form-control-custom" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
-          <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
-        </select>
+  <!-- Mode Buttons (National Sales Head only) -->
+  <div class="d-flex gap-2 mb-3" *ngIf="isNSH">
+    <button type="button" class="mode-btn" [class.active]="pageMode === 'update'" (click)="setPageMode('update')">
+      <i class="bi bi-pencil-square me-1"></i> Retail Update
+    </button>
+    <button type="button" class="mode-btn mode-btn-return" [class.active]="pageMode === 'return'" (click)="setPageMode('return')">
+      <i class="bi bi-arrow-return-left me-1"></i> Retail Return
+    </button>
+  </div>
+
+  <!-- ════════ Retail Update Section ════════ -->
+  <div [style.display]="pageMode === 'update' ? 'block' : 'none'">
+
+    <!-- Filter Section -->
+    <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+      <div class="row g-3 align-items-end mb-3">
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showSH">
+          <label class="form-label fw-medium mb-0">State Head</label>
+          <select class="form-select form-control-custom" [(ngModel)]="selectedSH" (change)="onStateChange(selectedSH)">
+            <option *ngFor="let am of stateHead" [value]="am.Mail">{{ am.Name }}</option>
+          </select>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showAM">
+          <label class="form-label fw-medium mb-0">Area Manager</label>
+          <select class="form-select form-control-custom" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
+            <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
+          </select>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
+          <label class="form-label fw-medium mb-0">Territory Manager</label>
+          <select class="form-select form-control-custom" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
+            <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
+          </select>
+        </div>
+
+        <!--<div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDealer">
+          <label class="form-label fw-medium mb-0">Dealer</label>
+          <select class="form-select form-control-custom" [(ngModel)]="selectedDealer">
+            <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
+          </select>
+        </div>-->
+
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showStatename">
+          <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
+          <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
+            <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
+          </select>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLocation">
+          <label for="location" class="form-label fw-medium mb-0">Location</label>
+          <select class="form-select" [(ngModel)]="selectedLocation">
+            <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
+          </select>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <label class="form-label fw-medium mb-0">Dealer Category</label>
+          <select class="form-select form-control-custom" [(ngModel)]="selectedCategory">
+            <option value="">All</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </select>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-sm-6 align-self-end">
+          <div class="d-flex gap-2">
+            <button class="btn custom-btn" (click)="onShowReport()">
+              <i class="bi bi-clipboard-data"></i> Filter
+            </button>
+            <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px" (click)="exportToExcel()">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showAM">
-        <label class="form-label fw-medium mb-0">Area Manager</label>
-        <select class="form-select form-control-custom" [(ngModel)]="selectedAM" (change)="onAreaChange(selectedAM)">
-          <option *ngFor="let am of areaManagersList" [value]="am.Mail">{{ am.Name }}</option>
-        </select>
-      </div>
-      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showTM">
-        <label class="form-label fw-medium mb-0">Territory Manager</label>
-        <select class="form-select form-control-custom" [(ngModel)]="selectedTM" (change)="onTerritoryChange(selectedTM)">
-          <option *ngFor="let tm of territoryManagersList" [value]="tm.Mail">{{ tm.Name }}</option>
-        </select>
+    </div>
+
+    <!-- Toolbar: Search + Freeze + Customize -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+      <div class="search-wrapper">
+        <div class="input-group custom-search-group">
+          <span class="input-group-text bg-white border-0">
+            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-0 shadow-none"
+                 placeholder="Search by sap, chassis no. or mobile"
+                 [(ngModel)]="globalFilter">
+          <button class="btn search-btn text-white" type="button" (click)="searchFilter()">Search</button>
+        </div>
       </div>
 
-      <!--<div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showDealer">
-        <label class="form-label fw-medium mb-0">Dealer</label>
-        <select class="form-select form-control-custom" [(ngModel)]="selectedDealer">
-          <option *ngFor="let dealer of dealersList" [value]="dealer.Mail">{{ dealer.Name }}</option>
-        </select>
-      </div>-->
+      <div class="d-flex align-items-center gap-2 flex-wrap">
 
+        <!-- Freeze Columns -->
+        <div class="position-relative">
+          <button class="btn-freeze" (click)="toggleFreezePanel($event)">
+            <i class="fas fa-thumbtack me-1"></i> Freeze Columns
+            <span *ngIf="frozenColumnKeys.size > 0" class="freeze-badge">{{ frozenColumnKeys.size }}</span>
+          </button>
+          <div class="tool-panel" [class.open]="freezePanelOpen" (click)="$event.stopPropagation()">
+            <div class="tool-panel-title">Select columns to freeze</div>
+            <div class="tool-panel-options">
+              <label *ngFor="let col of freezableColumns" class="tool-panel-option">
+                <input type="checkbox"
+                       [checked]="frozenColumnKeys.has(col.key)"
+                       (change)="toggleFreezeColumn(col.key, $event)">
+                <span>{{ col.label }}</span>
+              </label>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+              <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="clearAllFreeze()">Clear All</button>
+              <button class="btn btn-sm btn-primary-custom flex-fill" (click)="freezePanelOpen = false">Done</button>
+            </div>
+          </div>
+        </div>
 
-      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showStatename">
-        <label for="StateName" class="form-label fw-medium mb-0">State Name</label>
-        <select class="form-select" [(ngModel)]="selectedStateName" (change)="onStateNameChange(selectedStateName)">
-          <option *ngFor="let state of statelist" [value]="state.Mail">{{ state.Name }}</option>
-        </select>
-      </div>
+        <!-- Customize Columns -->
+        <div class="position-relative">
+          <button class="btn-customize" (click)="toggleCustomizePanel($event)">
+            <i class="fas fa-cog me-1"></i> Customize Columns
+          </button>
+          <div class="tool-panel" [class.open]="customizePanelOpen" (click)="$event.stopPropagation()">
+            <div class="tool-panel-title">Show / Hide Columns</div>
+            <div class="tool-panel-options">
+              <label *ngFor="let col of allTableColumns" class="tool-panel-option">
+                <input type="checkbox"
+                       [checked]="!hiddenColumns.has(col.key)"
+                       (change)="toggleColumnVisibility(col.key, $event)">
+                <span>{{ col.label }}</span>
+              </label>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+              <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="showAllColumns()">Show All</button>
+              <button class="btn btn-sm btn-primary-custom flex-fill" (click)="customizePanelOpen = false">Done</button>
+            </div>
+          </div>
+        </div>
 
-      <div class="col-xl-3 col-lg-4 col-sm-6" *ngIf="showLocation">
-        <label for="location" class="form-label fw-medium mb-0">Location</label>
-        <select class="form-select" [(ngModel)]="selectedLocation">
-          <option *ngFor="let location of locationlist" [value]="location.Mail">{{ location.Name }}</option>
-        </select>
       </div>
-      <div class="col-xl-3 col-lg-4 col-sm-6">
-        <label class="form-label fw-medium mb-0">Dealer Category</label>
-        <select class="form-select form-control-custom" [(ngModel)]="selectedCategory">
-          <option value="">All</option>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="INACTIVE">INACTIVE</option>
-        </select>
+    </div>
+
+    <!-- Active Filters Bar -->
+    <div class="active-filters-bar" *ngIf="activeFilters.size > 0">
+      <span class="filter-bar-label"><i class="fas fa-filter me-1"></i>Active Filters:</span>
+      <span class="filter-chip" *ngFor="let col of getActiveFilterCols()">
+        <span class="filter-chip-col">{{ getColumnLabel(col) }}</span>
+        <span class="filter-chip-vals">{{ getFilterSummary(col) }}</span>
+        <button class="filter-chip-remove" (click)="removeFilter(col)"><i class="fas fa-times"></i></button>
+      </span>
+      <button class="btn-clear-all-filters" (click)="clearAllFilters()">Clear All</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive mt-3 enquiry-table-wrapper" #tableWrapper>
+      <table id="enquiryTable" class="table table-bordered table-striped" style="min-width:1200px;">
+        <thead>
+          <tr style="--bs-table-bg:#215378;--bs-table-color:white;font-size:14px;">
+
+            <th class="th-cell" [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')" style="border-top-left-radius:8px;">
+              <div class="th-content"><span>S.No.</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('sno')" (click)="openColumnFilter($event,'sno')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('Action')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Action')" [style.left.px]="getFrozenLeft('Action')">
+              <div class="th-content"><span>Action</span></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('Mobile')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Mobile')" [style.left.px]="getFrozenLeft('Mobile')">
+              <div class="th-content"><span>Mobile</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Mobile')" (click)="openColumnFilter($event,'Mobile')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="showSH && !hiddenColumns.has('SHName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('SHName')" [style.left.px]="getFrozenLeft('SHName')">
+              <div class="th-content"><span>SH Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('SHName')" (click)="openColumnFilter($event,'SHName')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="showAM && !hiddenColumns.has('AmName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('AmName')" [style.left.px]="getFrozenLeft('AmName')">
+              <div class="th-content"><span>AM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('AmName')" (click)="openColumnFilter($event,'AmName')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="showTM && !hiddenColumns.has('TmName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('TmName')" [style.left.px]="getFrozenLeft('TmName')">
+              <div class="th-content"><span>TM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('TmName')" (click)="openColumnFilter($event,'TmName')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('DealerCode')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">
+              <div class="th-content"><span>SAP</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerCode')" (click)="openColumnFilter($event,'DealerCode')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('DealerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">
+              <div class="th-content"><span>Dealer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerName')" (click)="openColumnFilter($event,'DealerName')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('DlrLoc')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrLoc')" [style.left.px]="getFrozenLeft('DlrLoc')">
+              <div class="th-content"><span>Dealer Location</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrLoc')" (click)="openColumnFilter($event,'DlrLoc')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('DlrCat')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">
+              <div class="th-content"><span>Dealer Category</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrCat')" (click)="openColumnFilter($event,'DlrCat')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('CustomerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('CustomerName')" [style.left.px]="getFrozenLeft('CustomerName')">
+              <div class="th-content"><span>Customer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('CustomerName')" (click)="openColumnFilter($event,'CustomerName')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('ModelName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ModelName')" [style.left.px]="getFrozenLeft('ModelName')">
+              <div class="th-content"><span>Model Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ModelName')" (click)="openColumnFilter($event,'ModelName')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('DriveType')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DriveType')" [style.left.px]="getFrozenLeft('DriveType')">
+              <div class="th-content"><span>Drive Type</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DriveType')" (click)="openColumnFilter($event,'DriveType')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('DeliveryDate')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DeliveryDate')" [style.left.px]="getFrozenLeft('DeliveryDate')">
+              <div class="th-content"><span>Delivery Date</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DeliveryDate')" (click)="openColumnFilter($event,'DeliveryDate')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('AgeingofAdvance')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('AgeingofAdvance')" [style.left.px]="getFrozenLeft('AgeingofAdvance')">
+              <div class="th-content"><span>Ageing of Advance</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('AgeingofAdvance')" (click)="openColumnFilter($event,'AgeingofAdvance')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('ChasisNo')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ChasisNo')" [style.left.px]="getFrozenLeft('ChasisNo')">
+              <div class="th-content"><span>Chassis Number</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ChasisNo')" (click)="openColumnFilter($event,'ChasisNo')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+            <th *ngIf="!hiddenColumns.has('LastUpdt')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('LastUpdt')" [style.left.px]="getFrozenLeft('LastUpdt')" style="border-top-right-radius:8px;">
+              <div class="th-content"><span>Last Update Date</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('LastUpdt')" (click)="openColumnFilter($event,'LastUpdt')"><i class="fas fa-filter"></i></button></div>
+            </th>
+
+          </tr>
+        </thead>
+        <tbody style="font-size:14px;">
+          <tr *ngFor="let item of displayData; let i = index;" style="cursor:pointer">
+            <td [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td *ngIf="!hiddenColumns.has('Action')" class="text-center" [class.frozen-col]="frozenColumnKeys.has('Action')" [style.left.px]="getFrozenLeft('Action')">
+              <i class="fa-solid fa-arrow-right text-primary cursor-pointer" style="font-size:14px" title="Update RC Status" (click)="onRowClick(item)"></i>
+            </td>
+            <td *ngIf="!hiddenColumns.has('Mobile')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Mobile')" [style.left.px]="getFrozenLeft('Mobile')">{{ item.Mobile ? item.Mobile : 'VACANT' }}</td>
+            <td *ngIf="showSH && !hiddenColumns.has('SHName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('SHName')" [style.left.px]="getFrozenLeft('SHName')">{{ item.SHName }}</td>
+            <td *ngIf="showAM && !hiddenColumns.has('AmName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('AmName')" [style.left.px]="getFrozenLeft('AmName')">{{ item.AmName }}</td>
+            <td *ngIf="showTM && !hiddenColumns.has('TmName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('TmName')" [style.left.px]="getFrozenLeft('TmName')">{{ item.TmName }}</td>
+            <td *ngIf="!hiddenColumns.has('DealerCode')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">{{ item.DealerCode }}</td>
+            <td *ngIf="!hiddenColumns.has('DealerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">{{ item.DealerName }}</td>
+            <td *ngIf="!hiddenColumns.has('DlrLoc')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrLoc')" [style.left.px]="getFrozenLeft('DlrLoc')">{{ item.DlrLoc }}</td>
+            <td *ngIf="!hiddenColumns.has('DlrCat')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">{{ item.DlrCat | uppercase }}</td>
+            <td *ngIf="!hiddenColumns.has('CustomerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('CustomerName')" [style.left.px]="getFrozenLeft('CustomerName')">{{ item.CustomerName ? item.CustomerName : 'VACANT' }}</td>
+            <td *ngIf="!hiddenColumns.has('ModelName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ModelName')" [style.left.px]="getFrozenLeft('ModelName')">{{ item.ModelName }}</td>
+            <td *ngIf="!hiddenColumns.has('DriveType')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DriveType')" [style.left.px]="getFrozenLeft('DriveType')">{{ item.DriveType }}</td>
+            <td *ngIf="!hiddenColumns.has('DeliveryDate')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DeliveryDate')" [style.left.px]="getFrozenLeft('DeliveryDate')">{{ item.DeliveryDate }}</td>
+            <td *ngIf="!hiddenColumns.has('AgeingofAdvance')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('AgeingofAdvance')" [style.left.px]="getFrozenLeft('AgeingofAdvance')">{{ item.AgeingofAdvance }} Days</td>
+            <td *ngIf="!hiddenColumns.has('ChasisNo')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ChasisNo')" [style.left.px]="getFrozenLeft('ChasisNo')">{{ item.ChasisNo }}</td>
+            <td *ngIf="!hiddenColumns.has('LastUpdt')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('LastUpdt')" [style.left.px]="getFrozenLeft('LastUpdt')">{{ item.LastUpdt }}</td>
+          </tr>
+
+          <tr *ngIf="!displayData || displayData.length === 0">
+            <td colspan="17" class="text-center py-4">
+              <div class="mb-2 d-flex justify-content-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:48px;height:48px;background:linear-gradient(135deg,#4e73df,#1cc88a);color:white;">
+                  <i class="fa-solid fa-hand-point-right fs-5"></i>
+                </div>
+              </div>
+              <h6 class="fw-normal mb-1" style="font-size:15px;color:#2c3e50;">No Retail Punch Data Found</h6>
+              <p class="mb-0 text-muted" style="font-size:13px;">There is currently no retail punch data available. Try adjusting your filters.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
+
+    <!-- Column Filter Dropdown — fully DOM-controlled -->
+    <div #filterDropdownEl class="col-filter-dropdown" (click)="$event.stopPropagation()">
+      <input type="text" class="filter-search-input" placeholder="Search values..."
+             [(ngModel)]="filterSearchText" (input)="onFilterSearch()">
+      <div class="filter-select-actions">
+        <button (click)="selectAllFilterValues()">Select All</button>
+        <button (click)="clearAllFilterValues()">Clear All</button>
       </div>
-      <div class="col-xl-3 col-lg-4 col-sm-6 align-self-end">
-        <div class="d-flex gap-2">
-          <button class="btn custom-btn" (click)="onShowReport()">
+      <div class="filter-values-list">
+        <label *ngFor="let val of filteredDropdownValues" class="filter-value-item">
+          <input type="checkbox" [checked]="tempSelectedValues.has(val)" (change)="toggleFilterValue(val, $event)">
+          <span>{{ val || '(Blank)' }}</span>
+        </label>
+        <div *ngIf="filteredDropdownValues.length === 0" class="no-values-msg">No values found</div>
+      </div>
+      <div class="filter-dropdown-actions">
+        <button class="btn-cancel" (click)="cancelFilter()">Cancel</button>
+        <button class="btn-apply" (click)="applyColumnFilter()">Apply</button>
+      </div>
+    </div>
+  </div>
+  <!-- ════════ /Retail Update Section ════════ -->
+  <!-- ════════ Retail Return Section (NSH only) ════════ -->
+  <div *ngIf="pageMode === 'return' && isNSH">
+
+    <!-- Filters -->
+    <div class="card shadow-sm px-4 border-0 pb-2 pt-3" style="border-radius: 12px;">
+      <div class="row g-3 align-items-end mb-3">
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <label class="form-label fw-medium mb-0">Date Range</label>
+          <select class="form-select form-control-custom" [(ngModel)]="returnDateFilter" (change)="onReturnDateFilterChange()">
+            <option value="thisMonth">This Month</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <ng-container *ngIf="returnDateFilter === 'custom'">
+          <div class="col-xl-2 col-lg-4 col-sm-6">
+            <label class="form-label fw-medium mb-0">Start Date</label>
+            <input type="date" class="form-control form-control-custom" [max]="todayDate" [(ngModel)]="returnStartDate" (ngModelChange)="returnDateError = ''" />
+          </div>
+          <div class="col-xl-2 col-lg-4 col-sm-6">
+            <label class="form-label fw-medium mb-0">End Date</label>
+            <input type="date" class="form-control form-control-custom" [max]="todayDate" [(ngModel)]="returnEndDate" (ngModelChange)="returnDateError = ''" />
+          </div>
+        </ng-container>
+
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <label class="form-label fw-medium mb-0">Chassis Number</label>
+          <input type="text" class="form-control form-control-custom" placeholder="Enter chassis number"
+                 [(ngModel)]="returnChassisNo" (keyup.enter)="onReturnSearch()" />
+        </div>
+
+        <div class="col-xl-2 col-lg-4 col-sm-6 align-self-end">
+          <button class="btn custom-btn" (click)="onReturnSearch()">
             <i class="bi bi-clipboard-data"></i> Filter
           </button>
-          <button class="btn text-white" style="background-color:#4796BD;padding:2px 14px;font-size:14px" (click)="exportToExcel()">
-            <i class="fas fa-download"></i>
-          </button>
+        </div>
+
+        <div class="col-12" *ngIf="returnDateError">
+          <div class="text-danger small">{{ returnDateError }}</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Toolbar: Search + Freeze + Customize -->
-  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
-    <div class="search-wrapper">
-      <div class="input-group custom-search-group">
-        <span class="input-group-text bg-white border-0">
-          <i class="fa-solid fa-magnifying-glass text-muted"></i>
-        </span>
-        <input type="text" class="form-control border-0 shadow-none"
-               placeholder="Search by sap, chassis no. or mobile"
-               [(ngModel)]="globalFilter">
-        <button class="btn search-btn text-white" type="button" (click)="searchFilter()">Search</button>
-      </div>
+    <!-- Table -->
+    <div class="table-responsive mt-3 enquiry-table-wrapper">
+      <table class="table table-bordered table-striped return-table" style="min-width:1100px;">
+        <thead>
+          <tr style="--bs-table-bg:#962d22;--bs-table-color:white;font-size:14px;">
+            <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
+            <th class="text-nowrap fw-normal text-center">Action</th>
+            <th class="text-nowrap fw-normal">SAP</th>
+            <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">Customer Name</th>
+            <th class="text-nowrap fw-normal">Mobile</th>
+            <th class="text-nowrap fw-normal">Model Name</th>
+            <th class="text-nowrap fw-normal">Chassis Number</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Retailed Date</th>
+          </tr>
+        </thead>
+        <tbody style="font-size:14px;">
+          <tr *ngFor="let item of returnList; let i = index;" style="cursor:pointer" (click)="onReturnClick(item)">
+            <td>{{ (returnCurrentPage - 1) * returnItemsPerPage + i + 1 }}</td>
+            <td class="text-center"><i class="fa-solid fa-rotate-left text-danger" style="font-size:14px" title="Retail Return"></i></td>
+            <td class="text-nowrap">{{ item.DealerCode }}</td>
+            <td class="text-nowrap">{{ item.DealerName }}</td>
+            <td class="text-nowrap">{{ item.CustomerName || '—' }}</td>
+            <td class="text-nowrap">{{ item.Mobile }}</td>
+            <td class="text-nowrap">{{ item.ModelName }}</td>
+            <td class="text-nowrap">{{ item.ChasisNo }}</td>
+            <td class="text-nowrap">{{ formatDisplayDate(item.retailedDate) }}</td>
+          </tr>
+
+          <tr *ngIf="!returnList || returnList.length === 0">
+            <td colspan="9" class="text-center py-4">
+              <h6 class="fw-normal mb-1" style="font-size:15px;color:#2c3e50;">No Retailed Data Found</h6>
+              <p class="mb-0 text-muted" style="font-size:13px;">Try adjusting your filters.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-
-      <!-- Freeze Columns -->
-      <div class="position-relative">
-        <button class="btn-freeze" (click)="toggleFreezePanel($event)">
-          <i class="fas fa-thumbtack me-1"></i> Freeze Columns
-          <span *ngIf="frozenColumnKeys.size > 0" class="freeze-badge">{{ frozenColumnKeys.size }}</span>
-        </button>
-        <div class="tool-panel" [class.open]="freezePanelOpen" (click)="$event.stopPropagation()">
-          <div class="tool-panel-title">Select columns to freeze</div>
-          <div class="tool-panel-options">
-            <label *ngFor="let col of freezableColumns" class="tool-panel-option">
-              <input type="checkbox"
-                     [checked]="frozenColumnKeys.has(col.key)"
-                     (change)="toggleFreezeColumn(col.key, $event)">
-              <span>{{ col.label }}</span>
-            </label>
-          </div>
-          <div class="d-flex gap-2 mt-2">
-            <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="clearAllFreeze()">Clear All</button>
-            <button class="btn btn-sm btn-primary-custom flex-fill" (click)="freezePanelOpen = false">Done</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Customize Columns -->
-      <div class="position-relative">
-        <button class="btn-customize" (click)="toggleCustomizePanel($event)">
-          <i class="fas fa-cog me-1"></i> Customize Columns
-        </button>
-        <div class="tool-panel" [class.open]="customizePanelOpen" (click)="$event.stopPropagation()">
-          <div class="tool-panel-title">Show / Hide Columns</div>
-          <div class="tool-panel-options">
-            <label *ngFor="let col of allTableColumns" class="tool-panel-option">
-              <input type="checkbox"
-                     [checked]="!hiddenColumns.has(col.key)"
-                     (change)="toggleColumnVisibility(col.key, $event)">
-              <span>{{ col.label }}</span>
-            </label>
-          </div>
-          <div class="d-flex gap-2 mt-2">
-            <button class="btn btn-sm btn-outline-secondary flex-fill" (click)="showAllColumns()">Show All</button>
-            <button class="btn btn-sm btn-primary-custom flex-fill" (click)="customizePanelOpen = false">Done</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <app-pagination [totalItems]="returnTotalItems" [pageSize]="returnItemsPerPage" [currentPage]="returnCurrentPage" (pageChange)="onReturnPageChange($event)"></app-pagination>
   </div>
-
-  <!-- Active Filters Bar -->
-  <div class="active-filters-bar" *ngIf="activeFilters.size > 0">
-    <span class="filter-bar-label"><i class="fas fa-filter me-1"></i>Active Filters:</span>
-    <span class="filter-chip" *ngFor="let col of getActiveFilterCols()">
-      <span class="filter-chip-col">{{ getColumnLabel(col) }}</span>
-      <span class="filter-chip-vals">{{ getFilterSummary(col) }}</span>
-      <button class="filter-chip-remove" (click)="removeFilter(col)"><i class="fas fa-times"></i></button>
-    </span>
-    <button class="btn-clear-all-filters" (click)="clearAllFilters()">Clear All</button>
-  </div>
-
-  <!-- Table -->
-  <div class="table-responsive mt-3 enquiry-table-wrapper" #tableWrapper>
-    <table id="enquiryTable" class="table table-bordered table-striped" style="min-width:1200px;">
-      <thead>
-        <tr style="--bs-table-bg:#215378;--bs-table-color:white;font-size:14px;">
-
-          <th class="th-cell" [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')" style="border-top-left-radius:8px;">
-            <div class="th-content"><span>S.No.</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('sno')" (click)="openColumnFilter($event,'sno')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('Action')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Action')" [style.left.px]="getFrozenLeft('Action')">
-            <div class="th-content"><span>Action</span></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('Mobile')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('Mobile')" [style.left.px]="getFrozenLeft('Mobile')">
-            <div class="th-content"><span>Mobile</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('Mobile')" (click)="openColumnFilter($event,'Mobile')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="showSH && !hiddenColumns.has('SHName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('SHName')" [style.left.px]="getFrozenLeft('SHName')">
-            <div class="th-content"><span>SH Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('SHName')" (click)="openColumnFilter($event,'SHName')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="showAM && !hiddenColumns.has('AmName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('AmName')" [style.left.px]="getFrozenLeft('AmName')">
-            <div class="th-content"><span>AM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('AmName')" (click)="openColumnFilter($event,'AmName')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="showTM && !hiddenColumns.has('TmName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('TmName')" [style.left.px]="getFrozenLeft('TmName')">
-            <div class="th-content"><span>TM Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('TmName')" (click)="openColumnFilter($event,'TmName')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('DealerCode')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">
-            <div class="th-content"><span>SAP</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerCode')" (click)="openColumnFilter($event,'DealerCode')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('DealerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">
-            <div class="th-content"><span>Dealer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DealerName')" (click)="openColumnFilter($event,'DealerName')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('DlrLoc')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrLoc')" [style.left.px]="getFrozenLeft('DlrLoc')">
-            <div class="th-content"><span>Dealer Location</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrLoc')" (click)="openColumnFilter($event,'DlrLoc')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('DlrCat')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">
-            <div class="th-content"><span>Dealer Category</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DlrCat')" (click)="openColumnFilter($event,'DlrCat')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('CustomerName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('CustomerName')" [style.left.px]="getFrozenLeft('CustomerName')">
-            <div class="th-content"><span>Customer Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('CustomerName')" (click)="openColumnFilter($event,'CustomerName')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('ModelName')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ModelName')" [style.left.px]="getFrozenLeft('ModelName')">
-            <div class="th-content"><span>Model Name</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ModelName')" (click)="openColumnFilter($event,'ModelName')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('DriveType')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DriveType')" [style.left.px]="getFrozenLeft('DriveType')">
-            <div class="th-content"><span>Drive Type</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DriveType')" (click)="openColumnFilter($event,'DriveType')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('DeliveryDate')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('DeliveryDate')" [style.left.px]="getFrozenLeft('DeliveryDate')">
-            <div class="th-content"><span>Delivery Date</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('DeliveryDate')" (click)="openColumnFilter($event,'DeliveryDate')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('AgeingofAdvance')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('AgeingofAdvance')" [style.left.px]="getFrozenLeft('AgeingofAdvance')">
-            <div class="th-content"><span>Ageing of Advance</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('AgeingofAdvance')" (click)="openColumnFilter($event,'AgeingofAdvance')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('ChasisNo')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('ChasisNo')" [style.left.px]="getFrozenLeft('ChasisNo')">
-            <div class="th-content"><span>Chassis Number</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('ChasisNo')" (click)="openColumnFilter($event,'ChasisNo')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-          <th *ngIf="!hiddenColumns.has('LastUpdt')" class="th-cell" [class.frozen-col]="frozenColumnKeys.has('LastUpdt')" [style.left.px]="getFrozenLeft('LastUpdt')" style="border-top-right-radius:8px;">
-            <div class="th-content"><span>Last Update Date</span><button class="col-filter-btn" [class.col-filter-active]="activeFilters.has('LastUpdt')" (click)="openColumnFilter($event,'LastUpdt')"><i class="fas fa-filter"></i></button></div>
-          </th>
-
-        </tr>
-      </thead>
-      <tbody style="font-size:14px;">
-        <tr *ngFor="let item of displayData; let i = index;" style="cursor:pointer">
-          <td [class.frozen-col]="frozenColumnKeys.has('sno')" [style.left.px]="getFrozenLeft('sno')">{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
-          <td *ngIf="!hiddenColumns.has('Action')" class="text-center" [class.frozen-col]="frozenColumnKeys.has('Action')" [style.left.px]="getFrozenLeft('Action')">
-            <i class="fa-solid fa-arrow-right text-primary cursor-pointer" style="font-size:14px" title="Update RC Status" (click)="onRowClick(item)"></i>
-          </td>
-          <td *ngIf="!hiddenColumns.has('Mobile')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('Mobile')" [style.left.px]="getFrozenLeft('Mobile')">{{ item.Mobile ? item.Mobile : 'VACANT' }}</td>
-          <td *ngIf="showSH && !hiddenColumns.has('SHName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('SHName')" [style.left.px]="getFrozenLeft('SHName')">{{ item.SHName }}</td>
-          <td *ngIf="showAM && !hiddenColumns.has('AmName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('AmName')" [style.left.px]="getFrozenLeft('AmName')">{{ item.AmName }}</td>
-          <td *ngIf="showTM && !hiddenColumns.has('TmName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('TmName')" [style.left.px]="getFrozenLeft('TmName')">{{ item.TmName }}</td>
-          <td *ngIf="!hiddenColumns.has('DealerCode')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerCode')" [style.left.px]="getFrozenLeft('DealerCode')">{{ item.DealerCode }}</td>
-          <td *ngIf="!hiddenColumns.has('DealerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DealerName')" [style.left.px]="getFrozenLeft('DealerName')">{{ item.DealerName }}</td>
-          <td *ngIf="!hiddenColumns.has('DlrLoc')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrLoc')" [style.left.px]="getFrozenLeft('DlrLoc')">{{ item.DlrLoc }}</td>
-          <td *ngIf="!hiddenColumns.has('DlrCat')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DlrCat')" [style.left.px]="getFrozenLeft('DlrCat')">{{ item.DlrCat | uppercase }}</td>
-          <td *ngIf="!hiddenColumns.has('CustomerName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('CustomerName')" [style.left.px]="getFrozenLeft('CustomerName')">{{ item.CustomerName ? item.CustomerName : 'VACANT' }}</td>
-          <td *ngIf="!hiddenColumns.has('ModelName')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ModelName')" [style.left.px]="getFrozenLeft('ModelName')">{{ item.ModelName }}</td>
-          <td *ngIf="!hiddenColumns.has('DriveType')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DriveType')" [style.left.px]="getFrozenLeft('DriveType')">{{ item.DriveType }}</td>
-          <td *ngIf="!hiddenColumns.has('DeliveryDate')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('DeliveryDate')" [style.left.px]="getFrozenLeft('DeliveryDate')">{{ item.DeliveryDate }}</td>
-          <td *ngIf="!hiddenColumns.has('AgeingofAdvance')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('AgeingofAdvance')" [style.left.px]="getFrozenLeft('AgeingofAdvance')">{{ item.AgeingofAdvance }} Days</td>
-          <td *ngIf="!hiddenColumns.has('ChasisNo')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('ChasisNo')" [style.left.px]="getFrozenLeft('ChasisNo')">{{ item.ChasisNo }}</td>
-          <td *ngIf="!hiddenColumns.has('LastUpdt')" class="text-nowrap" [class.frozen-col]="frozenColumnKeys.has('LastUpdt')" [style.left.px]="getFrozenLeft('LastUpdt')">{{ item.LastUpdt }}</td>
-        </tr>
-
-        <tr *ngIf="!displayData || displayData.length === 0">
-          <td colspan="17" class="text-center py-4">
-            <div class="mb-2 d-flex justify-content-center">
-              <div class="rounded-circle d-flex align-items-center justify-content-center"
-                   style="width:48px;height:48px;background:linear-gradient(135deg,#4e73df,#1cc88a);color:white;">
-                <i class="fa-solid fa-hand-point-right fs-5"></i>
-              </div>
-            </div>
-            <h6 class="fw-normal mb-1" style="font-size:15px;color:#2c3e50;">No Retail Punch Data Found</h6>
-            <p class="mb-0 text-muted" style="font-size:13px;">There is currently no retail punch data available. Try adjusting your filters.</p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <app-pagination [totalItems]="totalItems" [pageSize]="itemsPerPage" [currentPage]="currentPage" (pageChange)="onPageChange($event)"></app-pagination>
-
-  <!-- Column Filter Dropdown — fully DOM-controlled -->
-  <div #filterDropdownEl class="col-filter-dropdown" (click)="$event.stopPropagation()">
-    <input type="text" class="filter-search-input" placeholder="Search values..."
-           [(ngModel)]="filterSearchText" (input)="onFilterSearch()">
-    <div class="filter-select-actions">
-      <button (click)="selectAllFilterValues()">Select All</button>
-      <button (click)="clearAllFilterValues()">Clear All</button>
-    </div>
-    <div class="filter-values-list">
-      <label *ngFor="let val of filteredDropdownValues" class="filter-value-item">
-        <input type="checkbox" [checked]="tempSelectedValues.has(val)" (change)="toggleFilterValue(val, $event)">
-        <span>{{ val || '(Blank)' }}</span>
-      </label>
-      <div *ngIf="filteredDropdownValues.length === 0" class="no-values-msg">No values found</div>
-    </div>
-    <div class="filter-dropdown-actions">
-      <button class="btn-cancel" (click)="cancelFilter()">Cancel</button>
-      <button class="btn-apply" (click)="applyColumnFilter()">Apply</button>
-    </div>
-  </div>
+  <!-- ════════ /Retail Return Section ════════ -->
 
 </div>
-
-<!-- Modal (unchanged from original) -->
+<!-- /container-fluid -->
+<!-- ════════ Update Retail Sale Modal ════════ -->
 <div class="modal fade" id="viewMoreModal" tabindex="-1" aria-labelledby="viewMoreLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content border-0 shadow-lg">
@@ -373,7 +472,6 @@
                   <div *ngIf="formErrors['ExchangeMake']" class="text-danger small mt-1">{{ formErrors['ExchangeMake'] }}</div>
                 </div>
 
-
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                   <label class="form-label fw-medium mb-1">Exc HP Category <span class="text-danger">*</span></label>
                   <select class="form-select form-control-custom" [(ngModel)]="retailForm.ExchangeHpCategory" (change)="onExchHpChange()">
@@ -382,7 +480,6 @@
                   </select>
                   <div *ngIf="formErrors['ExchangeHpCategory']" class="text-danger small mt-1">{{ formErrors['ExchangeHpCategory'] }}</div>
                 </div>
-
 
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" *ngIf="showExcModelInput">
                   <label class="form-label fw-medium mb-1">Model <span class="text-danger">*</span></label>
@@ -399,8 +496,6 @@
                   <div *ngIf="formErrors['ExchangeModel']" class="text-danger small mt-1">{{ formErrors['ExchangeModel'] }}</div>
                 </div>
 
-
-
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                   <label class="form-label fw-medium mb-1">Mfg Year <span class="text-danger">*</span></label>
                   <select class="form-select form-control-custom" [(ngModel)]="retailForm.ExchangeMfgYear">
@@ -409,6 +504,7 @@
                   </select>
                   <div *ngIf="formErrors['ExchangeMfgYear']" class="text-danger small mt-1">{{ formErrors['ExchangeMfgYear'] }}</div>
                 </div>
+
                 <!--Exchange Photo-->
                 <!--<div class="col-lg-3 col-sm-6" *ngIf="showExchangeFields">
                   <div class="form-floating-custom">
@@ -424,6 +520,7 @@
                   <div *ngIf="formErrors['excFile']" class="text-danger small mt-1">{{ formErrors['excFile'] }}</div>
                 </div>-->
                 <!--Exchange Photo-->
+
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                   <label class="form-label fw-medium mb-1">Mkt Value Exc Tr. <span class="text-danger">*</span></label>
                   <input type="number" class="form-control form-control-custom" placeholder="Enter market value" [(ngModel)]="retailForm.MktExchTracAmt" min="0" />
@@ -547,14 +644,12 @@
                   <input [disabled]="selectedItem.IsRetailedSales === 'Yes'" type="text" class="form-control form-control-custom" [value]="customerDues | number" readonly style="background:#f0f8ff;color:#4796BD;" />
                 </div>
 
-
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                   <label class="form-label fw-medium mb-1">Expected Retail Date <span class="text-danger">*</span></label>
                   <input [disabled]="selectedItem.IsRetailedSales === 'Yes'" type="date" class="form-control" style="font-size:14px"
                          [min]="todayDate" [(ngModel)]="retailForm.expectedRetailDate" (change)="expeRetailChange($event)" />
                   <div *ngIf="formErrors['expectedRetailDate']" class="text-danger small mt-1">{{ formErrors['expectedRetailDate'] }}</div>
                 </div>
-
 
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
                   <label class="form-label fw-medium mb-1">
@@ -607,6 +702,55 @@
           <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1" role="status"></span>
           <i *ngIf="!isSubmitting" class="bi bi-check-circle me-1"></i>
           {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════ Retail Return Modal ════════ -->
+<div class="modal fade" id="retailReturnModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center"
+           style="background: linear-gradient(135deg, #c0392b 0%, #962d22 100%);">
+        <div class="text-white p-3">
+          <h6 class="modal-title mb-0"><i class="bi bi-arrow-return-left me-2"></i>Retail Return</h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-3" style="font-size:13px" (click)="closeReturnModal()"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div class="customer-details-card mb-3" *ngIf="returnItem">
+          <div class="details-grid">
+            <div class="detail-item"><div class="detail-label">SAP</div><div class="detail-value">{{ returnItem.DealerCode }}</div></div>
+            <div class="detail-item"><div class="detail-label">Dealer Name</div><div class="detail-value">{{ returnItem.DealerName }}</div></div>
+            <div class="detail-item"><div class="detail-label">Customer Name</div><div class="detail-value">{{ $any(returnItem).CustomerName || '—' }}</div></div>
+            <div class="detail-item"><div class="detail-label">Mobile</div><div class="detail-value">{{ returnItem.Mobile }}</div></div>
+            <div class="detail-item"><div class="detail-label">Model Name</div><div class="detail-value">{{ returnItem.ModelName }}</div></div>
+            <div class="detail-item"><div class="detail-label">Chassis Number</div><div class="detail-value">{{ returnItem.ChasisNo }}</div></div>
+          </div>
+        </div>
+
+        <label class="form-label fw-medium mb-1">
+          Remark <span class="text-danger">*</span>
+          <span class="text-muted">(Maximum 500 characters)</span>
+        </label>
+        <textarea class="form-control" style="font-size:14px" rows="4" maxlength="500"
+                  placeholder="Enter return remark"
+                  [(ngModel)]="returnRemark" (ngModelChange)="returnRemarkError = ''"></textarea>
+        <div class="d-flex justify-content-between mt-1">
+          <div class="text-danger small">{{ returnRemarkError }}</div>
+          <div class="small text-muted">{{ (returnRemark || '').length }}/500</div>
+        </div>
+      </div>
+
+      <div class="modal-footer pt-0 p-3 d-flex justify-content-center">
+        <button type="button" class="btn btn-submit btn-return-submit mt-2" (click)="onReturnSubmit()" [disabled]="isReturnSubmitting">
+          <span *ngIf="isReturnSubmitting" class="spinner-border spinner-border-sm me-1" role="status"></span>
+          <i *ngIf="!isReturnSubmitting" class="bi bi-check-circle me-1"></i>
+          {{ isReturnSubmitting ? 'Submitting...' : 'Submit Return' }}
         </button>
       </div>
     </div>

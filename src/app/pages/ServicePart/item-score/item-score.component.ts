@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { timeout } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { PaginationComponent } from '../../../layout/pagination/pagination.component';
+import * as XLSX from 'xlsx';
 import {
   DraftPoint, ItemScoreDraft, ItemScorePhotoSlot, GroupStatus,
   ItemScoreColumn, ItemScoreReportRow
@@ -1044,5 +1045,108 @@ export class ItemScoreComponent implements OnInit, OnDestroy {
 
     // Input → "5.00" -> "5", "12.50" -> "12.5"
     return String(n);
+  }
+
+  // ===================== EXCEL EXPORT =====================
+
+  // ===================== EXCEL DOWNLOAD (WITHOUT OPENING EDIT) =====================
+
+  onDownloadExcelClick(row: ItemScoreReportRow): void {
+    const id = this.getRowId(row);
+    if (!id) {
+      this.apis.showAlert('error', 'Error!', 'Item score id not found.');
+      return;
+    }
+
+    this.actionLoadingId = id;
+    this.apis.getItemScoreById(id).subscribe({
+      next: (res: any) => {
+        this.actionLoadingId = null;
+        const list = res?.data?.report ?? res?.data?.Report;
+        const rows = Array.isArray(list) ? list : [];
+
+        if (!this.isOk(res)) {
+          this.apis.showAlert('error', 'Error!', res?.message || 'Failed to fetch item score details.');
+          return;
+        }
+        if (!rows.length) {
+          this.apis.showAlert('warning', 'No Data', 'No item score data found.');
+          return;
+        }
+
+        this.downloadReportExcel(row, rows);
+      },
+      error: () => {
+        this.actionLoadingId = null;
+        this.apis.showAlert('error', 'Error!', 'Failed to fetch item score details.');
+      }
+    });
+  }
+
+  private downloadReportExcel(row: ItemScoreReportRow, rows: any[]): void {
+    // 1. Group Name ke hisaab se Order By (Ascending)
+    const sortedRows = [...rows].sort((a: any, b: any) => {
+      const groupA = (a?.groupName || '').trim();
+      const groupB = (b?.groupName || '').trim();
+      return groupA.localeCompare(groupB);
+    });
+
+    // 2. Sorted rows ko map karein
+    const excelRows = sortedRows.map((r: any, index: number) => {
+      const isInput = Number(r?.isInput) === 1;
+      const rawScore = r?.score !== null && r?.score !== undefined ? String(r.score).trim() : '';
+      const normalizedScore = rawScore !== '' ? this.normalizeScore(r, rawScore) : '';
+
+      // Answer column (Yes/No ya Input value + unit)
+      let answer = '-';
+      if (normalizedScore !== '') {
+        answer = isInput
+          ? `${normalizedScore}${r.units ? ' ' + r.units : ''}`
+          : (normalizedScore === '1' ? 'Yes' : 'No');
+      }
+
+      // Multiple images ko comma-separated string banayein
+      const images = this.parseImages(r.images);
+
+      return {
+        'Sr. No.': index + 1,
+        'Dealer Code': r.dealerCode ?? r.DealerCode ?? row.DealerCode ?? '',
+        'Dealer Name': row.DealerName ?? '',
+        'Category Type': r.catType ?? row['CateType'] ?? '',
+        'Group Name': r.groupName ?? '',
+        'Group Item': r.groupItem ?? '',
+        'Audit Criteria': r.cat ?? '',
+        'Answer': answer,
+        'Max Score': r.maxScore ?? 0,
+        'Units': r.units ?? '-',
+        'Image URLs': images.length > 0 ? images.join(', ') : ''
+      };
+    });
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelRows);
+
+    // 11 columns ke hisaab se exact width
+    worksheet['!cols'] = [
+      { wch: 8 },   // Sr. No.
+      { wch: 14 },  // Dealer Code
+      { wch: 25 },  // Dealer Name
+      { wch: 15 },  // Category Type
+      { wch: 24 },  // Group Name
+      { wch: 35 },  // Group Item
+      { wch: 50 },  // Audit Criteria
+      { wch: 14 },  // Answer
+      { wch: 12 },  // Max Score
+      { wch: 10 },  // Units
+      { wch: 80 }   // Image URLs
+    ];
+
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Item Score Report': worksheet },
+      SheetNames: ['Item Score Report']
+    };
+
+    const dealerCode = row.DealerCode || sortedRows[0]?.dealerCode || sortedRows[0]?.DealerCode || 'Report';
+    const dateStr = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10);
+    XLSX.writeFile(workbook, `Item_Score_${dealerCode}_${dateStr}.xlsx`);
   }
 }

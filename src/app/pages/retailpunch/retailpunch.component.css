@@ -596,3 +596,62 @@ thead .frozen-col {
 .table-striped > tbody > tr:nth-of-type(odd) > * {
   --bs-table-bg-type: rgba(0,0,0,0.025);
 }
+/* ── Mode Buttons (Retail Update / Retail Return) ─────────────── */
+.mode-btn {
+  background: #fff;
+  color: #4796BD;
+  border: 1px solid #4796BD;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+  .mode-btn:hover {
+    background: #eef7fb;
+  }
+
+  .mode-btn.active {
+    background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);
+    color: #fff;
+  }
+
+.mode-btn-return {
+  color: #c0392b;
+  border-color: #c0392b;
+}
+
+  .mode-btn-return:hover {
+    background: #fdf0ee;
+  }
+
+  .mode-btn-return.active {
+    background: linear-gradient(135deg, #c0392b 0%, #962d22 100%);
+    color: #fff;
+  }
+
+.btn-return-submit {
+  background: linear-gradient(135deg, #c0392b 0%, #962d22 100%);
+}
+
+  .btn-return-submit:hover {
+    background: linear-gradient(135deg, #962d22 0%, #7a2018 100%);
+  }
+/* ── Return table ─────────────────────────────────────────────── */
+.return-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 10px;
+}
+
+.return-table tbody td {
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+.return-table tbody tr:hover > td {
+  background-color: #fdf0ee !important;
+}
