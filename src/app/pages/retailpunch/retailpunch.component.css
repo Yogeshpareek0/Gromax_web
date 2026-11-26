@@ -618,28 +618,41 @@ thead .frozen-col {
     color: #fff;
   }
 
+/* Return button: Retail Update jaisi hi blue theme */
 .mode-btn-return {
-  color: #c0392b;
-  border-color: #c0392b;
+  color: #4796BD;
+  border-color: #4796BD;
 }
 
   .mode-btn-return:hover {
-    background: #fdf0ee;
+    background: #eef7fb;
   }
 
   .mode-btn-return.active {
-    background: linear-gradient(135deg, #c0392b 0%, #962d22 100%);
+    background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);
     color: #fff;
   }
 
+/* ── Return modal ─────────────────────────────────────────────── */
+#retailReturnModal .modal-header {
+  background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%) !important;
+}
+
 .btn-return-submit {
-  background: linear-gradient(135deg, #c0392b 0%, #962d22 100%);
+  background: linear-gradient(135deg, #4796BD 0%, #3a7a9a 100%);
 }
 
   .btn-return-submit:hover {
-    background: linear-gradient(135deg, #962d22 0%, #7a2018 100%);
+    background: linear-gradient(135deg, #3a7a9a 0%, #2d5f7a 100%);
   }
+
 /* ── Return table ─────────────────────────────────────────────── */
+.return-table thead tr,
+.return-table thead th {
+  --bs-table-bg: #215378 !important;
+  --bs-table-color: #ffffff !important;
+}
+
 .return-table thead th {
   position: sticky;
   top: 0;
@@ -653,5 +666,9 @@ thead .frozen-col {
 }
 
 .return-table tbody tr:hover > td {
-  background-color: #fdf0ee !important;
+  background-color: #dff0f8 !important;
+}
+
+.return-table .fa-rotate-left.text-danger {
+  color: #0d6efd !important;
 }

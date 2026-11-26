@@ -94,7 +94,7 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
 
   // ── Retail Return (National Sales Head only) ──
   pageMode: 'update' | 'return' = 'update';
-  returnItem: NotRetaildList | null = null;
+  returnItem: any = null;
   returnRemark: string = '';
   returnRemarkError: string = '';
   isReturnSubmitting = false;
@@ -105,7 +105,7 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
   returnTotalItems = 0;
   returnCurrentPage = 1;
   returnItemsPerPage = 20;
-  returnDateFilter: 'thisMonth' | 'custom' = 'thisMonth';
+  returnDateFilter: string = 'this Month';
   returnStartDate: string = '';
   returnEndDate: string = '';
   returnChassisNo: string = '';
@@ -1057,7 +1057,7 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
     this.pageMode = mode;
     if (mode === 'return') {
       this.closeFilterDropdown();
-      this.returnDateFilter = 'thisMonth';
+      this.returnDateFilter = 'this Month';
       this.returnChassisNo = '';
       this.returnDateError = '';
       this.loadReturnList(1);
@@ -1099,8 +1099,8 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
     this.returnRemarkError = '';
 
     const payload = {
-      SalesId: (this.returnItem as any).SalesId || (this.returnItem as any).salesId,
-      Remarks: remark
+      Id: this.returnItem.Id,
+      ReturnRemark: remark
     };
 
     this.isReturnSubmitting = true;
@@ -1146,6 +1146,7 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
   onReturnPageChange(page: number): void { this.loadReturnList(page); }
 
   loadReturnList(page: number = 1): void {
+    debugger;
     let startDate: string;
     let endDate: string;
 
@@ -1170,6 +1171,7 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
     const payload = {
       StartDate: startDate,
       EndDate: endDate,
+      Period: this.returnDateFilter,
       ChassisNo: this.returnChassisNo?.trim() || '',
       PageSize: this.returnItemsPerPage,
       RowStart: (page - 1) * this.returnItemsPerPage
@@ -1183,6 +1185,9 @@ export class RetailpunchComponent implements OnInit, OnDestroy {
         } else {
           this.returnList = [];
           this.returnTotalItems = 0;
+          if (res?.statusCode && res.statusCode !== 200) {
+            this.apis.showAlert('error', 'Error!', res.message || 'Failed to load retailed data.');
+          }
         }
         this.returnCurrentPage = page;
       },

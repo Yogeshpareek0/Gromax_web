@@ -1227,11 +1227,17 @@ export class AuthService {
     return this.http.get(this.baseUrl + 'Api/Services/GetWarrantyClaimsCount');
   }
   processRetailReturn(payload: any) {
-    return this.http.post(this.baseUrl + 'Api/Retiledsales/ProcessRetailReturn', payload);
+    return this.http.post(this.baseUrl + 'Api/Home/ProcessRetailReturn', payload);
   }
   getRetailedListForReturn(payload: any) {
-    // TODO: backend API ban jaye to endpoint replace kar dena
-    return this.http.post(this.baseUrl + 'Api/Retiledsales/GetRetailedListForReturn', payload);
+    let params = new HttpParams();
+    Object.keys(payload).forEach(key => {
+      const val = payload[key];
+      if (val !== null && val !== undefined && val !== '') {
+        params = params.set(key, val);
+      }
+    });
+    return this.http.get(this.baseUrl + 'Api/Home/RetailListForReturnUpdate', { params });
   }
 }
 

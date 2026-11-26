@@ -299,7 +299,10 @@
         <div class="col-xl-3 col-lg-4 col-sm-6">
           <label class="form-label fw-medium mb-0">Date Range</label>
           <select class="form-select form-control-custom" [(ngModel)]="returnDateFilter" (change)="onReturnDateFilterChange()">
-            <option value="thisMonth">This Month</option>
+            <option value="this Month">This Month</option>
+            <option value="this Quarter">This Quarter</option>
+            <option value="last Quarter">Last Quarter</option>
+            <option value="this FY">This FY</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -335,18 +338,23 @@
 
     <!-- Table -->
     <div class="table-responsive mt-3 enquiry-table-wrapper">
-      <table class="table table-bordered table-striped return-table" style="min-width:1100px;">
+      <table class="table table-bordered table-striped return-table" style="min-width:1500px;">
         <thead>
           <tr style="--bs-table-bg:#962d22;--bs-table-color:white;font-size:14px;">
             <th class="text-nowrap fw-normal" style="border-top-left-radius:8px;">S.No.</th>
             <th class="text-nowrap fw-normal text-center">Action</th>
             <th class="text-nowrap fw-normal">SAP</th>
             <th class="text-nowrap fw-normal">Dealer Name</th>
+            <th class="text-nowrap fw-normal">State</th>
+            <th class="text-nowrap fw-normal">City</th>
             <th class="text-nowrap fw-normal">Customer Name</th>
             <th class="text-nowrap fw-normal">Mobile</th>
-            <th class="text-nowrap fw-normal">Model Name</th>
+            <th class="text-nowrap fw-normal">Model</th>
             <th class="text-nowrap fw-normal">Chassis Number</th>
-            <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Retailed Date</th>
+            <th class="text-nowrap fw-normal">Retail Date</th>
+            <th class="text-nowrap fw-normal">Retail Return</th>
+            <th class="text-nowrap fw-normal">Return Date</th>
+            <th class="text-nowrap fw-normal" style="border-top-right-radius:8px;">Return Remark</th>
           </tr>
         </thead>
         <tbody style="font-size:14px;">
@@ -355,15 +363,20 @@
             <td class="text-center"><i class="fa-solid fa-rotate-left text-danger" style="font-size:14px" title="Retail Return"></i></td>
             <td class="text-nowrap">{{ item.DealerCode }}</td>
             <td class="text-nowrap">{{ item.DealerName }}</td>
+            <td class="text-nowrap">{{ item.StateName }}</td>
+            <td class="text-nowrap">{{ item.City }}</td>
             <td class="text-nowrap">{{ item.CustomerName || '—' }}</td>
             <td class="text-nowrap">{{ item.Mobile }}</td>
-            <td class="text-nowrap">{{ item.ModelName }}</td>
-            <td class="text-nowrap">{{ item.ChasisNo }}</td>
-            <td class="text-nowrap">{{ formatDisplayDate(item.retailedDate) }}</td>
+            <td class="text-nowrap">{{ item.Model }}</td>
+            <td class="text-nowrap">{{ item.ChassisNumber }}</td>
+            <td class="text-nowrap">{{ formatDisplayDate(item.RetailDate) }}</td>
+            <td class="text-nowrap">{{ item.RetailReturn || '-' }}</td>
+            <td class="text-nowrap">{{ formatDisplayDate(item.ReturnDate) || '—' }}</td>
+            <td>{{ item.ReturnRemark || '—' }}</td>
           </tr>
 
           <tr *ngIf="!returnList || returnList.length === 0">
-            <td colspan="9" class="text-center py-4">
+            <td colspan="14" class="text-center py-4">
               <h6 class="fw-normal mb-1" style="font-size:15px;color:#2c3e50;">No Retailed Data Found</h6>
               <p class="mb-0 text-muted" style="font-size:13px;">Try adjusting your filters.</p>
             </td>
@@ -522,6 +535,7 @@
                 <!--Exchange Photo-->
 
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                  rm
                   <label class="form-label fw-medium mb-1">Mkt Value Exc Tr. <span class="text-danger">*</span></label>
                   <input type="number" class="form-control form-control-custom" placeholder="Enter market value" [(ngModel)]="retailForm.MktExchTracAmt" min="0" />
                   <div *ngIf="formErrors['MktExchTracAmt']" class="text-danger small mt-1">{{ formErrors['MktExchTracAmt'] }}</div>
@@ -726,10 +740,13 @@
           <div class="details-grid">
             <div class="detail-item"><div class="detail-label">SAP</div><div class="detail-value">{{ returnItem.DealerCode }}</div></div>
             <div class="detail-item"><div class="detail-label">Dealer Name</div><div class="detail-value">{{ returnItem.DealerName }}</div></div>
-            <div class="detail-item"><div class="detail-label">Customer Name</div><div class="detail-value">{{ $any(returnItem).CustomerName || '—' }}</div></div>
+            <div class="detail-item"><div class="detail-label">State</div><div class="detail-value">{{ returnItem.StateName }}</div></div>
+            <div class="detail-item"><div class="detail-label">City</div><div class="detail-value">{{ returnItem.City }}</div></div>
+            <div class="detail-item"><div class="detail-label">Customer Name</div><div class="detail-value">{{ returnItem.CustomerName || '—' }}</div></div>
             <div class="detail-item"><div class="detail-label">Mobile</div><div class="detail-value">{{ returnItem.Mobile }}</div></div>
-            <div class="detail-item"><div class="detail-label">Model Name</div><div class="detail-value">{{ returnItem.ModelName }}</div></div>
-            <div class="detail-item"><div class="detail-label">Chassis Number</div><div class="detail-value">{{ returnItem.ChasisNo }}</div></div>
+            <div class="detail-item"><div class="detail-label">Model</div><div class="detail-value">{{ returnItem.Model }}</div></div>
+            <div class="detail-item"><div class="detail-label">Chassis Number</div><div class="detail-value">{{ returnItem.ChassisNumber }}</div></div>
+            <div class="detail-item"><div class="detail-label">Retail Date</div><div class="detail-value">{{ formatDisplayDate(returnItem.RetailDate) }}</div></div>
           </div>
         </div>
 
