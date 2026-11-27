@@ -10,10 +10,8 @@
       </div>
 
       <ul class="nav flex-column mt-3">
-        <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            [class.active]="activeRoute === 'dashboard'"
-            *ngIf="hasSubMenu('Dashboard','Dashboard')"
-            (click)="onNavigate('dashboard')">
+        <li class="nav-item d-flex align-items-center px-2 custom-nav-item" [class.active]="activeRoute === 'dashboard'"
+          *ngIf="hasSubMenu('Dashboard','Dashboard')" (click)="onNavigate('dashboard')">
           <i class="fa-solid fa-gauge me-2 text-white"></i>
           <a class="nav-link text-white p-0 m-0">Dashboard</a>
         </li>
@@ -34,17 +32,15 @@
 
           <ul class="nav flex-column mt-2 submenu" *ngIf="isSalesOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                [class.active]="activeRoute === 'enquirygenerate'"
-                *ngIf="hasSubMenu('Sales','GenerateEnquiry')"
-                (click)="onNavigate('enquirygenerate')">
+              [class.active]="activeRoute === 'enquirygenerate'" *ngIf="hasSubMenu('Sales','GenerateEnquiry')"
+              (click)="onNavigate('enquirygenerate')">
               <img src="assets/images/bussiness.png" alt="business" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">Generate Enquiry</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','AssignDealerToEnq')"
-                [class.active]="activeRoute === 'assigndealerenquiry'"
-                (click)="onNavigate('assigndealerenquiry')">
+              *ngIf="hasSubMenu('Sales','AssignDealerToEnq')" [class.active]="activeRoute === 'assigndealerenquiry'"
+              (click)="onNavigate('assigndealerenquiry')">
               <i class="fa-solid fa-people-arrows me-2" style="font-size:14px;"></i>
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Assign Dealer to Enq.
@@ -52,9 +48,8 @@
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','SuperHotEnquiry')"
-                [class.active]="activeRoute === 'sevendayenquiry'"
-                (click)="onNavigate('sevendayenquiry')">
+              *ngIf="hasSubMenu('Sales','SuperHotEnquiry')" [class.active]="activeRoute === 'sevendayenquiry'"
+              (click)="onNavigate('sevendayenquiry')">
               <i class="fa-solid fa-fire me-2" style="font-size:14px;"></i>
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Super Hot Enquiry
@@ -62,9 +57,8 @@
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','DueEnquiry3Days')"
-                [class.active]="activeRoute === 'threedaysodenqu'"
-                (click)="onNavigate('threedaysodenqu')">
+              *ngIf="hasSubMenu('Sales','DueEnquiry3Days')" [class.active]="activeRoute === 'threedaysodenqu'"
+              (click)="onNavigate('threedaysodenqu')">
               <i class="fa-solid fa-hourglass-half me-2" style="font-size:14px;"></i>
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Due Enquiry (3 Days)
@@ -72,42 +66,41 @@
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','FollowUpDeliveryUpdate')"
-                [class.active]="activeRoute === 'enquiryfollowup'"
-                (click)="onNavigate('enquiryfollowup')">
-              <img src="assets/images/followup.png" alt="enquiry" class="me-2" style="width: 18px; height: 18px; filter: brightness(0) invert(1);" />
-              <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">FollowUp / Delivery Update</a>
+              *ngIf="hasSubMenu('Sales','FollowUpDeliveryUpdate')" [class.active]="activeRoute === 'enquiryfollowup'"
+              (click)="onNavigate('enquiryfollowup')">
+              <img src="assets/images/followup.png" alt="enquiry" class="me-2"
+                style="width: 18px; height: 18px; filter: brightness(0) invert(1);" />
+              <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">FollowUp /
+                Delivery Update</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','RetailUpdate')"
-                [class.active]="activeRoute === 'retailpunch'"
-                (click)="onNavigate('retailpunch')">
+              *ngIf="hasSubMenu('Sales','RetailUpdate')" [class.active]="activeRoute === 'retailpunch'"
+              (click)="onNavigate('retailpunch')">
               <i class="fa-solid fa-cash-register me-2" style="font-size:15px;"></i>
               <a class="nav-link text-white p-0 m-0" style="font-size: 13px; text-decoration: none">Retail Update</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','RCStatus')"
-                [class.active]="activeRoute === 'rcstatus'"
-                (click)="onNavigate('rcstatus')">
-              <img src="assets/images/Registration.png" alt="Registration" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
+              *ngIf="hasSubMenu('Sales','RCStatus')" [class.active]="activeRoute === 'rcstatus'"
+              (click)="onNavigate('rcstatus')">
+              <img src="assets/images/Registration.png" alt="Registration" class="me-2"
+                style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
               <a class="nav-link text-white p-0 m-0" style="font-size: 13px; text-decoration: none">RC Status</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','ExchangeStock')"
-                [class.active]="activeRoute === 'exchangestock'"
-                (click)="onNavigate('exchangestock')">
+              *ngIf="hasSubMenu('Sales','ExchangeStock')" [class.active]="activeRoute === 'exchangestock'"
+              (click)="onNavigate('exchangestock')">
               <i class="fas fa-retweet me-2" style="font-size:16px;"></i>
               <a class="nav-link text-white p-0 m-0" style="font-size: 13px; text-decoration: none">Exchange Stock</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','DealerStockTransfer')"
-                [class.active]="activeRoute === 'stocktransfer'"
-                (click)="onNavigate('stocktransfer')">
-              <img src="assets/images/dealing.png" alt=" Dealer Stock Transfer" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
+              *ngIf="hasSubMenu('Sales','DealerStockTransfer')" [class.active]="activeRoute === 'stocktransfer'"
+              (click)="onNavigate('stocktransfer')">
+              <img src="assets/images/dealing.png" alt=" Dealer Stock Transfer" class="me-2"
+                style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Dealer Stock Transfer
               </a>
@@ -115,26 +108,27 @@
 
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Sales','PostDeliveryUpdate')"
-                [class.active]="activeRoute === 'updateoldenquiry'"
-                (click)="onNavigate('updateoldenquiry')">
-              <img src="assets/images/updateenquiry.png" alt="enquiry" class="me-2" style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
-              <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Post Delivery Update</a>
+              *ngIf="hasSubMenu('Sales','PostDeliveryUpdate')" [class.active]="activeRoute === 'updateoldenquiry'"
+              (click)="onNavigate('updateoldenquiry')">
+              <img src="assets/images/updateenquiry.png" alt="enquiry" class="me-2"
+                style="width: 20px; height: 20px; filter: brightness(0) invert(1);" />
+              <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Post Delivery
+                Update</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                [class.active]="activeRoute === 'updtdealer'"
-                *ngIf="hasSubMenu('Sales','UpdateDealer')"
-                (click)="onNavigate('updtdealer')">
-              <img src="assets/images/updtdealer.png" alt="dealer" class="me-2" style="width: 15px; height: 15px; filter: brightness(0) invert(1);" />
+              [class.active]="activeRoute === 'updtdealer'" *ngIf="hasSubMenu('Sales','UpdateDealer')"
+              (click)="onNavigate('updtdealer')">
+              <img src="assets/images/updtdealer.png" alt="dealer" class="me-2"
+                style="width: 15px; height: 15px; filter: brightness(0) invert(1);" />
               <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Update Dealer</a>
             </li>
 
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                [class.active]="activeRoute === 'dealermaster'"
-                *ngIf="hasSubMenu('Sales','DealerMaster')"
-                (click)="onNavigate('dealermaster')">
-              <img src="assets/images/dealer.png" alt="adddealer" class="me-2" style="width: 15px; height: 15px; filter: brightness(0) invert(1);" />
+              [class.active]="activeRoute === 'dealermaster'" *ngIf="hasSubMenu('Sales','DealerMaster')"
+              (click)="onNavigate('dealermaster')">
+              <img src="assets/images/dealer.png" alt="adddealer" class="me-2"
+                style="width: 15px; height: 15px; filter: brightness(0) invert(1);" />
               <a class="text-white p-0 m-0 report-name" style="font-size: 13px; text-decoration: none">Add Dealer</a>
             </li>
 
@@ -147,8 +141,7 @@
           </ul>
         </li>
 
-        <li class="nav-item px-2 custom-nav-item" style="padding:10px 0"
-            *ngIf="hasMenu('Service')">
+        <li class="nav-item px-2 custom-nav-item" style="padding:10px 0" *ngIf="hasMenu('Service')">
           <div class="d-flex align-items-center justify-content-between" (click)="toggleService()">
             <div class="d-flex align-items-center">
               <img src="assets/images/services.png" alt="service" class="menu-icon me-2" />
@@ -161,9 +154,7 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','NTIR')"
-                [class.active]="activeRoute === 'ntir'"
-                (click)="onNavigate('ntir')">
+              *ngIf="hasSubMenu('Service','NTIR')" [class.active]="activeRoute === 'ntir'" (click)="onNavigate('ntir')">
               <img src="assets/images/ntir.png" alt="ntir" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">Update NTIR</a>
             </li>
@@ -171,9 +162,8 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','PreDeliveryInspection')"
-                [class.active]="activeRoute === 'pdi'"
-                (click)="onNavigate('pdi')">
+              *ngIf="hasSubMenu('Service','PreDeliveryInspection')" [class.active]="activeRoute === 'pdi'"
+              (click)="onNavigate('pdi')">
               <img src="assets/images/pdi2.png" alt="pdi" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">Update PDI</a>
             </li>
@@ -181,9 +171,8 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','ItemScore')"
-                [class.active]="activeRoute === 'additemscore'"
-                (click)="onNavigate('additemscore')">
+              *ngIf="hasSubMenu('Service','ItemScore')" [class.active]="activeRoute === 'additemscore'"
+              (click)="onNavigate('additemscore')">
               <img src="assets/images/score.png" alt="additemscore" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">Item Score</a>
             </li>
@@ -192,18 +181,16 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','GenerateJobCard')"
-                [class.active]="activeRoute === 'generatejob'"
-                (click)="onNavigate('generatejob')">
+              *ngIf="hasSubMenu('Service','GenerateJobCard')" [class.active]="activeRoute === 'generatejob'"
+              (click)="onNavigate('generatejob')">
               <img src="assets/images/OpenJob.png" alt="generatejob" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">Generate Job Card</a>
             </li>
           </ul>
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','ReimbursementService')"
-                [class.active]="activeRoute === 'reimbursementservice'"
-                (click)="onNavigate('reimbursementservice')">
+              *ngIf="hasSubMenu('Service','ReimbursementService')"
+              [class.active]="activeRoute === 'reimbursementservice'" (click)="onNavigate('reimbursementservice')">
               <img src="assets/images/reimbersement.png" alt="reimbursementservice" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Reimbursement Service
@@ -212,9 +199,8 @@
           </ul>
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','GenerateInvoiceList')"
-                [class.active]="activeRoute === 'generatedinvoicelist'"
-                (click)="onNavigate('generatedinvoicelist')">
+              *ngIf="hasSubMenu('Service','GenerateInvoiceList')"
+              [class.active]="activeRoute === 'generatedinvoicelist'" (click)="onNavigate('generatedinvoicelist')">
               <img src="assets/images/generatedinvoicelist.png" alt="generatedinvoicelist" class="menu-icon me-2" />
               <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Generated Invoice List
@@ -224,12 +210,10 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','Installation')"
-                [class.active]="activeRoute === 'installation'"
-                (click)="onNavigate('installation')">
+              *ngIf="hasSubMenu('Service','Installation')" [class.active]="activeRoute === 'installation'"
+              (click)="onNavigate('installation')">
               <i class="fa-solid fa-screwdriver-wrench text-white me-2"></i>
-              <a class="text-white p-0 m-0"
-                 style="font-size:13px;text-decoration:none">
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Installation
               </a>
             </li>
@@ -237,12 +221,10 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','Mechanic')"
-                [class.active]="activeRoute === 'Mechanic'"
-                (click)="onNavigate('Mechanic')">
+              *ngIf="hasSubMenu('Service','Mechanic')" [class.active]="activeRoute === 'Mechanic'"
+              (click)="onNavigate('Mechanic')">
               <img src="assets/images/mechanic.png" alt="stock" class="menu-icon me-2" />
-              <a class="text-white p-0 m-0"
-                 style="font-size:13px;text-decoration:none">
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Dealer Manpower
               </a>
             </li>
@@ -250,12 +232,10 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','AddFTR')||hasSubMenu('Service','UpdateFTR')"
-                [class.active]="activeRoute === 'ftrform'"
-                (click)="onNavigate('ftrform')">
+              *ngIf="hasSubMenu('Service','AddFTR')||hasSubMenu('Service','UpdateFTR')"
+              [class.active]="activeRoute === 'ftrform'" (click)="onNavigate('ftrform')">
               <img src="assets/images/FTR.png" alt="ftrform" class="menu-icon me-2" />
-              <a class="text-white p-0 m-0"
-                 style="font-size:13px;text-decoration:none">
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Raise FTR
               </a>
             </li>
@@ -264,12 +244,10 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','OrderSparePart')"
-                [class.active]="activeRoute === 'sparepartorder'"
-                (click)="onNavigate('sparepartorder')">
+              *ngIf="hasSubMenu('Service','OrderSparePart')" [class.active]="activeRoute === 'sparepartorder'"
+              (click)="onNavigate('sparepartorder')">
               <img src="assets/images/CreateSpareOrder.png" alt="sparepartorder" class="menu-icon me-2" />
-              <a class="text-white p-0 m-0"
-                 style="font-size:13px;text-decoration:none">
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Spare Part Order
               </a>
             </li>
@@ -278,12 +256,10 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','UpdateOrderedSparePartDealer')||hasSubMenu('Service','UpdateOrderedSparePartHO')"
-                [class.active]="activeRoute === 'updatesparepartorder'"
-                (click)="onNavigate('updatesparepartorder')">
+              *ngIf="hasSubMenu('Service','UpdateOrderedSparePartDealer')||hasSubMenu('Service','UpdateOrderedSparePartHO')"
+              [class.active]="activeRoute === 'updatesparepartorder'" (click)="onNavigate('updatesparepartorder')">
               <img src="assets/images/UpdateSpareOrder.png" alt="updatesparepartorder" class="menu-icon me-2" />
-              <a class="text-white p-0 m-0"
-                 style="font-size:13px;text-decoration:none">
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Update Spare Part Order
               </a>
             </li>
@@ -291,12 +267,10 @@
 
           <ul class="nav flex-column submenu" *ngIf="isServiceOpen">
             <li class="nav-item d-flex align-items-center px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','WarrantyClaim')"
-                [class.active]="activeRoute === 'warrantyclaim'"
-                (click)="onNavigate('warrantyclaim')">
+              *ngIf="hasSubMenu('Service','WarrantyClaim')" [class.active]="activeRoute === 'warrantyclaim'"
+              (click)="onNavigate('warrantyclaim')">
               <img src="assets/images/warranty.png" alt="warrantyclaim" class="menu-icon me-2" />
-              <a class="text-white p-0 m-0"
-                 style="font-size:13px;text-decoration:none">
+              <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">
                 Warranty Claim
               </a>
             </li>
@@ -305,16 +279,15 @@
         </li>
 
         <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            *ngIf="hasSubMenu('StockMaster','StockMaster')"
-            [class.active]="activeRoute === 'inventory_data'"
-            (click)="onNavigate('inventory_data')">
+          *ngIf="hasSubMenu('StockMaster','StockMaster')" [class.active]="activeRoute === 'inventory_data'"
+          (click)="onNavigate('inventory_data')">
           <img src="assets/images/stockmaster.png" alt="stock" class="menu-icon me-2" />
           <a class="nav-link text-white p-0 m-0">Stock Master</a>
         </li>
 
         <li class="nav-item px-2 custom-nav-item" style="padding:10px 0" *ngIf="hasMenu('Reports')">
           <div class="d-flex align-items-center justify-content-between"
-               (click)="isBusinessReportsOpen = !isBusinessReportsOpen">
+            (click)="isBusinessReportsOpen = !isBusinessReportsOpen">
             <div class="d-flex align-items-center">
               <img src="assets/images/report.png" alt="report" class="menu-icon me-2" />
               <a class="nav-link text-white p-0 m-0">Business Reports</a>
@@ -326,9 +299,8 @@
 
           <ul class="nav flex-column mt-2 submenu" *ngIf="isBusinessReportsOpen">
             <li *ngFor="let rpt of businessReports"
-                class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                (click)="openReport(rpt)"
-                [class.active]="activeDashboardId === rpt.Id">
+              class="nav-item d-flex align-items-start px-2 custom-nav-item border-0" (click)="openReport(rpt)"
+              [class.active]="activeDashboardId === rpt.Id">
 
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name">
@@ -337,53 +309,46 @@
             </li>
 
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Reports','EnquiryMaster')"
-                [class.active]="activeRoute === 'enquiry'"
-                (click)="onNavigate('enquiry')">
+              *ngIf="hasSubMenu('Reports','EnquiryMaster')" [class.active]="activeRoute === 'enquiry'"
+              (click)="onNavigate('enquiry')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">Enquiry Master</span>
             </li>
 
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Reports','BusinessPerformanceMaster')"
-                [class.active]="activeRoute === 'business_performance'"
-                (click)="onNavigate('business_performance')">
+              *ngIf="hasSubMenu('Reports','BusinessPerformanceMaster')"
+              [class.active]="activeRoute === 'business_performance'" (click)="onNavigate('business_performance')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">Business Performance Master</span>
             </li>
 
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Reports','PdiReport')"
-                [class.active]="activeRoute === 'pdireport'"
-                (click)="onNavigate('pdireport')">
+              *ngIf="hasSubMenu('Reports','PdiReport')" [class.active]="activeRoute === 'pdireport'"
+              (click)="onNavigate('pdireport')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">PDI Report</span>
             </li>
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Reports','NtirReport')"
-                [class.active]="activeRoute === 'ntirreport'"
-                (click)="onNavigate('ntirreport')">
+              *ngIf="hasSubMenu('Reports','NtirReport')" [class.active]="activeRoute === 'ntirreport'"
+              (click)="onNavigate('ntirreport')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">NTIR Report</span>
             </li>
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Service','JobCardReport')"
-                [class.active]="activeRoute === 'jobcardreport'"
-                (click)="onNavigate('jobcardreport')">
+              *ngIf="hasSubMenu('Service','JobCardReport')" [class.active]="activeRoute === 'jobcardreport'"
+              (click)="onNavigate('jobcardreport')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">JobCard Report</span>
             </li>
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Reports','FtrReport')"
-                [class.active]="activeRoute === 'ftrreport'"
-                (click)="onNavigate('ftrreport')">
+              *ngIf="hasSubMenu('Reports','FtrReport')" [class.active]="activeRoute === 'ftrreport'"
+              (click)="onNavigate('ftrreport')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">FTR Report</span>
             </li>
             <li class="nav-item d-flex align-items-start px-2 custom-nav-item border-0"
-                *ngIf="hasSubMenu('Reports','ItemScoreReport')"
-                [class.active]="activeRoute === 'itemscorereport'"
-                (click)="onNavigate('itemscorereport')">
+              *ngIf="hasSubMenu('Reports','ItemScoreReport')" [class.active]="activeRoute === 'itemscorereport'"
+              (click)="onNavigate('itemscorereport')">
               <i class="fas fa-file-alt me-2" style="font-size:13px;"></i>
               <span class="text-white report-name" style="font-size:13px;">Item-Score Report</span>
             </li>
@@ -392,26 +357,23 @@
         </li>
 
         <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            *ngIf="hasSubMenu('UploadBusinessData','UploadBusinessData')"
-            [class.active]="activeRoute === 'uploadexcel'"
-            (click)="onNavigate('uploadexcel')">
+          *ngIf="hasSubMenu('UploadBusinessData','UploadBusinessData')" [class.active]="activeRoute === 'uploadexcel'"
+          (click)="onNavigate('uploadexcel')">
           <img src="assets/images/uploaddata.png" alt="uploaddata" class="menu-icon me-2" />
           <a class="nav-link text-white p-0 m-0">Upload Business Data</a>
         </li>
 
         <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            *ngIf="hasSubMenu('BusinessDataReview','BusinessDataReview')"
-            [class.active]="activeRoute === 'businessdatareview'"
-            (click)="onNavigate('businessdatareview')">
+          *ngIf="hasSubMenu('BusinessDataReview','BusinessDataReview')"
+          [class.active]="activeRoute === 'businessdatareview'" (click)="onNavigate('businessdatareview')">
 
           <i class="fas fa-clipboard-check me-2"></i>
           <a class="nav-link text-white p-0 m-0">Business Data Review</a>
         </li>
 
         <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            *ngIf="hasSubMenu('NDAEnquiryFollowUp','NDAEnquiryFollowUp')"
-            [class.active]="activeRoute === 'ndaform'"
-            (click)="onNavigate('ndaform')">
+          *ngIf="hasSubMenu('NDAEnquiryFollowUp','NDAEnquiryFollowUp')" [class.active]="activeRoute === 'ndaform'"
+          (click)="onNavigate('ndaform')">
           <i class="fa-solid fa-handshake  me-2" style="font-size:16px;"></i>
           <a class="text-white p-0 m-0" style="font-size:13px;text-decoration:none">NDA Enquiry & Follow Up</a>
         </li>
@@ -419,17 +381,16 @@
 
 
         <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            *ngIf="hasSubMenu('AddSalesman','AddSalesman')"
-            [class.active]="activeRoute === 'salesman'"
-            (click)="onNavigate('salesman')">
+          *ngIf="hasSubMenu('AddSalesman','AddSalesman')" [class.active]="activeRoute === 'salesman'"
+          (click)="onNavigate('salesman')">
 
           <img src="assets/images/sales.png" alt="sales" class="menu-icon me-2" />
 
           <a class="nav-link text-white p-0 m-0">
             {{
-      possitionId === 'National Sales Head'
-        ? 'Approve Salesman KYC'
-        : 'Add Salesman'
+            possitionId === 'National Sales Head'
+            ? 'Approve Salesman KYC'
+            : 'Add Salesman'
             }}
           </a>
         </li>
@@ -437,9 +398,8 @@
         <!--*ngIf="possitionId === 'Territory Manager' || possitionId === 'State Head' || possitionId === 'Dealer'"-->
 
         <li class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            *ngIf="hasSubMenu('RaiseReturn','RaiseReturn')"
-            [class.active]="activeRoute === 'raisereturn'"
-            (click)="onNavigate('raisereturn')">
+          *ngIf="hasSubMenu('RaiseReturn','RaiseReturn')" [class.active]="activeRoute === 'raisereturn'"
+          (click)="onNavigate('raisereturn')">
           <i class="fa-solid fa-rotate-left me-2"></i>
           <a class="nav-link text-white p-0 m-0">Raise Return</a>
         </li>
@@ -459,26 +419,22 @@
         </li>-->
 
         <li *ngIf="hasSubMenu('UploadBilling','UploadBilling')"
-            class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            [class.active]="activeRoute === 'transferstock'"
-            (click)="onNavigate('transferstock')">
+          class="nav-item d-flex align-items-center px-2 custom-nav-item"
+          [class.active]="activeRoute === 'transferstock'" (click)="onNavigate('transferstock')">
           <img src="assets/images/billingupload.png" alt="Billing" class="menu-icon me-2" />
           <a class="nav-link text-white p-0 m-0">Upload Billing</a>
         </li>
 
         <li *ngIf="hasSubMenu('BillingRequest','BillingRequest')"
-            class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            [class.active]="activeRoute === 'billingrequest'"
-            (click)="onNavigate('billingrequest')">
+          class="nav-item d-flex align-items-center px-2 custom-nav-item"
+          [class.active]="activeRoute === 'billingrequest'" (click)="onNavigate('billingrequest')">
           <img src="assets/images/billingrequest.png" alt="Billing" class="menu-icon me-2" />
 
           <a class="nav-link text-white p-0 m-0">Billing Request</a>
         </li>
 
-        <li *ngIf="hasMenu('Circular')"
-            class="nav-item d-flex align-items-center px-2 custom-nav-item"
-            [class.active]="activeRoute === 'circular'"
-            (click)="onNavigate('circular')">
+        <li *ngIf="hasMenu('Circular')" class="nav-item d-flex align-items-center px-2 custom-nav-item"
+          [class.active]="activeRoute === 'circular'" (click)="onNavigate('circular')">
           <img src="assets/images/billingrequest.png" alt="Circular" class="menu-icon me-2" />
 
           <a class="nav-link text-white p-0 m-0">Circular Management</a>
@@ -503,7 +459,7 @@
         <div class="right-icons d-flex align-items-center ms-auto">
           <div class="dropdown user-dropdown">
             <button class="btn btn-link p-0 d-flex align-items-center text-decoration-none gap-2"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+              data-bs-toggle="dropdown" aria-expanded="false">
               <div class="user-avatar">
                 <img src="assets/images/users.png" class="rounded-circle" width="40" height="40" alt="User" />
                 <span class="user-status-dot"></span>
@@ -531,18 +487,30 @@
               </li>
               <!-- Profile -->
               <li class="pt-2 pb-0 border-0" *ngIf="hasSubMenu('Dashboard','Profile')">
-                <a class="dropdown-item profile-item d-flex align-items-center gap-2"
-                   href="#" (click)="openProfile($event)">
+                <a class="dropdown-item profile-item d-flex align-items-center gap-2" href="#"
+                  (click)="openProfile($event)">
                   <div class="profile-icon-wrap">
                     <i class="fa-solid fa-user"></i>
                   </div>
                   <span>My Profile</span>
                 </a>
               </li>
+              <li class="pb-0 border-0">
+                <a class="dropdown-item chassis-item d-flex align-items-center gap-2" href="#"
+                  (click)="openChassisTracking($event)">
+                  <div class="chassis-icon-wrap">
+                    <i class="fa-solid fa-route"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="chassis-item-title">Chassis Tracking</div>
+                    <small class="chassis-item-sub">Search by chassis no.</small>
+                  </div>
+                  <i class="fa-solid fa-chevron-right chassis-item-arrow"></i>
+                </a>
+              </li>
               <!-- Logout -->
               <li class="py-2 border-0">
-                <a class="dropdown-item logout-item d-flex align-items-center gap-2"
-                   href="#" (click)="logout()">
+                <a class="dropdown-item logout-item d-flex align-items-center gap-2" href="#" (click)="logout()">
                   <div class="logout-icon-wrap">
                     <i class="fa-solid fa-right-from-bracket"></i>
                   </div>
@@ -562,3 +530,77 @@
 </div>
 <app-profile [isOpen]="isProfileOpen" (closed)="isProfileOpen = false"></app-profile>
 
+<!-- Chassis Tracking Modal -->
+<div class="ct-overlay" *ngIf="isChassisOpen" (click)="closeChassisTracking()">
+  <div class="ct-modal" (click)="$event.stopPropagation()">
+
+    <div class="ct-header">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fa-solid fa-route fs-5"></i>
+        <div>
+          <div class="ct-title">Chassis Tracking</div>
+          <div class="ct-subtitle">Track tractor movement end to end</div>
+        </div>
+      </div>
+      <button class="ct-close" (click)="closeChassisTracking()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="ct-body">
+      <div class="ct-search">
+        <div class="ct-input-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" [(ngModel)]="chassisNo" placeholder="Enter chassis number"
+                 (keyup.enter)="searchChassis()" autocomplete="off" />
+        </div>
+        <button class="ct-btn" (click)="searchChassis()" [disabled]="chassisLoading">
+          <span *ngIf="!chassisLoading">Track</span>
+          <span *ngIf="chassisLoading" class="spinner-border spinner-border-sm"></span>
+        </button>
+      </div>
+
+      <!-- Model summary -->
+      <div class="ct-summary" *ngIf="chassisInfo">
+        <div class="ct-summary-icon"><i class="fa-solid fa-tractor"></i></div>
+        <div class="flex-grow-1 min-w-0">
+          <div class="ct-model-name">{{ chassisInfo.ModelName }}</div>
+          <div class="ct-model-code">{{ chassisInfo.ModelCode }}</div>
+        </div>
+        <div class="ct-tags">
+          <span class="ct-tag">{{ chassisInfo.DriveType }}</span>
+          <span class="ct-tag ct-tag-colour">{{ chassisInfo.Colour }}</span>
+          <span class="ct-tag">{{ chassisInfo.HpCategory }} HP</span>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="ct-timeline" *ngIf="chassisData.length">
+        <div class="ct-step" *ngFor="let item of chassisData; let last = last"
+             [class.ct-current]="last" [class.ct-return]="isReturnStatus(item.CurrentStatus)">
+          <div class="ct-marker">
+            <div class="ct-dot"><i class="fa-solid" [ngClass]="getStatusIcon(item.CurrentStatus)"></i></div>
+            <div class="ct-line" *ngIf="!last"></div>
+          </div>
+          <div class="ct-content">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="ct-status">
+                {{ item.CurrentStatus }}
+                <span class="ct-badge" *ngIf="last">Current</span>
+              </span>
+              <span class="ct-date">{{ item.EffectiveDate | date:'dd MMM yyyy' }}</span>
+            </div>
+            <div class="ct-dealer">{{ item.DealerName }} <span class="ct-code">({{ item.DealerCode }})</span></div>
+            <div class="ct-loc"><i class="fa-solid fa-location-dot me-1"></i>{{ item.Location?.trim() }}, {{ item.State }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty -->
+      <div class="ct-empty" *ngIf="chassisSearched && !chassisLoading && !chassisData.length">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <div>No tracking data found for this chassis number.</div>
+      </div>
+    </div>
+  </div>
+</div>
