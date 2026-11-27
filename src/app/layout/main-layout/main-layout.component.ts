@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-main-layout',
@@ -44,7 +45,8 @@ export class MainLayoutComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private apis: AuthService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private toast: ToastrService
   ) {
     // Listen to route changes
     this.router.events.pipe(
@@ -380,7 +382,7 @@ export class MainLayoutComponent implements OnInit {
   searchChassis() {
     const no = this.chassisNo.trim();
     if (!no) {
-      this.apis.showAlert('warning', 'Warning!', 'Please enter chassis number.');
+      this.toast.info('Please enter chassis number.');
       return;
     }
     this.chassisLoading = true;
@@ -394,7 +396,7 @@ export class MainLayoutComponent implements OnInit {
       },
       error: () => {
         this.chassisLoading = false;
-        this.apis.showAlert('error', 'Error!', 'Unable to fetch chassis tracking.');
+        this.toast.error('Unable to fetch chassis tracking.');
       }
     });
   }

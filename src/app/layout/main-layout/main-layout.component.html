@@ -495,7 +495,7 @@
                   <span>My Profile</span>
                 </a>
               </li>
-              <li class="pb-0 border-0">
+              <li class="pb-0 border-0" *ngIf="hasSubMenu('Dashboard','ChassisTracking')">
                 <a class="dropdown-item chassis-item d-flex align-items-center gap-2" href="#"
                   (click)="openChassisTracking($event)">
                   <div class="chassis-icon-wrap">
@@ -531,8 +531,8 @@
 <app-profile [isOpen]="isProfileOpen" (closed)="isProfileOpen = false"></app-profile>
 
 <!-- Chassis Tracking Modal -->
-<div class="ct-overlay" *ngIf="isChassisOpen" (click)="closeChassisTracking()">
-  <div class="ct-modal" (click)="$event.stopPropagation()">
+<div class="ct-overlay" *ngIf="isChassisOpen">
+  <div class="ct-modal">
 
     <div class="ct-header">
       <div class="d-flex align-items-center gap-2">
