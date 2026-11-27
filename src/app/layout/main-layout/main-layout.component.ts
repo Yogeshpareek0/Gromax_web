@@ -6,10 +6,11 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, CommonModule, ProfileComponent],
+  imports: [RouterOutlet, CommonModule, ProfileComponent, FormsModule],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css'
 })
@@ -32,6 +33,12 @@ export class MainLayoutComponent implements OnInit {
   menuList: any[] = [];
   activeDashboardId: number | null = null;
   activeDashboardName: string = '';
+
+  isChassisOpen = false;
+  chassisNo = '';
+  chassisData: any[] = [];
+  chassisLoading = false;
+  chassisSearched = false;
 
   constructor(
     private http: HttpClient,
@@ -123,8 +130,8 @@ export class MainLayoutComponent implements OnInit {
 
     const salesRoutes = ['enquiryfollowup', 'enquirygenerate', 'sevendayenquiry', 'stocktransfer', 'rcstatus',
       'retailpunch', 'exchangestock', 'updateoldenquiry', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
-    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport', 'jobcardreport', 'ftrreport','itemscorereport'];
-    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform','updatesparepartorder','sparepartorder']; // 🔑 naya array
+    const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport', 'jobcardreport', 'ftrreport', 'itemscorereport'];
+    const serviceRoutes = ['pdi', 'generatejob', 'installation', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist', 'ftrform', 'updatesparepartorder', 'sparepartorder']; // 🔑 naya array
 
     if (path !== 'dynamicreport') {
       this.activeDashboardId = null;
@@ -188,7 +195,7 @@ export class MainLayoutComponent implements OnInit {
       'stocktransfer', 'rcstatus', 'retailpunch', 'exchangestock', 'updateoldenquiry',
       'updtoldretailedenq', 'assigndealerenquiry', 'threedaysodenqu', 'dealermaster', 'updtdealer'];
     const businessReportRoutes = ['enquiry', 'business_performance', 'dynamicreport', 'pdireport', 'ntirreport', 'jobcardreport', 'ftrreport', 'itemscorereport'];
-    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist','ftrform','updatesparepartorder','sparepartorder'];
+    const serviceRoutes = ['pdi', 'serviceRoutes', 'ntir', 'reimbursementservice', 'Mechanic', 'additemscore', 'generatedinvoicelist', 'ftrform', 'updatesparepartorder', 'sparepartorder'];
 
     this.isSalesOpen = false;
     this.isBusinessReportsOpen = false;
@@ -356,5 +363,59 @@ export class MainLayoutComponent implements OnInit {
   openProfile(event: Event) {
     event.preventDefault();
     this.isProfileOpen = true;
+  }
+
+  openChassisTracking(event: Event) {
+    event.preventDefault();
+    this.chassisNo = '';
+    this.chassisData = [];
+    this.chassisSearched = false;
+    this.isChassisOpen = true;
+  }
+
+  closeChassisTracking() {
+    this.isChassisOpen = false;
+  }
+
+  searchChassis() {
+    const no = this.chassisNo.trim();
+    if (!no) {
+      this.apis.showAlert('warning', 'Warning!', 'Please enter chassis number.');
+      return;
+    }
+    this.chassisLoading = true;
+    this.chassisSearched = true;
+    this.chassisData = [];
+
+    this.apis.ChassisTracking(no).subscribe({
+      next: (res: any) => {
+        this.chassisLoading = false;
+        this.chassisData = (res.statusCode === 200 && res.data) ? res.data : [];
+      },
+      error: () => {
+        this.chassisLoading = false;
+        this.apis.showAlert('error', 'Error!', 'Unable to fetch chassis tracking.');
+      }
+    });
+  }
+
+  get chassisInfo() {
+    return this.chassisData.length ? this.chassisData[0] : null;
+  }
+
+  getStatusIcon(status: string): string {
+    switch ((status || '').trim().toLowerCase()) {
+      case 'billing': return 'fa-file-invoice';
+      case 'billing return': return 'fa-file-circle-xmark';
+      case 'idt from': return 'fa-truck-fast';
+      case 'idt to': return 'fa-warehouse';
+      case 'delivery': return 'fa-flag-checkered';
+      case 'delivery return': return 'fa-rotate-left';
+      default: return 'fa-circle-dot';
+    }
+  }
+
+  isReturnStatus(status: string): boolean {
+    return (status || '').toLowerCase().includes('return');
   }
 }
